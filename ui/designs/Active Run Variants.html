@@ -1,0 +1,1068 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>claudboard — active run variants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg:#08090a; --bg-2:#0e0f11; --surface:#131418; --surface-2:#181a1f; --surface-3:#20232a;
+    --border:#23252b; --border-hi:#2e3138; --border-bright:#3b3f48;
+    --text:#ededef; --text-2:#b8b9be; --muted:#797b83; --dim:#4d4f57;
+    --teal:oklch(78% 0.13 195);   --teal-dim:oklch(78% 0.13 195 / 0.18);
+    --green:oklch(78% 0.13 150);  --green-dim:oklch(78% 0.13 150 / 0.18);
+    --amber:oklch(80% 0.13 78);   --amber-dim:oklch(80% 0.13 78 / 0.18);
+    --red:oklch(70% 0.16 25);     --red-dim:oklch(70% 0.16 25 / 0.18);
+    --violet:oklch(72% 0.13 295); --violet-dim:oklch(72% 0.13 295 / 0.18);
+    --font-sans:'Geist',-apple-system,system-ui,sans-serif;
+    --font-mono:'Geist Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:13px;-webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01","ss03"}
+  button{font:inherit;color:inherit;cursor:pointer;background:transparent;border:0}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+  /* page header */
+  .pg-head{padding:32px 48px 24px;background:var(--bg-2);border-bottom:1px solid var(--border)}
+  .brand{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);margin-bottom:10px}
+  .brand-mark{width:22px;height:22px;border-radius:5px;background:var(--text);color:var(--bg);display:grid;place-items:center;font:700 11px var(--font-mono)}
+  .pg-head h1{margin:0 0 8px;font-size:28px;font-weight:600;letter-spacing:-0.018em}
+  .pg-head p{margin:0;max-width:920px;color:var(--text-2);line-height:1.55;font-size:14px}
+
+  /* tabs */
+  .tabs{display:flex;padding:0 48px;background:var(--bg-2);border-bottom:1px solid var(--border);gap:0;position:sticky;top:0;z-index:10}
+  .tab{padding:12px 16px;display:flex;align-items:center;gap:8px;color:var(--muted);border-radius:7px 7px 0 0;font:500 13px var(--font-sans);position:relative;top:1px;margin-right:2px;border:1px solid transparent;border-bottom:0}
+  .tab.on{background:var(--bg);border-color:var(--border);color:var(--text);font-weight:600}
+  .tab .tag{padding:2px 7px;border-radius:4px;background:var(--surface-2);color:var(--muted);font:600 10px var(--font-mono);letter-spacing:.04em}
+  .tab.on .tag{background:var(--teal-dim);color:var(--teal)}
+  .panel{display:none}
+  .panel.on{display:block}
+
+  /* intro per panel */
+  .intro{display:grid;grid-template-columns:1.4fr 1fr;gap:48px;padding:32px 48px 16px;max-width:1380px}
+  .intro-tag{font:700 11px var(--font-mono);color:var(--teal);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+  .intro h2{margin:0 0 6px;font-size:22px;font-weight:600;letter-spacing:-0.012em}
+  .intro p{font-size:13px;color:var(--text-2);line-height:1.6;margin:0;max-width:620px}
+  .scen-meta{padding-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .meta-h{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .meta-item{font-size:12px;color:var(--text-2);line-height:1.5;padding-left:14px;position:relative;margin-bottom:4px}
+  .meta-item::before{content:"·";position:absolute;left:2px;color:var(--violet);font-weight:700}
+
+  /* frame */
+  .frame{width:1280px;height:840px;background:var(--bg);border:1px solid var(--border-hi);border-radius:12px;
+    overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4);margin:0 auto 64px;
+    display:grid;grid-template-columns:220px 1fr;grid-template-rows:44px 1fr;
+    grid-template-areas:"side topbar" "side body";position:relative}
+  .fs{grid-area:side;background:var(--bg-2);border-right:1px solid var(--border);padding:12px 10px;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+  .fs-brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;padding:0 4px 10px;border-bottom:1px solid var(--border)}
+  .fs-mark{width:20px;height:20px;border-radius:5px;background:var(--text);color:var(--bg);display:grid;place-items:center;font:700 11px var(--font-mono)}
+  .fs-brand small{margin-left:auto;font:500 9px var(--font-sans);color:var(--muted);border:1px solid var(--border-hi);border-radius:999px;padding:1px 6px;letter-spacing:.05em;text-transform:uppercase}
+  .ws{margin-top:10px;display:flex;align-items:center;gap:7px;padding:7px 9px;background:var(--surface);border:1px solid var(--border-hi);border-radius:6px}
+  .ws-ico{width:18px;height:18px;border-radius:4px;display:grid;place-items:center;font:600 9px var(--font-mono);background:var(--violet-dim);color:var(--violet)}
+  .ws-name{font-weight:500;font-size:12px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ws-chev{color:var(--muted);font-size:10px}
+  .fs-nav{margin-top:10px;display:flex;flex-direction:column;gap:1px;flex:1;min-height:0}
+  .fs-label{font:600 10px var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:8px 8px 4px}
+  .fs-item{display:flex;align-items:center;gap:9px;padding:5px 8px;border-radius:5px;color:var(--text-2);font-size:12px;cursor:pointer}
+  .fs-item.on{background:var(--surface-2);color:var(--text)}
+  .fs-item .fs-ico{width:13px;height:13px;color:var(--muted);flex-shrink:0}
+  .fs-item.on .fs-ico{color:var(--teal)}
+  .fs-running{margin-top:6px;padding:8px 10px;border-left:2px solid var(--amber);background:var(--amber-dim);border-radius:0 6px 6px 0;cursor:pointer}
+  .fs-running .nr-top{display:flex;align-items:center;gap:6px;font:600 11px var(--font-sans);color:var(--amber);margin-bottom:3px;letter-spacing:.02em}
+  .fs-running .nr-title{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fs-running .nr-meta{font:500 10px var(--font-mono);color:var(--muted);margin-top:2px}
+
+  .ftb{grid-area:topbar;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:10px;background:var(--bg)}
+  .crumb{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
+  .crumb .sep{color:var(--dim)}
+  .crumb .now{color:var(--text);font-weight:500}
+  .spacer{flex:1}
+  .key{font:500 10px var(--font-mono);border:1px solid var(--border-hi);background:var(--surface);border-radius:4px;padding:2px 5px;color:var(--muted)}
+
+  .fbd{grid-area:body;min-width:0;min-height:0;overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
+
+  /* shared atoms */
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;border-radius:999px;border:1px solid var(--border-hi);background:var(--surface);color:var(--text-2);font-size:11px;font-weight:500}
+  .chip.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+  .chip.teal{border-color:transparent;background:var(--teal-dim);color:var(--teal)}
+  .chip.green{border-color:transparent;background:var(--green-dim);color:var(--green)}
+  .chip.amber{border-color:transparent;background:var(--amber-dim);color:var(--amber)}
+  .chip.violet{border-color:transparent;background:var(--violet-dim);color:var(--violet)}
+  .chip .dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+  .chip .dot.pulse{animation:pulse 1.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+  .pulse-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 1.5s ease-in-out infinite}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border:1px solid var(--border-hi);background:var(--surface);color:var(--text);border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0}
+  .btn:hover{border-color:var(--border-bright);background:var(--surface-2)}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--text-2)}
+  .btn.ghost:hover{background:var(--surface)}
+  .btn.amber{background:var(--amber);color:#1a1300;border-color:var(--amber);font-weight:600}
+  .btn.sm{padding:4px 8px;font-size:11px}
+  .btn.lg{padding:9px 14px;font-size:13px;font-weight:600}
+  .svg-ico{display:inline-block;vertical-align:-2px}
+
+  /* —————————————————————————— Variant A: Pipeline-first —————————————————————————— */
+  .a-banner{padding:12px 18px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--amber-dim),transparent 80%)}
+  .a-banner .rb-ico{width:28px;height:28px;border-radius:7px;background:var(--amber);color:#1a1300;display:grid;place-items:center}
+  .a-banner .rb-t{font-weight:600;font-size:13px}
+  .a-banner .rb-s{font-size:12px;color:var(--text-2);margin-top:1px}
+  .a-banner .actions{margin-left:auto;display:flex;gap:6px}
+
+  .a-kpis{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1fr;gap:0;border-bottom:1px solid var(--border);background:var(--bg-2)}
+  .a-kpi{padding:12px 16px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:4px;min-width:0}
+  .a-kpi:last-child{border-right:0}
+  .a-kpi .kl{font:600 9px var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .a-kpi .kv{font:600 18px var(--font-mono);color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-0.01em}
+  .a-kpi .ks{font-size:11px;color:var(--muted)}
+  .a-kpi.gate .kv{color:var(--amber)}
+  .a-kpi .progbar{height:5px;background:var(--surface-3);border-radius:3px;overflow:hidden;margin-top:5px}
+  .a-kpi .progbar .fill{height:100%;background:var(--amber);border-radius:3px}
+  .a-kpi .progmark{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:5px}
+  .a-kpi .progmark .s{height:5px;border-radius:1px;background:var(--surface-3)}
+  .a-kpi .progmark .s.done{background:var(--green)}
+  .a-kpi .progmark .s.now{background:var(--amber);box-shadow:0 0 0 2px var(--amber-dim)}
+
+  .a-pipeline{padding:14px 18px 4px;background:var(--bg);position:relative}
+  .a-pipeline .ph-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+  .a-pipeline .ph-head h3{margin:0;font-size:14px;font-weight:600}
+  .a-pipeline .ph-head .ph-sub{color:var(--muted);font-size:11px;font-family:var(--font-mono)}
+  .a-pipeline .ph-tabs{margin-left:auto;display:flex;gap:2px;background:var(--surface);border:1px solid var(--border-hi);border-radius:6px;padding:2px}
+  .a-pipeline .ph-tabs .pt{padding:3px 9px;font-size:11px;border-radius:4px;color:var(--muted);cursor:pointer}
+  .a-pipeline .ph-tabs .pt.on{background:var(--surface-3);color:var(--text)}
+
+  .a-flow{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;position:relative;align-items:stretch}
+  .a-flow::before{content:"";position:absolute;top:30px;left:18px;right:18px;height:2px;background:linear-gradient(90deg,var(--green) 0%, var(--green) 14%, var(--amber) 14%, var(--amber) 28%, var(--surface-3) 28%);z-index:0;border-radius:2px}
+  .a-phase{position:relative;z-index:1;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 11px;display:flex;flex-direction:column;gap:7px;min-width:0}
+  .a-phase.done{border-color:color-mix(in oklab,var(--green) 30%,var(--border))}
+  .a-phase.active{border-color:var(--amber);box-shadow:0 0 0 3px color-mix(in oklab,var(--amber) 16%,transparent)}
+  .a-phase .ph-top{display:flex;align-items:center;gap:7px}
+  .a-phase .ph-num{width:22px;height:22px;border-radius:50%;background:var(--surface-2);color:var(--muted);display:grid;place-items:center;font:700 10px var(--font-mono);flex-shrink:0;border:2px solid var(--bg)}
+  .a-phase.done .ph-num{background:var(--green);color:#04190f}
+  .a-phase.active .ph-num{background:var(--amber);color:#1a1300}
+  .a-phase .ph-name{font-size:12px;font-weight:600;line-height:1.25;flex:1;min-width:0}
+  .a-phase .ph-state{font:600 9px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .a-phase.done .ph-state{color:var(--green)}
+  .a-phase.active .ph-state{color:var(--amber)}
+  .a-phase .ph-outcome{font-size:11px;color:var(--text-2);line-height:1.45;border-top:1px solid var(--border);padding-top:7px}
+  .a-phase .ph-agents{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto}
+  .a-phase .agtag{display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:3px;background:var(--surface-2);font:500 10px var(--font-mono);color:var(--muted);border:1px solid var(--border)}
+  .a-phase.done .agtag{color:var(--text-2);background:var(--green-dim);border-color:transparent}
+  .a-phase.done .agtag .ag-dot{background:var(--green)}
+  .a-phase.active .agtag.gate{color:var(--amber);background:var(--amber-dim);border-color:transparent}
+  .a-phase .agtag .ag-dot{width:4px;height:4px;border-radius:50%;background:var(--muted)}
+  .a-phase .ph-time{font:500 10px var(--font-mono);color:var(--muted)}
+  .a-phase .ph-cp{display:flex;gap:2px;margin-top:5px}
+  .a-phase .ph-cp .b{flex:1;height:4px;border-radius:1px;background:var(--surface-3)}
+
+  .a-mid{display:grid;grid-template-columns:1.4fr 1fr;gap:0;border-top:1px solid var(--border);flex:1;min-height:0;overflow:hidden}
+  .a-current{padding:14px 22px 16px;display:flex;flex-direction:column;gap:10px;border-right:1px solid var(--border);min-height:0}
+  .a-current-head{display:flex;align-items:baseline;gap:10px}
+  .a-current-head h3{margin:0;font-size:14px;font-weight:600}
+  .a-current-head .sub{font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+  .a-storyline{display:flex;flex-direction:column;gap:8px}
+  .a-step{display:grid;grid-template-columns:24px 1fr auto;gap:11px;padding:6px 12px;border-radius:8px;background:var(--surface);border:1px solid var(--border);align-items:center}
+  .a-step.done{background:transparent;border-color:transparent;padding:3px 12px}
+  .a-step.gate{border-color:var(--amber);background:var(--amber-dim)}
+  .a-step .mk{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:700 10px var(--font-mono)}
+  .a-step.done .mk{background:var(--green-dim);color:var(--green)}
+  .a-step.gate .mk{background:var(--amber);color:#1a1300}
+  .a-step .desc{font-size:12px;color:var(--text);line-height:1.45}
+  .a-step.done .desc{color:var(--text-2)}
+  .a-step .desc em{font-style:normal;color:var(--muted);font-size:11px}
+  .a-step .t{font:500 10px var(--font-mono);color:var(--muted)}
+  .a-decision{display:flex;flex-direction:column;gap:6px;margin-top:auto;padding:14px;border:1px solid var(--amber);border-radius:9px;background:linear-gradient(180deg,var(--amber-dim),transparent)}
+  .a-decision .dh{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--amber);margin-bottom:4px}
+  .a-decision .dt{font-size:13px;font-weight:600}
+  .a-decision .ds{font-size:11.5px;color:var(--text-2);line-height:1.5}
+  .a-decision .dact{display:flex;gap:6px;margin-top:8px}
+
+  .a-rail{padding:16px 18px;display:flex;flex-direction:column;gap:14px;background:var(--bg-2);min-height:0;overflow:hidden}
+  .a-rail-h{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+  .a-rail-section{display:flex;flex-direction:column;gap:6px}
+  .a-rail-section .kv{display:grid;grid-template-columns:90px 1fr;font-size:11.5px;padding:2px 0;gap:8px}
+  .a-rail-section .kv .k{color:var(--muted)}
+  .a-rail-section .kv .v{color:var(--text)}
+  .a-rail-section .kv .v.mono{font-family:var(--font-mono);font-size:11px}
+
+  .a-stream{margin-top:auto;border:1px solid var(--border);border-radius:8px;background:var(--surface);overflow:hidden}
+  .a-stream-head{display:flex;align-items:center;gap:8px;padding:8px 11px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text-2)}
+  .a-stream-head .sl{margin-left:auto;color:var(--muted);font-family:var(--font-mono);font-size:10px}
+  .a-stream-body{padding:8px 11px;font-family:var(--font-mono);font-size:11px;line-height:1.7;color:var(--text-2);max-height:130px;overflow:hidden}
+  .a-stream-body .row{display:grid;grid-template-columns:54px 72px 1fr;gap:8px}
+  .a-stream-body .t{color:var(--dim)}
+  .a-stream-body .ag{color:var(--muted)}
+  .a-stream-body .ag.violet{color:var(--violet)}
+  .a-stream-body .ag.green{color:var(--green)}
+  .a-stream-body .ag.amber{color:var(--amber)}
+  .a-stream-body .msg{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* —————————————————————————— Variant B: Workflow document —————————————————————————— */
+  .b-banner{padding:14px 22px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border);background:var(--bg)}
+  .b-banner .ico{width:32px;height:32px;border-radius:8px;background:var(--amber);color:#1a1300;display:grid;place-items:center}
+  .b-banner .t{font-weight:600;font-size:14px}
+  .b-banner .s{font-size:12px;color:var(--text-2);margin-top:2px}
+  .b-banner .actions{margin-left:auto;display:flex;gap:6px}
+
+  .b-tabs{display:flex;align-items:center;padding:0 22px;border-bottom:1px solid var(--border);background:var(--bg);gap:4px}
+  .b-tab{padding:9px 12px;font-size:12px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;font-weight:500;display:flex;align-items:center;gap:6px}
+  .b-tab.on{color:var(--text);border-bottom-color:var(--teal)}
+  .b-tab .tc{font:500 10px var(--font-mono);color:var(--dim);background:var(--surface-2);padding:1px 6px;border-radius:3px}
+  .b-tab.on .tc{color:var(--teal);background:var(--teal-dim)}
+
+  .b-body{display:grid;grid-template-columns:1fr 320px;flex:1;min-height:0;overflow:hidden}
+
+  .b-doc{padding:22px 28px;overflow:auto;min-height:0;display:flex;flex-direction:column;gap:14px}
+  .b-doc-head{padding-bottom:14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:16px}
+  .b-doc-head h1{margin:0 0 4px;font-size:20px;font-weight:600;letter-spacing:-0.012em}
+  .b-doc-head .meta{font-size:12px;color:var(--muted);font-family:var(--font-mono)}
+  .b-doc-head .ptr{margin-left:auto;text-align:right}
+  .b-doc-head .ptr .l{font:600 9px var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+  .b-doc-head .ptr .v{font:600 22px var(--font-mono);color:var(--amber);font-variant-numeric:tabular-nums}
+  .b-doc-head .ptr .s{font-size:11px;color:var(--muted)}
+
+  .b-phase{border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:14px 18px;display:grid;grid-template-columns:32px 1fr auto;gap:14px;align-items:flex-start;cursor:default}
+  .b-phase.gate{border-color:var(--amber);background:linear-gradient(180deg,color-mix(in oklab,var(--amber-dim) 60%,var(--surface)),var(--surface));padding-bottom:0}
+  .b-phase.done{background:var(--bg-2)}
+  .b-phase .num{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:700 12px var(--font-mono);background:var(--surface-2);color:var(--muted);flex-shrink:0}
+  .b-phase.done .num{background:var(--green-dim);color:var(--green)}
+  .b-phase.gate .num{background:var(--amber);color:#1a1300}
+  .b-phase .b-pmain{min-width:0}
+  .b-phase .b-ptitle{font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px}
+  .b-phase .b-ptitle .state{font:600 9px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:2px 7px;border-radius:3px;background:var(--surface-2)}
+  .b-phase.done .state{background:var(--green-dim);color:var(--green)}
+  .b-phase.gate .state{background:var(--amber);color:#1a1300}
+  .b-phase .b-poutcome{font-size:12.5px;color:var(--text-2);line-height:1.55;margin-top:5px}
+  .b-phase .b-poutcome strong{color:var(--text);font-weight:600}
+  .b-phase .b-deliv{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+  .b-phase .b-deliv .d{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:5px;background:var(--bg);border:1px solid var(--border);font-size:11px;color:var(--text-2)}
+  .b-phase .b-deliv .d.mono{font-family:var(--font-mono);font-size:10.5px}
+  .b-phase .b-deliv .d.acc{background:var(--violet-dim);color:var(--violet);border-color:transparent}
+  .b-phase .b-pagents{margin-top:10px;display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted)}
+  .b-phase .b-pagents .av{width:18px;height:18px;border-radius:50%;background:var(--surface-2);color:var(--muted);display:grid;place-items:center;font:700 9px var(--font-mono);border:2px solid var(--surface)}
+  .b-phase.done .b-pagents .av{background:var(--green-dim);color:var(--green)}
+  .b-phase.gate .b-pagents .av.you{background:var(--amber);color:#1a1300}
+  .b-phase .b-pagents .stack{display:flex}
+  .b-phase .b-pagents .stack .av+.av{margin-left:-4px}
+  .b-phase .b-prside{text-align:right;min-width:90px;display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+  .b-phase .b-prside .dur{font:500 11px var(--font-mono);color:var(--text-2)}
+  .b-phase .b-prside .sub{font-size:10px;color:var(--muted)}
+  .b-phase .more{font-size:11px;color:var(--muted);cursor:pointer;margin-top:6px;display:flex;align-items:center;gap:4px}
+  .b-phase .more:hover{color:var(--text)}
+
+  .b-gate-cta{grid-column:1/-1;margin-top:10px;padding:12px 0 4px;border-top:1px dashed var(--amber);display:flex;align-items:center;gap:10px}
+  .b-gate-cta .gct{font-size:12px;color:var(--text-2);flex:1}
+  .b-gate-cta .gct strong{color:var(--text);font-weight:600}
+
+  .b-up-next{border:1px dashed var(--border-hi);border-radius:10px;padding:14px 18px;background:transparent}
+  .b-up-next .uh{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .b-up-next .ulist{display:flex;flex-direction:column;gap:8px}
+  .b-up-next .uli{display:grid;grid-template-columns:24px 1fr auto;gap:11px;align-items:center;font-size:12px;color:var(--text-2);padding:4px 0}
+  .b-up-next .uli .un{width:22px;height:22px;border-radius:50%;background:var(--surface-2);color:var(--muted);display:grid;place-items:center;font:700 10px var(--font-mono)}
+  .b-up-next .uli .ut{font-weight:500;color:var(--text)}
+  .b-up-next .uli .uagents{font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+  .b-up-next .uli .ueta{font:500 10px var(--font-mono);color:var(--muted);text-align:right}
+
+  /* right telemetry rail */
+  .b-rail{border-left:1px solid var(--border);background:var(--bg-2);overflow:auto;min-height:0}
+  .b-rail-sec{padding:14px 18px;border-bottom:1px solid var(--border)}
+  .b-rail-sec:last-child{border-bottom:0}
+  .b-rail-h{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  .b-kv{display:grid;grid-template-columns:90px 1fr;font-size:12px;padding:4px 0;gap:8px}
+  .b-kv .k{color:var(--muted)}
+  .b-kv .v{color:var(--text)}
+  .b-kv .v.mono{font-family:var(--font-mono);font-size:11px}
+  .b-spark{display:flex;align-items:flex-end;gap:2px;height:28px;margin-top:6px}
+  .b-spark .b{flex:1;background:var(--teal);border-radius:1px 1px 0 0;opacity:.65}
+  .b-spark .b.muted{background:var(--surface-3);opacity:1}
+  .b-meter{height:5px;background:var(--surface-3);border-radius:3px;overflow:hidden;margin:9px 0}
+  .b-meter .fill{height:100%;background:var(--amber);border-radius:3px}
+
+  /* —————————————————————————— Variant C: Cockpit —————————————————————————— */
+  .c-statusbar{display:grid;grid-template-columns:1fr auto;align-items:center;padding:14px 22px;gap:14px;background:linear-gradient(180deg,var(--amber-dim),transparent);border-bottom:1px solid var(--border)}
+  .c-statusbar .sl{display:flex;align-items:center;gap:14px}
+  .c-statusbar .sl .icb{width:36px;height:36px;border-radius:8px;background:var(--amber);color:#1a1300;display:grid;place-items:center}
+  .c-statusbar .sl .t{font:600 15px var(--font-sans);letter-spacing:-0.005em}
+  .c-statusbar .sl .s{font:500 12px var(--font-sans);color:var(--text-2);margin-top:2px}
+  .c-statusbar .sr{display:flex;align-items:center;gap:6px}
+
+  .c-hero{display:grid;grid-template-columns:1fr 320px;flex:1;min-height:0;overflow:hidden}
+  .c-main{padding:18px 22px;overflow:auto;min-height:0;display:flex;flex-direction:column;gap:16px}
+  .c-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .c-tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:3px;min-width:0}
+  .c-tile .l{font:600 9px var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .c-tile .v{font:600 22px var(--font-mono);color:var(--text);letter-spacing:-0.012em;font-variant-numeric:tabular-nums;margin-top:2px}
+  .c-tile .s{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;margin-top:1px}
+  .c-tile.amber .v{color:var(--amber)}
+  .c-tile.green .v{color:var(--green)}
+  .c-tile.teal .v{color:var(--teal)}
+  .c-tile .barx{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:6px}
+  .c-tile .barx .seg{height:4px;border-radius:1px;background:var(--surface-3)}
+  .c-tile .barx .seg.done{background:var(--green)}
+  .c-tile .barx .seg.now{background:var(--amber)}
+  .c-tile .ks{font-family:var(--font-mono);font-size:10px;color:var(--muted)}
+
+  .c-ribbon{padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
+  .c-ribbon .rh{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+  .c-ribbon .rh h3{margin:0;font-size:13px;font-weight:600}
+  .c-ribbon .rh .sub{color:var(--muted);font-size:11px;font-family:var(--font-mono)}
+  .c-ribbon .rh .legend{margin-left:auto;display:flex;gap:10px;font-size:10.5px;color:var(--muted)}
+  .c-ribbon .rh .legend .dt{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:0}
+  .c-ribbon-flow{display:grid;grid-template-columns:repeat(7,1fr);position:relative;padding:0 4px}
+  .c-ribbon-flow::before{content:"";position:absolute;left:34px;right:34px;top:13px;height:2px;background:var(--surface-3);border-radius:1px;z-index:0}
+  .c-ribbon-flow .pseg{display:flex;flex-direction:column;align-items:center;gap:7px;position:relative;z-index:1;padding:0 2px;min-width:0}
+  .c-ribbon-flow .node{width:28px;height:28px;border-radius:50%;background:var(--surface-2);border:3px solid var(--bg);display:grid;place-items:center;font:700 11px var(--font-mono);color:var(--muted);position:relative}
+  .c-ribbon-flow .pseg.done .node{background:var(--green);color:#04190f}
+  .c-ribbon-flow .pseg.active .node{background:var(--amber);color:#1a1300;box-shadow:0 0 0 4px color-mix(in oklab,var(--amber) 28%,transparent)}
+  .c-ribbon-flow .pseg .pname{font-size:11px;text-align:center;color:var(--text-2);line-height:1.3;font-weight:500}
+  .c-ribbon-flow .pseg.active .pname{color:var(--text);font-weight:600}
+  .c-ribbon-flow .pseg.pending .pname{color:var(--muted)}
+  .c-ribbon-flow .pseg .pdur{font:500 10px var(--font-mono);color:var(--muted)}
+
+  .c-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .c-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-height:0}
+  .c-card-h{display:flex;align-items:baseline;gap:10px}
+  .c-card-h h3{margin:0;font-size:13px;font-weight:600}
+  .c-card-h .sub{color:var(--muted);font-size:11px;font-family:var(--font-mono)}
+  .c-card-h .act{margin-left:auto;font-size:11px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:4px}
+
+  .c-checklist{display:flex;flex-direction:column;gap:6px}
+  .c-cli{display:grid;grid-template-columns:18px 1fr auto;gap:9px;align-items:center;padding:3px 0;font-size:12px;color:var(--text-2)}
+  .c-cli .mk{width:16px;height:16px;border-radius:50%;background:var(--green-dim);color:var(--green);display:grid;place-items:center;font:700 9px var(--font-mono)}
+  .c-cli.gate .mk{background:var(--amber);color:#1a1300}
+  .c-cli.gate{color:var(--text);font-weight:500}
+  .c-cli .t{font:500 10px var(--font-mono);color:var(--dim)}
+
+  .c-decisionq{background:linear-gradient(180deg,var(--amber-dim),transparent 90%);border:1px solid var(--amber);border-radius:10px;padding:14px 16px}
+  .c-decisionq .dqh{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+  .c-decisionq .dqt{font-size:13px;font-weight:600;margin-bottom:3px}
+  .c-decisionq .dqs{font-size:11.5px;color:var(--text-2);line-height:1.5}
+  .c-decisionq .dqact{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+
+  .c-rail{border-left:1px solid var(--border);background:var(--bg-2);min-height:0;overflow:auto;display:flex;flex-direction:column}
+  .c-rail-sec{padding:14px 18px;border-bottom:1px solid var(--border)}
+  .c-rail-sec:last-child{border-bottom:0;flex:1;display:flex;flex-direction:column;min-height:0}
+  .c-rail-h{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .c-rail-h .feed-toggle{margin-left:auto;display:flex;background:var(--surface);border:1px solid var(--border-hi);border-radius:5px;padding:2px}
+  .c-rail-h .feed-toggle .ft{padding:2px 7px;font:500 10px var(--font-sans);text-transform:none;letter-spacing:0;border-radius:3px;color:var(--muted);cursor:pointer}
+  .c-rail-h .feed-toggle .ft.on{background:var(--surface-3);color:var(--text)}
+  .c-feed{display:flex;flex-direction:column;gap:7px;font-size:11.5px;flex:1;min-height:0;overflow:auto}
+  .c-fe{display:grid;grid-template-columns:18px 1fr auto;gap:9px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border)}
+  .c-fe:last-child{border-bottom:0}
+  .c-fe .fi{width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font:700 9px var(--font-mono);background:var(--surface-2);color:var(--muted);margin-top:1px}
+  .c-fe.done .fi{background:var(--green-dim);color:var(--green)}
+  .c-fe.gate .fi{background:var(--amber);color:#1a1300}
+  .c-fe.tool .fi{background:var(--violet-dim);color:var(--violet)}
+  .c-fe .ft{color:var(--text)}
+  .c-fe .ft em{font-style:normal;color:var(--muted);font-size:10.5px;display:block;margin-top:1px}
+  .c-fe .ago{color:var(--dim);font-family:var(--font-mono);font-size:10px;white-space:nowrap}
+
+  .brandword{display:inline-flex;align-items:baseline}
+  .wbd{color:var(--teal,#1ed1d1)}
+</style>
+</head>
+<body>
+
+<header class="pg-head">
+  <div class="brand">
+    <span class="brand-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span>
+    <span class="brandword">claud<span class="wbd">board</span></span> · UX exploration · active run
+  </div>
+  <h1>Active run — orchestration over log</h1>
+  <p>Feedback: the current run screen reads like a tail of a developer log. For PMs, leads and other non-engineering watchers it's noisy and unparseable — too much "what each agent typed", too little "where the work is and what's needed from me". All three proposals keep every piece of information that's there today, but invert the visual hierarchy: pipeline state and run telemetry become the primary signal, and the live stream is treated as a supporting detail rather than the protagonist.</p>
+</header>
+
+<div class="tabs">
+  <button class="tab on" data-tab="a"><span class="tag">A</span>Pipeline-first</button>
+  <button class="tab" data-tab="b"><span class="tag">B</span>Workflow document</button>
+  <button class="tab" data-tab="c"><span class="tag">C</span>Cockpit / status board</button>
+</div>
+
+<!-- ═════════════════════════════════════════════════════════════════════════
+     VARIANT A · Pipeline-first
+     ═════════════════════════════════════════════════════════════════════════ -->
+<section class="panel on" data-panel="a">
+  <div class="intro">
+    <div>
+      <div class="intro-tag">Variant A · Pipeline-first</div>
+      <h2>Telemetry strip on top. Swim-lane below. Log in a drawer.</h2>
+      <p>Reads horizontally, left-to-right, the way an actual build pipeline reads. The 7 phases of the workflow are always visible as a single row across the top of the body — that's the orchestration. Above it sits a row of KPI tiles (progress · elapsed · ETA · cost · gate). Below it sits a "what just happened" storyline rewritten in plain English, with the live stream as a small collapsible drawer beside the telemetry rail.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">Emphasises</div>
+        <div class="meta-item">Where in the 7-phase pipeline the run is, at a glance</div>
+        <div class="meta-item">Run telemetry as headline numbers, not rail kv-pairs</div>
+        <div class="meta-item">The single human decision needed, surfaced as a block</div>
+      </div>
+      <div>
+        <div class="meta-h">Hides without losing</div>
+        <div class="meta-item">Full stream → bottom drawer (expandable)</div>
+        <div class="meta-item">Tool calls + agent chatter → tooltip on agent pill</div>
+        <div class="meta-item">Capability flags → moved into the rail under "Context"</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <aside class="fs">
+      <div class="fs-brand"><span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span><span class="brandword">claud<span class="wbd">board</span></span><small>v1.4</small></div>
+      <div class="ws"><span class="ws-ico">M</span><span class="ws-name">meas</span><span class="ws-chev">▾</span></div>
+      <nav class="fs-nav">
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11 12 3l9 8M5 9.5V21h14V9.5"/></svg>Overview</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2 4 6v6c0 5 4 9 8 10 4-1 8-5 8-10V6l-8-4z"/></svg>Project · health</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19c0-3 2-6 5-7l9-9-1 9c-1 3-4 5-7 5l-3 3-3-1z"/></svg>Start feature</div>
+        <div class="fs-item on"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>Active run</div>
+        <div class="fs-label">Project</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Run history</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M5 17V9M11 17V5M17 17v-7"/></svg>Analytics</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</div>
+        <div class="fs-running">
+          <div class="nr-top"><span class="pulse-dot" style="background:var(--amber)"></span>HUMAN GATE</div>
+          <div class="nr-title">MEAS-7140 · Outbox dispatcher</div>
+          <div class="nr-meta">phase 1 / 7 · 13m</div>
+        </div>
+      </nav>
+    </aside>
+
+    <div class="ftb">
+      <div class="crumb">
+        <span>meas.cloud.datahandler</span><span class="sep">/</span><span>runs</span><span class="sep">/</span><span class="now mono">MEAS-7140</span>
+      </div>
+      <div class="spacer"></div>
+      <span class="chip mono"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="7" r="2"/><path d="M6 7v10M6 13c0-4 4-6 12-6"/></svg>feature/MEAS-7140/outbox-dispatcher</span>
+      <span class="key">⌘ K</span>
+    </div>
+
+    <div class="fbd">
+      <!-- banner -->
+      <div class="a-banner">
+        <div class="rb-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></div>
+        <div>
+          <div class="rb-t">Paused — awaiting your approval of the spec + plan</div>
+          <div class="rb-s">After approval, phases 2–7 run autonomously (est. 3h 24m). This is the only human checkpoint.</div>
+        </div>
+        <div class="actions">
+          <button class="btn ghost sm"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Diff</button>
+          <button class="btn sm">Request changes</button>
+          <button class="btn amber"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 13l4 4L19 7"/></svg>Review spec + plan</button>
+        </div>
+      </div>
+
+      <!-- KPI strip -->
+      <div class="a-kpis">
+        <div class="a-kpi gate">
+          <div class="kl">Status</div>
+          <div class="kv" style="font-size:14px;font-family:var(--font-sans);font-weight:600;letter-spacing:0">Human gate · phase 1d</div>
+          <div class="ks">5 of 6 phase-1 steps done · awaiting you</div>
+        </div>
+        <div class="a-kpi">
+          <div class="kl">Progress</div>
+          <div class="kv">1 / 7</div>
+          <div class="progmark">
+            <div class="s now"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div>
+          </div>
+        </div>
+        <div class="a-kpi">
+          <div class="kl">Elapsed</div>
+          <div class="kv">13m 28s</div>
+          <div class="ks">started 09:47</div>
+        </div>
+        <div class="a-kpi">
+          <div class="kl">Est. to merge</div>
+          <div class="kv">3h 24m</div>
+          <div class="ks">post-approval, autonomous</div>
+        </div>
+        <div class="a-kpi">
+          <div class="kl">Cost · so far</div>
+          <div class="kv">$0.84</div>
+          <div class="ks">~$5.20 projected</div>
+        </div>
+      </div>
+
+      <!-- pipeline swim-lane -->
+      <div class="a-pipeline">
+        <div class="ph-head">
+          <h3>Pipeline</h3>
+          <span class="ph-sub">7 phases · 8 agents</span>
+          <div class="ph-tabs">
+            <div class="pt on">Phases</div>
+            <div class="pt">Agents</div>
+            <div class="pt">Timeline</div>
+          </div>
+        </div>
+        <div class="a-flow">
+          <div class="a-phase done">
+            <div class="ph-top"><div class="ph-num">1</div><div class="ph-name">Ticket · Spec · Plan</div></div>
+            <div class="ph-state">Active · gate</div>
+            <div class="ph-outcome"><strong style="color:var(--text)">3 scenarios</strong> drafted, <strong style="color:var(--text)">4-checkpoint plan</strong> ready.</div>
+            <div class="ph-agents">
+              <span class="agtag"><span class="ag-dot"></span>jira</span>
+              <span class="agtag"><span class="ag-dot"></span>sdd</span>
+              <span class="agtag"><span class="ag-dot"></span>arch</span>
+              <span class="agtag gate"><span class="ag-dot" style="background:var(--amber)"></span>you</span>
+            </div>
+            <div class="ph-time">12m 04s</div>
+          </div>
+          <div class="a-phase" style="opacity:.85">
+            <div class="ph-top"><div class="ph-num">2</div><div class="ph-name">Create branch</div></div>
+            <div class="ph-state">Pending</div>
+            <div class="ph-outcome">Will create <span class="mono" style="color:var(--text-2);font-size:10.5px">feature/MEAS-7140/…</span></div>
+            <div class="ph-agents"><span class="agtag"><span class="ag-dot"></span>git</span></div>
+            <div class="ph-time">~ 20s</div>
+          </div>
+          <div class="a-phase">
+            <div class="ph-top"><div class="ph-num">3</div><div class="ph-name">Develop</div></div>
+            <div class="ph-state">Pending</div>
+            <div class="ph-outcome"><strong style="color:var(--text)">4 checkpoints</strong> · entity → worker → kafka → tests</div>
+            <div class="ph-cp"><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div></div>
+            <div class="ph-agents"><span class="agtag"><span class="ag-dot"></span>impl × 5</span></div>
+            <div class="ph-time">~ 2h 40m</div>
+          </div>
+          <div class="a-phase">
+            <div class="ph-top"><div class="ph-num">4</div><div class="ph-name">Commit</div></div>
+            <div class="ph-state">Pending</div>
+            <div class="ph-outcome">Squash + conventional commit</div>
+            <div class="ph-agents"><span class="agtag"><span class="ag-dot"></span>git</span></div>
+            <div class="ph-time">~ 1m</div>
+          </div>
+          <div class="a-phase">
+            <div class="ph-top"><div class="ph-num">5</div><div class="ph-name">Review</div></div>
+            <div class="ph-state">Pending</div>
+            <div class="ph-outcome">Spec coverage + rules conformance</div>
+            <div class="ph-agents"><span class="agtag"><span class="ag-dot"></span>spec</span><span class="agtag"><span class="ag-dot"></span>design</span></div>
+            <div class="ph-time">~ 12m</div>
+          </div>
+          <div class="a-phase">
+            <div class="ph-top"><div class="ph-num">6</div><div class="ph-name">Pull request</div></div>
+            <div class="ph-state">Pending</div>
+            <div class="ph-outcome">Open ADO PR with template body</div>
+            <div class="ph-agents"><span class="agtag"><span class="ag-dot"></span>pr</span></div>
+            <div class="ph-time">~ 2m</div>
+          </div>
+          <div class="a-phase">
+            <div class="ph-top"><div class="ph-num">7</div><div class="ph-name">Finalize</div></div>
+            <div class="ph-state">Pending</div>
+            <div class="ph-outcome">Transition Jira · worklog · notify</div>
+            <div class="ph-agents"><span class="agtag"><span class="ag-dot"></span>jira</span></div>
+            <div class="ph-time">~ 30s</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- mid: storyline + rail -->
+      <div class="a-mid">
+        <div class="a-current">
+          <div class="a-current-head">
+            <h3>Phase 1 · Ticket · Spec · Plan</h3>
+            <span class="sub">started 09:47 · 12m 04s</span>
+            <span style="margin-left:auto;font-size:11px;color:var(--muted);cursor:pointer">View artifacts →</span>
+          </div>
+
+          <div class="a-storyline">
+            <div class="a-step done"><div class="mk">✓</div><div class="desc"><strong>Ticket · scope · description</strong> <em>· jira-agent + main · 3m 42s</em></div><div class="t">09:47</div></div>
+            <div class="a-step done"><div class="mk">✓</div><div class="desc"><strong>BDD spec drafted</strong> <em>· sdd-expert · 3 scenarios, 14 steps · </em><span style="color:var(--teal);font-family:var(--font-mono);font-size:11px">outbox-dispatcher.feature</span></div><div class="t">09:55</div></div>
+            <div class="a-step done"><div class="mk">✓</div><div class="desc"><strong>Execution plan drafted</strong> <em>· architect · 4 checkpoints, 11 tasks, est. 3h 24m</em></div><div class="t">09:58</div></div>
+            <div class="a-step gate"><div class="mk"><span class="pulse-dot" style="background:#1a1300"></span></div><div class="desc"><strong>Waiting on you — approve spec + plan</strong> <em>· only human checkpoint of the run</em></div><div class="t">now</div></div>
+          </div>
+
+          <div class="a-decision">
+            <div class="dh">Decision required</div>
+            <div class="dt">Approve to enter autonomous mode</div>
+            <div class="ds">3 BDD scenarios cover happy path, FIFO ordering, and broker-outage retry. Plan touches domain, application and adapter layers (consistent with hexagonal convention). No schema-registry checkpoint — confirm intentional.</div>
+            <div class="dact">
+              <button class="btn sm">Reject</button>
+              <button class="btn sm">Request changes</button>
+              <button class="btn amber"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 13l4 4L19 7"/></svg>Approve · start autonomy</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="a-rail">
+          <div class="a-rail-section">
+            <div class="a-rail-h">Ticket</div>
+            <div style="display:flex;align-items:center;gap:6px"><span class="chip mono violet"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/><path d="M13 5v14"/></svg>MEAS-7140</span><span class="chip">Story</span></div>
+            <div style="font-size:11.5px;color:var(--text-2);margin-top:6px;line-height:1.5">Outbox dispatcher for entitlement events</div>
+          </div>
+
+          <div class="a-rail-section">
+            <div class="a-rail-h">Throughput</div>
+            <div class="kv"><span class="k">Tokens in</span><span class="v mono">124,300</span></div>
+            <div class="kv"><span class="k">Tokens out</span><span class="v mono">18,950</span></div>
+            <div class="b-spark" style="height:24px;margin-top:6px">
+              <div class="b" style="height:20%"></div><div class="b" style="height:30%"></div><div class="b" style="height:50%"></div><div class="b" style="height:40%"></div><div class="b" style="height:60%"></div><div class="b" style="height:80%"></div><div class="b" style="height:70%"></div><div class="b" style="height:90%"></div><div class="b" style="height:60%"></div><div class="b" style="height:40%"></div><div class="b" style="height:50%"></div><div class="b" style="height:30%"></div><div class="b" style="height:20%"></div><div class="b muted" style="height:8%"></div><div class="b muted" style="height:8%"></div><div class="b muted" style="height:8%"></div>
+            </div>
+            <div style="font-size:10px;color:var(--muted);margin-top:3px">token spend / minute · last 16 min</div>
+          </div>
+
+          <div class="a-rail-section">
+            <div class="a-rail-h">Context loaded</div>
+            <div style="font-family:var(--font-mono);font-size:11px;line-height:1.7;color:var(--text-2)">
+              CLAUDE.md <span style="color:var(--muted)">· 112 lines</span><br>
+              .claude/rules/ <span style="color:var(--muted)">· 7 files</span><br>
+              .claude/skills/ <span style="color:var(--muted)">· 4 skills</span>
+            </div>
+          </div>
+
+          <div class="a-stream">
+            <div class="a-stream-head">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>
+              Live stream
+              <span class="sl">17 events · paused</span>
+              <button class="btn ghost sm" style="margin-left:6px;padding:2px 5px">▾</button>
+            </div>
+            <div class="a-stream-body">
+              <div class="row"><span class="t">09:58:48</span><span class="ag violet">architect</span><span class="msg">Identified OpenAPI changes: none. DB: 1 new collection</span></div>
+              <div class="row"><span class="t">09:58:49</span><span class="ag violet">architect</span><span class="msg">Decomposed into 4 checkpoints · est. 3.5h</span></div>
+              <div class="row"><span class="t">09:58:50</span><span class="ag green">architect</span><span class="msg">Wrote plan.md · 4 checkpoints, 11 tasks</span></div>
+              <div class="row"><span class="t">09:58:51</span><span class="ag amber">main</span><span class="msg">Phase 1d · spec + plan approval</span></div>
+              <div class="row"><span class="t">09:58:52</span><span class="ag amber">main</span><span class="msg">⏸  Waiting for user approval</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════════════════════════
+     VARIANT B · Workflow document
+     ═════════════════════════════════════════════════════════════════════════ -->
+<section class="panel" data-panel="b">
+  <div class="intro">
+    <div>
+      <div class="intro-tag">Variant B · Workflow document</div>
+      <h2>Reads like a status report, not a console.</h2>
+      <p>The run is rendered as a structured document — one section per phase, each with a plain-English outcome line, the deliverables, who did it and how long it took. Tabs at the top split the experience into <b>Workflow</b> (default, business-readable), <b>Spec &amp; plan</b>, <b>Artifacts</b>, and <b>Activity</b> (the raw stream for engineers who want it). Right rail is dedicated telemetry — no stream competing for attention.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">Emphasises</div>
+        <div class="meta-item">Phases as the spine of the page, told in business language</div>
+        <div class="meta-item">Outcome lines, not tool calls — "Drafted 3 scenarios" not "wrote outbox-dispatcher.feature · 142 LOC"</div>
+        <div class="meta-item">A persistent telemetry rail that summarises the whole run</div>
+      </div>
+      <div>
+        <div class="meta-h">Hides without losing</div>
+        <div class="meta-item">Live stream → "Activity" tab (full fidelity, untouched)</div>
+        <div class="meta-item">Deeper artefacts → "Spec &amp; plan" + "Artifacts" tabs</div>
+        <div class="meta-item">Per-agent messages → expandable "More" link inside each phase card</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <aside class="fs">
+      <div class="fs-brand"><span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span><span class="brandword">claud<span class="wbd">board</span></span><small>v1.4</small></div>
+      <div class="ws"><span class="ws-ico">M</span><span class="ws-name">meas</span><span class="ws-chev">▾</span></div>
+      <nav class="fs-nav">
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11 12 3l9 8M5 9.5V21h14V9.5"/></svg>Overview</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2 4 6v6c0 5 4 9 8 10 4-1 8-5 8-10V6l-8-4z"/></svg>Project · health</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19c0-3 2-6 5-7l9-9-1 9c-1 3-4 5-7 5l-3 3-3-1z"/></svg>Start feature</div>
+        <div class="fs-item on"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>Active run</div>
+        <div class="fs-label">Project</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Run history</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M5 17V9M11 17V5M17 17v-7"/></svg>Analytics</div>
+        <div class="fs-running">
+          <div class="nr-top"><span class="pulse-dot" style="background:var(--amber)"></span>HUMAN GATE</div>
+          <div class="nr-title">MEAS-7140 · Outbox dispatcher</div>
+          <div class="nr-meta">phase 1 / 7 · 13m</div>
+        </div>
+      </nav>
+    </aside>
+
+    <div class="ftb">
+      <div class="crumb">
+        <span>meas.cloud.datahandler</span><span class="sep">/</span><span>runs</span><span class="sep">/</span><span class="now mono">MEAS-7140</span>
+      </div>
+      <div class="spacer"></div>
+      <span class="chip mono"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="7" r="2"/><path d="M6 7v10M6 13c0-4 4-6 12-6"/></svg>feature/MEAS-7140/outbox-dispatcher</span>
+      <span class="key">⌘ K</span>
+    </div>
+
+    <div class="fbd">
+      <div class="b-banner">
+        <div class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></div>
+        <div style="flex:1">
+          <div class="t">Paused at phase 1 · awaiting your approval of spec + plan</div>
+          <div class="s">After approval, phases 2–7 run autonomously for an estimated 3h 24m. This is the only human checkpoint.</div>
+        </div>
+        <div class="actions">
+          <button class="btn sm">Request changes</button>
+          <button class="btn amber"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 13l4 4L19 7"/></svg>Review spec + plan</button>
+        </div>
+      </div>
+
+      <div class="b-tabs">
+        <div class="b-tab on">Workflow <span class="tc">7</span></div>
+        <div class="b-tab">Spec &amp; plan <span class="tc">!</span></div>
+        <div class="b-tab">Artifacts <span class="tc">3</span></div>
+        <div class="b-tab">Activity <span class="tc">17</span></div>
+        <div style="margin-left:auto;display:flex;gap:6px;padding:6px 0;align-items:center">
+          <span class="chip mono" style="font-size:10px">Phase 1 / 7</span>
+          <span class="chip amber"><span class="dot pulse"></span>gate</span>
+        </div>
+      </div>
+
+      <div class="b-body">
+        <div class="b-doc">
+          <div class="b-doc-head">
+            <div style="flex:1;min-width:0">
+              <h1>Outbox dispatcher for entitlement events</h1>
+              <div class="meta">MEAS-7140 · Story · meas.cloud.datahandler · started 09:47 · running 13m 28s</div>
+            </div>
+            <div class="ptr">
+              <div class="l">Est. to merge</div>
+              <div class="v">3h 24m</div>
+              <div class="s">after you approve</div>
+            </div>
+          </div>
+
+          <!-- phase 1 -->
+          <div class="b-phase gate">
+            <div class="num">1</div>
+            <div class="b-pmain">
+              <div class="b-ptitle">Ticket · Spec · Plan <span class="state">Active · gate</span></div>
+              <div class="b-poutcome">Scope clarified, story filed, spec and execution plan ready for your sign-off. <strong>3 BDD scenarios</strong> covering happy path, FIFO order, and broker-outage retry. <strong>4-checkpoint plan</strong>, est. <strong>3h 24m</strong>, touching domain · application · adapter layers — consistent with the hexagonal convention.</div>
+              <div class="b-deliv">
+                <span class="d acc">MEAS-7140 created</span>
+                <span class="d mono">outbox-dispatcher.feature · 3 scenarios</span>
+                <span class="d mono">plan.md · 4 checkpoints, 11 tasks</span>
+              </div>
+              <div class="b-pagents">
+                <div class="stack">
+                  <div class="av" title="jira-agent">J</div>
+                  <div class="av" title="sdd-expert">S</div>
+                  <div class="av" title="architect">A</div>
+                  <div class="av you" title="you">U</div>
+                </div>
+                jira → main → sdd-expert → architect → <strong style="color:var(--text);font-weight:600">you</strong>
+              </div>
+
+              <div class="b-gate-cta">
+                <div class="gct"><strong>Decision needed:</strong> approve to start autonomous phases 2–7, or request changes to the spec or plan.</div>
+                <button class="btn sm">Diff vs. last run</button>
+                <button class="btn amber sm">Review spec + plan</button>
+              </div>
+            </div>
+            <div class="b-prside">
+              <div class="dur">12m 04s</div>
+              <div class="sub">5 of 6 steps done</div>
+              <div class="more">More activity ▾</div>
+            </div>
+          </div>
+
+          <!-- phase 2 -->
+          <div class="b-phase">
+            <div class="num">2</div>
+            <div class="b-pmain">
+              <div class="b-ptitle">Create branch <span class="state">Pending</span></div>
+              <div class="b-poutcome">Cuts a feature branch from <span class="mono" style="color:var(--text-2)">main</span> following <span class="mono" style="color:var(--text-2)">{type}/{ticket}/{slug}</span>.</div>
+              <div class="b-deliv">
+                <span class="d mono">feature/MEAS-7140/outbox-dispatcher-entitlement-events</span>
+              </div>
+              <div class="b-pagents"><div class="stack"><div class="av" title="git-agent">G</div></div>git-agent</div>
+            </div>
+            <div class="b-prside">
+              <div class="dur">~ 20s</div>
+              <div class="sub">est.</div>
+            </div>
+          </div>
+
+          <!-- phase 3 -->
+          <div class="b-phase">
+            <div class="num">3</div>
+            <div class="b-pmain">
+              <div class="b-ptitle">Develop · 4 checkpoints <span class="state">Pending</span></div>
+              <div class="b-poutcome">Implementation in four reviewable slices: OutboxEvent entity → dispatcher worker → Kafka producer → integration tests. Baseline build verified before each.</div>
+              <div class="b-deliv">
+                <span class="d">1 · OutboxEvent entity + repo</span>
+                <span class="d">2 · Dispatcher worker (scheduled tick)</span>
+                <span class="d">3 · Kafka producer wiring</span>
+                <span class="d">4 · Integration tests (3 scenarios)</span>
+              </div>
+              <div class="b-pagents"><div class="stack"><div class="av" title="implementation">I</div></div>implementation-agent · 5 invocations</div>
+            </div>
+            <div class="b-prside">
+              <div class="dur">~ 2h 40m</div>
+              <div class="sub">est.</div>
+            </div>
+          </div>
+
+          <!-- phase 4 + 5 + 6 + 7 condensed up-next -->
+          <div class="b-up-next">
+            <div class="uh">After develop · runs unattended</div>
+            <div class="ulist">
+              <div class="uli"><div class="un">4</div><div><div class="ut">Commit</div><div class="uagents">git-agent · squash + conventional commit</div></div><div class="ueta">~ 1m</div></div>
+              <div class="uli"><div class="un">5</div><div><div class="ut">Review</div><div class="uagents">spec-reviewer · design-reviewer</div></div><div class="ueta">~ 12m</div></div>
+              <div class="uli"><div class="un">6</div><div><div class="ut">Pull request</div><div class="uagents">pr-agent · open ADO PR</div></div><div class="ueta">~ 2m</div></div>
+              <div class="uli"><div class="un">7</div><div><div class="ut">Finalize</div><div class="uagents">jira-agent · transition + worklog</div></div><div class="ueta">~ 30s</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- right telemetry rail -->
+        <div class="b-rail">
+          <div class="b-rail-sec">
+            <div class="b-rail-h">Status</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="chip amber"><span class="dot pulse"></span>Awaiting approval</span></div>
+            <div class="b-meter"><div class="fill" style="width:28%"></div></div>
+            <div class="b-kv"><span class="k">Phase</span><span class="v">1 of 7</span></div>
+            <div class="b-kv"><span class="k">Checkpoint</span><span class="v">0 of 4</span></div>
+            <div class="b-kv"><span class="k">Elapsed</span><span class="v mono">13m 28s</span></div>
+            <div class="b-kv"><span class="k">Started</span><span class="v mono">2026-05-18 09:47</span></div>
+          </div>
+
+          <div class="b-rail-sec">
+            <div class="b-rail-h">Cost &amp; throughput</div>
+            <div class="b-kv"><span class="k">Cost so far</span><span class="v mono">$0.84</span></div>
+            <div class="b-kv"><span class="k">Projected</span><span class="v mono">~ $5.20</span></div>
+            <div class="b-kv"><span class="k">Tokens in</span><span class="v mono">124,300</span></div>
+            <div class="b-kv"><span class="k">Tokens out</span><span class="v mono">18,950</span></div>
+            <div class="b-spark">
+              <div class="b" style="height:20%"></div><div class="b" style="height:30%"></div><div class="b" style="height:50%"></div><div class="b" style="height:40%"></div><div class="b" style="height:60%"></div><div class="b" style="height:80%"></div><div class="b" style="height:70%"></div><div class="b" style="height:90%"></div><div class="b" style="height:60%"></div><div class="b" style="height:40%"></div><div class="b" style="height:50%"></div><div class="b" style="height:30%"></div><div class="b" style="height:20%"></div><div class="b muted" style="height:8%"></div><div class="b muted" style="height:8%"></div><div class="b muted" style="height:8%"></div>
+            </div>
+            <div style="font-size:10px;color:var(--muted);margin-top:3px">token spend / min</div>
+          </div>
+
+          <div class="b-rail-sec">
+            <div class="b-rail-h">Context</div>
+            <div style="font-family:var(--font-mono);font-size:11px;line-height:1.75;color:var(--text-2)">
+              CLAUDE.md <span style="color:var(--muted)">· 112 lines</span><br>
+              .claude/rules/ <span style="color:var(--muted)">· 7 files</span><br>
+              .claude/skills/ <span style="color:var(--muted)">· 4 skills</span><br>
+              <span style="color:var(--muted)">.claude/memories/ <span style="color:var(--dim)">· empty</span></span>
+            </div>
+          </div>
+
+          <div class="b-rail-sec">
+            <div class="b-rail-h">Capability flags</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">
+              <span class="chip mono" style="font-size:10px;padding:1px 6px">JIRA</span>
+              <span class="chip mono" style="font-size:10px;padding:1px 6px">ADO</span>
+              <span class="chip mono" style="font-size:10px;padding:1px 6px">MONGODB</span>
+              <span class="chip mono" style="font-size:10px;padding:1px 6px">KAFKA</span>
+              <span class="chip mono" style="font-size:10px;padding:1px 6px">JPA</span>
+              <span class="chip mono" style="font-size:10px;padding:1px 6px">SAGA</span>
+              <span class="chip mono" style="font-size:10px;padding:1px 6px">OUTBOX</span>
+              <span class="chip mono" style="font-size:10px;padding:1px 6px;opacity:.55">GRAPHQL</span>
+              <span class="chip mono" style="font-size:10px;padding:1px 6px;opacity:.55">WEBSOCKET</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════════════════════════
+     VARIANT C · Cockpit / status board
+     ═════════════════════════════════════════════════════════════════════════ -->
+<section class="panel" data-panel="c">
+  <div class="intro">
+    <div>
+      <div class="intro-tag">Variant C · Cockpit / status board</div>
+      <h2>Headline numbers, a compact pipeline ribbon, a "decision queue".</h2>
+      <p>This direction treats the active run like a status board you'd glance at between meetings. Big KPI tiles dominate. The pipeline is a small horizontal ribbon — present but secondary. The body is a 2-up of "what's happening / what just happened" and a <b>decision queue</b> for gates. The live stream is one of two toggleable feeds on the right ("Activity" vs. "Decisions") so it's there for those who want it, but not in your face.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">Emphasises</div>
+        <div class="meta-item">Glanceable: 4 KPI tiles + 1-line status answer the "where are we?" question instantly</div>
+        <div class="meta-item">A first-class "Decision queue" — what needs you, in priority order</div>
+        <div class="meta-item">Toggleable feed: same panel shows either activity or just gates</div>
+      </div>
+      <div>
+        <div class="meta-h">Hides without losing</div>
+        <div class="meta-item">Pipeline depth → compact ribbon, expandable from header</div>
+        <div class="meta-item">Per-agent log → behind feed-toggle (default: Decisions)</div>
+        <div class="meta-item">Plan + spec → behind "Review" CTA in the decision card</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <aside class="fs">
+      <div class="fs-brand"><span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span><span class="brandword">claud<span class="wbd">board</span></span><small>v1.4</small></div>
+      <div class="ws"><span class="ws-ico">M</span><span class="ws-name">meas</span><span class="ws-chev">▾</span></div>
+      <nav class="fs-nav">
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11 12 3l9 8M5 9.5V21h14V9.5"/></svg>Overview</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2 4 6v6c0 5 4 9 8 10 4-1 8-5 8-10V6l-8-4z"/></svg>Project · health</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19c0-3 2-6 5-7l9-9-1 9c-1 3-4 5-7 5l-3 3-3-1z"/></svg>Start feature</div>
+        <div class="fs-item on"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>Active run</div>
+        <div class="fs-label">Project</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Run history</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M5 17V9M11 17V5M17 17v-7"/></svg>Analytics</div>
+        <div class="fs-running">
+          <div class="nr-top"><span class="pulse-dot" style="background:var(--amber)"></span>HUMAN GATE</div>
+          <div class="nr-title">MEAS-7140 · Outbox dispatcher</div>
+          <div class="nr-meta">phase 1 / 7 · 13m</div>
+        </div>
+      </nav>
+    </aside>
+
+    <div class="ftb">
+      <div class="crumb">
+        <span>meas.cloud.datahandler</span><span class="sep">/</span><span>runs</span><span class="sep">/</span><span class="now mono">MEAS-7140</span>
+      </div>
+      <div class="spacer"></div>
+      <span class="chip mono"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="7" r="2"/><path d="M6 7v10M6 13c0-4 4-6 12-6"/></svg>feature/MEAS-7140/outbox-dispatcher</span>
+      <span class="key">⌘ K</span>
+    </div>
+
+    <div class="fbd">
+      <div class="c-statusbar">
+        <div class="sl">
+          <div class="icb"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></div>
+          <div>
+            <div class="t">MEAS-7140 · Outbox dispatcher for entitlement events</div>
+            <div class="s">Paused at human gate · phase 1 of 7 · 5 of 6 phase-1 steps done · est. <b style="color:var(--text)">3h 24m</b> to merge after approval</div>
+          </div>
+        </div>
+        <div class="sr">
+          <button class="btn ghost sm">Diff vs. last run</button>
+          <button class="btn sm">Request changes</button>
+          <button class="btn amber"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 13l4 4L19 7"/></svg>Review spec + plan</button>
+        </div>
+      </div>
+
+      <div class="c-hero">
+        <div class="c-main">
+          <!-- KPI tiles -->
+          <div class="c-tiles">
+            <div class="c-tile amber">
+              <div class="l">Status</div>
+              <div class="v" style="font-size:15px;font-family:var(--font-sans);font-weight:600;letter-spacing:0">Human gate</div>
+              <div class="s">phase 1d · awaiting you</div>
+            </div>
+            <div class="c-tile">
+              <div class="l">Progress</div>
+              <div class="v">1 / 7</div>
+              <div class="barx">
+                <div class="seg now"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+              </div>
+            </div>
+            <div class="c-tile">
+              <div class="l">Elapsed</div>
+              <div class="v">13:28</div>
+              <div class="s">+3h 24m est. to merge</div>
+            </div>
+            <div class="c-tile">
+              <div class="l">Cost</div>
+              <div class="v">$0.84</div>
+              <div class="s">~$5.20 projected · 143k tok</div>
+            </div>
+          </div>
+
+          <!-- pipeline ribbon -->
+          <div class="c-ribbon">
+            <div class="rh">
+              <h3>Pipeline</h3>
+              <span class="sub">7 phases · 8 agents</span>
+              <div class="legend">
+                <span><span class="dt" style="background:var(--green)"></span>done</span>
+                <span><span class="dt" style="background:var(--amber)"></span>gate</span>
+                <span><span class="dt" style="background:var(--surface-3)"></span>pending</span>
+                <span style="cursor:pointer;color:var(--text-2)">expand ↗</span>
+              </div>
+            </div>
+            <div class="c-ribbon-flow">
+              <div class="pseg active"><div class="node">1</div><div class="pname">Ticket · Spec · Plan</div><div class="pdur">12m</div></div>
+              <div class="pseg pending"><div class="node">2</div><div class="pname">Branch</div><div class="pdur">~20s</div></div>
+              <div class="pseg pending"><div class="node">3</div><div class="pname">Develop · 4 cp</div><div class="pdur">~2h 40m</div></div>
+              <div class="pseg pending"><div class="node">4</div><div class="pname">Commit</div><div class="pdur">~1m</div></div>
+              <div class="pseg pending"><div class="node">5</div><div class="pname">Review</div><div class="pdur">~12m</div></div>
+              <div class="pseg pending"><div class="node">6</div><div class="pname">PR</div><div class="pdur">~2m</div></div>
+              <div class="pseg pending"><div class="node">7</div><div class="pname">Finalize</div><div class="pdur">~30s</div></div>
+            </div>
+          </div>
+
+          <!-- 2-up -->
+          <div class="c-grid">
+            <!-- what just happened -->
+            <div class="c-card">
+              <div class="c-card-h">
+                <h3>What just happened</h3>
+                <span class="sub">phase 1 · 12m 04s</span>
+                <span class="act">View artifacts →</span>
+              </div>
+              <div class="c-checklist">
+                <div class="c-cli"><div class="mk">✓</div><div>Filed <b style="color:var(--text);font-weight:500">MEAS-7140</b> with 2 acceptance criteria</div><div class="t">09:47</div></div>
+                <div class="c-cli"><div class="mk">✓</div><div>Confirmed scope with you · no schema registry</div><div class="t">09:50</div></div>
+                <div class="c-cli"><div class="mk">✓</div><div>Drafted spec · <b style="color:var(--text);font-weight:500">3 BDD scenarios</b>, 14 steps</div><div class="t">09:55</div></div>
+                <div class="c-cli"><div class="mk">✓</div><div>Drafted plan · <b style="color:var(--text);font-weight:500">4 checkpoints</b>, est. 3h 24m</div><div class="t">09:58</div></div>
+                <div class="c-cli gate"><div class="mk"><span class="pulse-dot" style="background:#1a1300;width:5px;height:5px"></span></div><div>Awaiting your approval</div><div class="t">now</div></div>
+              </div>
+            </div>
+
+            <!-- decision queue -->
+            <div class="c-decisionq">
+              <div class="dqh">Decision queue · 1 item</div>
+              <div class="dqt">Approve spec + plan</div>
+              <div class="dqs">3 scenarios cover happy path, FIFO ordering, and broker-outage retry. Plan respects hexagonal layering. No schema-registry checkpoint — architect believes Avro isn't in use here, confirm intentional.</div>
+              <div class="dqact">
+                <button class="btn ghost sm">Reject</button>
+                <button class="btn sm">Request changes</button>
+                <button class="btn amber sm"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 13l4 4L19 7"/></svg>Approve · start autonomy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- right rail -->
+        <div class="c-rail">
+          <div class="c-rail-sec">
+            <div class="c-rail-h">Telemetry</div>
+            <div class="b-kv"><span class="k">Phase</span><span class="v">1 of 7</span></div>
+            <div class="b-kv"><span class="k">Checkpoint</span><span class="v">0 of 4</span></div>
+            <div class="b-kv"><span class="k">Elapsed</span><span class="v mono">13m 28s</span></div>
+            <div class="b-kv"><span class="k">ETA · merge</span><span class="v mono">+3h 24m</span></div>
+            <div class="b-kv"><span class="k">Cost</span><span class="v mono">$0.84 / ~$5.20</span></div>
+            <div class="b-kv"><span class="k">Tokens</span><span class="v mono">143,250</span></div>
+            <div class="b-spark">
+              <div class="b" style="height:20%"></div><div class="b" style="height:30%"></div><div class="b" style="height:50%"></div><div class="b" style="height:40%"></div><div class="b" style="height:60%"></div><div class="b" style="height:80%"></div><div class="b" style="height:70%"></div><div class="b" style="height:90%"></div><div class="b" style="height:60%"></div><div class="b" style="height:40%"></div><div class="b" style="height:50%"></div><div class="b" style="height:30%"></div><div class="b" style="height:20%"></div><div class="b muted" style="height:8%"></div><div class="b muted" style="height:8%"></div><div class="b muted" style="height:8%"></div>
+            </div>
+          </div>
+
+          <div class="c-rail-sec">
+            <div class="c-rail-h">
+              Feed
+              <div class="feed-toggle">
+                <div class="ft on">Decisions</div>
+                <div class="ft">All activity</div>
+              </div>
+            </div>
+            <div class="c-feed">
+              <div class="c-fe gate"><div class="fi">!</div><div class="ft"><b>Awaiting your approval</b><em>spec + plan · phase 1d</em></div><div class="ago">now</div></div>
+              <div class="c-fe done"><div class="fi">✓</div><div class="ft">Plan ready · 4 checkpoints<em>architect · 11 tasks, 7 contracts</em></div><div class="ago">2m</div></div>
+              <div class="c-fe done"><div class="fi">✓</div><div class="ft">Spec drafted · 3 scenarios<em>sdd-expert · outbox-dispatcher.feature</em></div><div class="ago">7m</div></div>
+              <div class="c-fe done"><div class="fi">✓</div><div class="ft">Ticket description updated<em>jira-agent · MEAS-7140</em></div><div class="ago">10m</div></div>
+              <div class="c-fe done"><div class="fi">✓</div><div class="ft">Scope confirmed<em>you · no schema registry</em></div><div class="ago">11m</div></div>
+              <div class="c-fe done"><div class="fi">✓</div><div class="ft">Story filed in Jira<em>jira-agent · MEAS-7140</em></div><div class="ago">13m</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      const id = t.dataset.tab;
+      document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
+      document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.dataset.panel === id));
+      window.scrollTo({top: 0, behavior: 'instant'});
+    });
+  });
+</script>
+
+</body>
+</html>

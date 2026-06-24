@@ -1,0 +1,36 @@
+{
+  "tracker": "jira",
+  "jira": {
+    "cloudId": "[TODO: JIRA_CLOUD_ID]",
+    "projectKey": "[TODO: JIRA_PROJECT_KEY]",
+    "urlBase": "[TODO: JIRA_URL_BASE]",
+    "customFields": {
+      "sprint": "customfield_10001",
+      "acceptanceCriteria": "customfield_12206"
+    },
+    "transitions": {
+      "start":   "In Progress",
+      "success": "In Review",
+      "failure": "Blocked",
+      "pause":   null
+    },
+    "labels": {
+      "ai": ["AI", "AI_CLI"],
+      "area": null
+    }
+  },
+  "repo": "github",
+  "github": {
+    "owner": "[TODO: GITHUB_OWNER]",
+    "repo": "[TODO: GITHUB_REPO]",
+    "linkingKeyword": "Closes"
+  },
+  "git": {
+    "branchTypes": ["feature", "bugfix", "hotfix"],
+    "branchPattern": "{type}/{ticket}/{slug}",
+    "ticketRegex": "[A-Z]+-[0-9]+"
+  },
+  "clarify": {
+    "defaultAutonomy": "balanced"
+  }
+}

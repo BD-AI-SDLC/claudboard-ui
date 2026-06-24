@@ -1,0 +1,111 @@
+.delete-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-modal__card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  min-width: 420px;
+  max-width: 520px;
+  padding: 24px;
+}
+
+.delete-modal__title {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 12px;
+}
+
+.delete-modal__body {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.delete-modal__body strong {
+  color: var(--text);
+}
+
+.delete-modal__warning {
+  background: var(--red-dim);
+  color: var(--red);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+
+.delete-modal__label {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+
+.delete-modal__input {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  font-size: var(--fs-sm);
+  font-family: var(--font-mono);
+  color: var(--text);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.delete-modal__input:focus {
+  border-color: var(--red);
+}
+
+.delete-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.delete-modal__btn-cancel {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 12px;
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.delete-modal__btn-cancel:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.delete-modal__btn-delete {
+  background: var(--red);
+  border: none;
+  border-radius: var(--radius);
+  padding: 6px 14px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink-on-accent);
+  cursor: pointer;
+}
+
+.delete-modal__btn-delete:hover {
+  opacity: 0.88;
+}
+
+.delete-modal__btn-delete:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

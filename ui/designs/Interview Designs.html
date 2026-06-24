@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>claudboard — interview surfaces</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg:#08090a; --bg-2:#0e0f11; --surface:#131418; --surface-2:#181a1f; --surface-3:#20232a;
+    --border:#23252b; --border-hi:#2e3138; --border-bright:#3b3f48;
+    --text:#ededef; --text-2:#b8b9be; --muted:#797b83; --dim:#4d4f57;
+    --teal:oklch(78% 0.13 195); --teal-dim:oklch(78% 0.13 195 / 0.18);
+    --green:oklch(78% 0.13 150); --green-dim:oklch(78% 0.13 150 / 0.18);
+    --amber:oklch(80% 0.13 78);  --amber-dim:oklch(80% 0.13 78 / 0.18);
+    --red:oklch(70% 0.16 25);    --red-dim:oklch(70% 0.16 25 / 0.18);
+    --violet:oklch(72% 0.13 295);--violet-dim:oklch(72% 0.13 295 / 0.18);
+    --font-sans:'Geist',-apple-system,system-ui,sans-serif;
+    --font-mono:'Geist Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+    font-family:var(--font-sans);font-size:13px;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:var(--font-mono)}
+  button{font:inherit;color:inherit;cursor:pointer}
+
+  /* ─── header ─── */
+  .hd{padding:32px 48px 24px;background:var(--bg-2);border-bottom:1px solid var(--border)}
+  .hd .brand{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;color:var(--muted)}
+  .hd .brand-mark{width:24px;height:24px;border-radius:6px;background:var(--text);color:var(--bg);
+    display:grid;place-items:center}
+  .hd .brand-mark svg{display:block}
+  .brand-ded{font-size:10px;color:var(--dim);font-style:italic;letter-spacing:.01em;margin:6px 0 0 34px;opacity:.7}
+  .hd h1{margin:0 0 10px;font-size:30px;font-weight:600;letter-spacing:-0.018em;line-height:1.15}
+  .hd p{margin:0;max-width:780px;color:var(--text-2);line-height:1.55;font-size:14px}
+
+  /* ─── section ─── */
+  .section{padding:48px 48px 12px;border-bottom:1px solid var(--border)}
+  .section-head{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-bottom:22px;max-width:1280px}
+  .section-tag{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--teal);
+    letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+  .section h2{margin:0 0 6px;font-size:24px;font-weight:600;letter-spacing:-0.012em}
+  .section-sub{font-size:14px;color:var(--muted);margin-bottom:14px}
+  .section-desc{font-size:13px;color:var(--text-2);line-height:1.65;margin:0;max-width:560px}
+  .pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding-top:6px}
+  .pc-h{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+  .pc-h.g{color:var(--green)} .pc-h.a{color:var(--amber)}
+  .pc-item{font-size:12px;color:var(--text-2);line-height:1.5;padding-left:14px;position:relative;margin-bottom:4px}
+  .pc-item::before{position:absolute;left:0}
+  .pros .pc-item::before{content:"+";color:var(--green)}
+  .cons .pc-item::before{content:"−";color:var(--amber)}
+
+  /* ─── frame (1280×720 design slot) ─── */
+  .frame{
+    width:1280px;height:760px;
+    background:var(--bg);
+    border:1px solid var(--border-hi);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+    display:grid; grid-template-columns: 200px 1fr 280px;
+    grid-template-rows: 40px 56px 1fr;
+    grid-template-areas:
+      "side topbar topbar"
+      "side banner banner"
+      "side body rail";
+    margin: 0 auto 48px;
+    position: relative;
+  }
+  .frame.no-rail { grid-template-columns: 200px 1fr; grid-template-areas: "side topbar" "side banner" "side body"; }
+  .frame.focus { grid-template-columns: 1fr; grid-template-areas: "topbar" "body" "body"; }
+
+  /* sidebar */
+  .fs{grid-area:side;background:var(--bg-2);border-right:1px solid var(--border);padding:14px 10px;overflow:hidden}
+  .fs-brand{display:flex;align-items:center;gap:8px;padding:0 4px 12px;border-bottom:1px solid var(--border);margin-bottom:10px;font-weight:600;font-size:13px}
+  .fs-mark{width:20px;height:20px;border-radius:5px;background:var(--text);color:var(--bg);display:grid;place-items:center;font:700 11px var(--font-mono)}
+  .fs-label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:600;padding:8px 6px 4px}
+  .fs-item{display:flex;align-items:center;gap:8px;padding:5px 7px;border-radius:5px;color:var(--text-2);font-size:12px}
+  .fs-item.on{background:var(--surface-2);color:var(--text)}
+  .fs-ico{width:5px;height:5px;border-radius:50%;background:var(--muted);display:inline-block}
+  .fs-item.on .fs-ico{background:var(--teal)}
+  .fs-running{margin-top:6px;padding:7px 9px;border-left:2px solid var(--teal);background:var(--teal-dim);border-radius:0 6px 6px 0}
+  .fs-running .rt{font-size:9px;color:var(--teal);font-weight:600;letter-spacing:.05em;margin-bottom:3px;display:flex;align-items:center;gap:5px}
+  .fs-running .rn{font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pulse{width:5px;height:5px;border-radius:50%;background:currentColor;
+    animation:pulse 1.6s ease-in-out infinite;display:inline-block}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* topbar */
+  .ftb{grid-area:topbar;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;font-size:12px;color:var(--muted)}
+  .ftb .now{color:var(--text);font-weight:500}
+  .ftb .sep{color:var(--dim)}
+
+  /* banner */
+  .fbn{grid-area:banner;padding:10px 16px;display:flex;align-items:center;gap:12px;
+    background:linear-gradient(180deg, var(--violet-dim), transparent);border-bottom:1px solid var(--border)}
+  .fbn-ico{width:28px;height:28px;border-radius:6px;background:var(--violet);color:var(--bg);display:grid;place-items:center;font-weight:700;font-size:14px}
+  .fbn-t{font-size:13px;font-weight:600;color:var(--text)}
+  .fbn-s{font-size:11px;color:var(--text-2);margin-top:1px}
+  .fbn-pill{margin-left:auto;padding:4px 9px;border:1px solid var(--border-hi);border-radius:999px;font-size:11px;color:var(--text-2)}
+
+  /* body + rail */
+  .fbd{grid-area:body;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .frl{grid-area:rail;border-left:1px solid var(--border);background:var(--bg-2);padding:14px 16px;overflow:hidden;font-size:12px}
+  .frl-h{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:600;margin:0 0 8px}
+  .frl-section{padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--border)}
+  .frl-section:last-child{border:0}
+
+  /* ─── chips & primitives ─── */
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;border-radius:999px;
+    border:1px solid var(--border-hi);background:var(--surface);color:var(--text-2);font-size:10px;font-weight:500}
+  .chip.t{border:0;background:var(--teal-dim);color:var(--teal)}
+  .chip.g{border:0;background:var(--green-dim);color:var(--green)}
+  .chip.a{border:0;background:var(--amber-dim);color:var(--amber)}
+  .chip.v{border:0;background:var(--violet-dim);color:var(--violet)}
+  .btn{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border:1px solid var(--border-hi);
+    background:var(--surface);color:var(--text);border-radius:5px;font-size:11px;font-weight:500}
+  .btn.accent{background:var(--teal);color:var(--bg-2);border-color:var(--teal);font-weight:600}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--text-2)}
+  .btn.v{background:var(--violet);color:var(--bg-2);border-color:var(--violet);font-weight:600}
+  .kbd{font-family:var(--font-mono);font-size:10px;border:1px solid var(--border-hi);background:var(--surface);
+    border-radius:3px;padding:1px 4px;color:var(--muted)}
+
+  /* ═══════════════ VARIANT A: CONVERSATION PANE ═══════════════ */
+  .conv{padding:14px 22px 12px;overflow:hidden;display:flex;flex-direction:column;flex:1;min-height:0}
+  .conv-h{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:700;margin-bottom:12px;display:flex;gap:8px;align-items:center}
+  .conv-body{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:14px}
+  .bubble-row{display:flex;flex-direction:column;gap:6px}
+  .bubble-meta{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted)}
+  .av{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font:700 9px var(--font-mono)}
+  .av.ag{background:var(--violet-dim);color:var(--violet)}
+  .av.usr{background:var(--teal-dim);color:var(--teal)}
+  .bubble{padding:8px 12px;border-radius:10px;font-size:12px;line-height:1.55;max-width:80%}
+  .bubble.ag{background:var(--surface);border:1px solid var(--border);color:var(--text-2);margin-left:24px}
+  .bubble.user{align-self:flex-end;background:var(--teal-dim);color:var(--text);border:1px solid color-mix(in oklab, var(--teal) 30%, transparent);font-weight:500}
+  .bubble.current{
+    background:linear-gradient(180deg, var(--violet-dim), var(--surface) 70%);
+    border:1px solid var(--violet);
+    margin-left:24px;
+    max-width:100%;
+    box-shadow:0 0 0 3px color-mix(in oklab, var(--violet) 12%, transparent);
+    padding:12px 14px;
+  }
+  .bubble.current .qt{font-size:13px;color:var(--text);font-weight:500;line-height:1.5;margin-bottom:4px}
+  .bubble.current .why{font-size:11px;color:var(--muted);line-height:1.5;font-style:italic;margin-bottom:10px}
+  .ans-opts{display:grid;gap:6px;margin-bottom:8px}
+  .ans-opt{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--border-hi);
+    background:var(--bg);border-radius:6px;cursor:pointer;text-align:left}
+  .ans-opt.on{background:var(--teal-dim);border-color:var(--teal)}
+  .ans-opt .lbl{font-size:12px;font-weight:500;color:var(--text)}
+  .ans-opt .sub{font-size:10px;color:var(--muted);margin-top:2px;display:block}
+  .ans-opt .rad{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border-bright);flex-shrink:0;margin-top:1px}
+  .ans-opt.on .rad{border:4px solid var(--teal);background:var(--bg)}
+  .ans-input{width:100%;padding:6px 10px;background:var(--bg);border:1px solid var(--border-hi);border-radius:5px;color:var(--text);font:inherit;font-size:11px;margin-bottom:8px}
+  .ans-actions{display:flex;gap:6px;align-items:center}
+  .ans-actions .hint{font-size:10px;color:var(--muted);margin-right:auto}
+
+  /* progress rail in A */
+  .qprog{display:flex;flex-direction:column;gap:4px}
+  .qprog-item{display:grid;grid-template-columns:20px 1fr;gap:8px;padding:6px 8px;border-radius:5px}
+  .qprog-item.on{background:var(--surface-2)}
+  .qprog-num{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:700 10px var(--font-mono);background:var(--surface-2);color:var(--muted)}
+  .qprog-num.done{background:var(--green-dim);color:var(--green)}
+  .qprog-num.cur{background:var(--violet-dim);color:var(--violet)}
+  .qprog-grp{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);font-weight:600}
+  .qprog-text{font-size:11px;color:var(--text-2);line-height:1.4;margin-top:1px}
+  .qprog-item.done .qprog-text{color:var(--muted)}
+  .qprog-ans{font-size:10px;color:var(--green);font-family:var(--font-mono);margin-top:2px}
+
+  /* ═══════════════ VARIANT B: FORM RAIL ═══════════════ */
+  .stream{flex:1;min-height:0;overflow:hidden;padding:10px 14px;font-family:var(--font-mono);font-size:11px;line-height:1.6}
+  .ev{display:grid;grid-template-columns:60px 80px 1fr;gap:10px;color:var(--text-2);padding:2px 0}
+  .ev .t{color:var(--dim)}
+  .ev .ag{color:var(--muted)}
+  .ev.t1 .ag{color:var(--teal)}
+  .ev.t2 .ag{color:var(--violet)}
+  .ev.ok .ag{color:var(--green)}
+  .ev.u .ag{color:var(--teal)}
+  .ev .m{color:var(--text)}
+  .sep-line{text-align:center;color:var(--dim);padding:8px 0;font-size:10px;letter-spacing:.1em}
+  .form-pane{display:flex;flex-direction:column;height:100%;min-height:0}
+  .form-prog{height:3px;background:var(--surface-3)}
+  .form-prog-fill{height:100%;background:var(--violet);width:50%}
+  .form-body{flex:1;min-height:0;overflow:hidden;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+  .form-q{padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg)}
+  .form-q.cur{border-color:var(--violet);background:var(--surface);box-shadow:0 0 0 2px color-mix(in oklab, var(--violet) 10%, transparent)}
+  .form-q-h{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  .form-q-num{width:18px;height:18px;border-radius:50%;background:var(--surface-2);color:var(--muted);display:grid;place-items:center;font:700 9px var(--font-mono)}
+  .form-q.done .form-q-num{background:var(--green-dim);color:var(--green)}
+  .form-q.cur .form-q-num{background:var(--violet-dim);color:var(--violet)}
+  .form-q-grp{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);font-weight:700}
+  .form-q-t{font-size:12px;color:var(--text);font-weight:500;line-height:1.45}
+  .form-q.done .form-q-t{color:var(--muted);font-weight:400}
+  .form-q-why{font-size:10px;color:var(--muted);margin-top:4px;font-style:italic;line-height:1.45}
+  .form-opts{display:grid;gap:4px;margin-top:8px}
+  .form-opts .ans-opt{padding:5px 8px}
+  .form-opts .ans-opt .lbl{font-size:11px}
+  .form-opts .ans-opt .sub{font-size:10px}
+  .form-foot{display:flex;gap:6px;align-items:center;padding:10px 14px;border-top:1px solid var(--border);background:var(--bg-2)}
+  .form-foot .hint{font-size:10px;color:var(--muted);margin-right:auto}
+
+  /* ═══════════════ VARIANT C: INLINE CARDS ═══════════════ */
+  .inline-card{margin:8px 0;padding:7px 11px;border:1px solid var(--border);border-radius:6px;background:var(--surface);
+    display:grid;grid-template-columns:55px 1fr auto;gap:10px;align-items:center;font-family:var(--font-sans);font-size:11px}
+  .inline-card .t{color:var(--muted);font-family:var(--font-mono);font-size:10px}
+  .inline-card.cur{
+    border:1px solid var(--violet);
+    background:linear-gradient(180deg, var(--violet-dim), transparent 80%);
+    grid-template-columns:1fr;
+    padding:12px 14px;
+    box-shadow:0 0 0 2px color-mix(in oklab, var(--violet) 10%, transparent);
+  }
+  .inline-card .q-mark{color:var(--violet);font-weight:700;margin-right:4px}
+  .inline-card .qt{color:var(--text-2)}
+  .inline-card .ans{color:var(--green);font-weight:500;margin-left:4px}
+  .inline-cur-h{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .inline-cur-h .q-badge{width:22px;height:22px;border-radius:50%;background:var(--violet);color:var(--bg);display:grid;place-items:center;font-weight:700;font-size:11px}
+  .inline-cur-h .grp{font-size:9px;color:var(--violet);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+  .inline-cur-h .ts{margin-left:auto;color:var(--muted);font-family:var(--font-mono);font-size:10px}
+  .inline-cur .qt-big{font-size:13px;color:var(--text);font-weight:500;line-height:1.45}
+  .inline-cur .why{font-size:10px;color:var(--muted);margin-top:4px;font-style:italic;line-height:1.5}
+
+  /* ═══════════════ VARIANT D: FOCUS MODE ═══════════════ */
+  .focus-body{display:grid;grid-template-columns:1fr 320px;flex:1;min-height:0;overflow:hidden}
+  .focus-progress{padding:12px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--bg-2)}
+  .focus-progress .lt{font-weight:600;font-size:13px}
+  .focus-progress .ls{color:var(--muted);font-size:11px}
+  .focus-dots{margin-left:auto;display:flex;gap:5px}
+  .focus-dot{width:24px;height:24px;border-radius:50%;background:var(--surface-2);color:var(--muted);
+    display:grid;place-items:center;font:700 10px var(--font-mono)}
+  .focus-dot.done{background:var(--green-dim);color:var(--green)}
+  .focus-dot.cur{background:var(--violet);color:var(--bg);box-shadow:0 0 0 2px var(--violet) inset, 0 0 0 4px color-mix(in oklab, var(--violet) 25%, transparent)}
+  .focus-main{padding:30px 40px;display:flex;flex-direction:column;gap:14px;overflow:hidden;min-height:0}
+  .focus-tag{font:700 10px var(--font-mono);color:var(--violet);letter-spacing:.08em;text-transform:uppercase}
+  .focus-h1{font-size:22px;font-weight:600;letter-spacing:-0.015em;line-height:1.25;margin:0}
+  .focus-why{padding:10px 14px;background:var(--surface);border-left:3px solid var(--violet);border-radius:5px;font-size:12px;color:var(--text-2);line-height:1.55}
+  .focus-why-h{font:700 9px var(--font-mono);color:var(--violet);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:4px}
+  .focus-opt{display:grid;grid-template-columns:22px 1fr;gap:14px;padding:12px 14px;
+    border:1px solid var(--border-hi);background:var(--surface);border-radius:8px;align-items:center;text-align:left;cursor:pointer}
+  .focus-opt.on{border-color:var(--violet);background:var(--violet-dim);box-shadow:0 0 0 3px color-mix(in oklab, var(--violet) 14%, transparent)}
+  .focus-opt .rad{width:20px;height:20px;border-radius:50%;border:2px solid var(--border-bright)}
+  .focus-opt.on .rad{border:6px solid var(--violet);background:var(--bg)}
+  .focus-opt .l{font-weight:600;font-size:14px;color:var(--text)}
+  .focus-opt .s{font-size:11px;color:var(--muted);margin-top:2px}
+  .focus-foot{display:flex;gap:8px;align-items:center;padding-top:6px}
+  .focus-foot .hint{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+  .focus-rail{border-left:1px solid var(--border);background:var(--bg-2);padding:18px 18px;overflow:hidden;font-size:11px}
+  .focus-rail .h{font:700 9px var(--font-mono);color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+  .focus-rail .section{padding:0 0 14px;margin-bottom:14px;border-bottom:1px solid var(--border)}
+  .focus-rail .ctx-line{color:var(--text-2);line-height:1.7;font-family:var(--font-mono);font-size:10px}
+  .focus-rail .ctx-line.hi{color:var(--violet)}
+  .focus-rail .done-line{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:11px}
+  .focus-rail .done-line .ck{color:var(--green);font-weight:700}
+
+  /* ═══════════════ TABS ═══════════════ */
+  .tabs{display:flex;gap:0;padding:0 48px;background:var(--bg-2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+  .tab{
+    background:transparent;border:1px solid transparent;border-bottom:0;
+    padding:12px 16px;display:flex;align-items:center;gap:8px;color:var(--muted);
+    border-radius:7px 7px 0 0;font:500 13px var(--font-sans);
+    position:relative;top:1px;margin-right:2px;
+  }
+  .tab.on{background:var(--bg);border-color:var(--border);color:var(--text);font-weight:600}
+  .tab .tag{width:20px;height:20px;border-radius:4px;background:var(--surface-2);color:var(--muted);
+    display:grid;place-items:center;font:700 10px var(--font-mono)}
+  .tab.on .tag{background:var(--teal-dim);color:var(--teal)}
+  .panel{display:none}
+  .panel.on{display:block}
+  .brandword{display:inline-flex;align-items:baseline}
+  .wbd{color:var(--teal,#1ed1d1)}
+</style>
+</head>
+<body>
+
+<header class="hd">
+  <div class="brand">
+    <span class="brand-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span>
+    <span class="brandword">claud<span class="wbd">board</span></span></div>
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item"><span class="fs-ico"></span>Overview</div>
+        <div class="fs-item"><span class="fs-ico"></span>Project · health</div>
+        <div class="fs-item"><span class="fs-ico"></span>Start feature</div>
+        <div class="fs-item on"><span class="fs-ico"></span>Active run</div>
+        <div class="fs-running">
+          <div class="rt"><span class="pulse"></span>ASKING · 3m 12s</div>
+          <div class="rn">MEAS-7140 · Outbox dispatcher</div>
+        </div>
+        <div class="fs-label">Project</div>
+        <div class="fs-item"><span class="fs-ico"></span>Run history</div>
+        <div class="fs-item"><span class="fs-ico"></span>Skills</div>
+        <div class="fs-item"><span class="fs-ico"></span>Rules</div>
+      </aside>
+
+      <!-- topbar -->
+      <div class="ftb">
+        <span>meas.cloud.datahandler</span>
+        <span class="sep">/</span>
+        <span>runs</span>
+        <span class="sep">/</span>
+        <span class="now mono">MEAS-7140</span>
+        <span class="fbn-pill" style="margin-left:auto" ><span class="mono">feature/MEAS-7140/outbox-dispatcher</span></span>
+      </div>
+
+      <!-- banner -->
+      <div class="fbn">
+        <div class="fbn-ico">?</div>
+        <div>
+          <div class="fbn-t">main agent is asking 6 questions to scope the feature</div>
+          <div class="fbn-s">Phase 1a · clarify scope · 3 of 6 answered · est ~4 min remaining</div>
+        </div>
+        <button class="btn ghost" style="margin-left:auto">Skip all → defaults</button>
+      </div>
+
+      <!-- body: conversation -->
+      <div class="fbd">
+        <div class="conv">
+          <div class="conv-h"><span style="color:var(--violet)">●</span> Clarify scope · conversation · 3 / 6</div>
+          <div class="conv-body">
+
+            <div class="bubble-row">
+              <div class="bubble-meta"><span class="av ag">●</span>main · Topology</div>
+              <div class="bubble ag">Should outbox events be published to a single topic or to per-event-type topics?</div>
+              <div class="bubble user">✓ Single topic — partition by tenantId</div>
+            </div>
+
+            <div class="bubble-row">
+              <div class="bubble-meta"><span class="av ag">●</span>main · Semantics</div>
+              <div class="bubble ag">What delivery guarantee do downstream consumers need?</div>
+              <div class="bubble user">✓ At-least-once</div>
+            </div>
+
+            <div class="bubble-row">
+              <div class="bubble-meta">
+                <span class="av ag">●</span>main · Failure modes
+                <span class="chip v" style="padding:1px 6px">question 4 of 6</span>
+              </div>
+              <div class="bubble current">
+                <div class="qt">On broker outage, how should the dispatcher retry?</div>
+                <div class="why">Existing platform retry uses fixed 30s ticks. Backoff would diverge from default.</div>
+                <div class="ans-opts">
+                  <div class="ans-opt on"><div class="rad"></div><div><div class="lbl">Fixed 30s tick</div><span class="sub">Matches platform retry policy</span></div></div>
+                  <div class="ans-opt"><div class="rad"></div><div><div class="lbl">Exponential 5s → 5m</div><span class="sub">Reduces load on unhealthy brokers</span></div></div>
+                  <div class="ans-opt"><div class="rad"></div><div><div class="lbl">Halt + alert</div><span class="sub">No automatic retry, ops handles</span></div></div>
+                </div>
+                <input class="ans-input" placeholder="Add a note (optional)…" />
+                <div class="ans-actions">
+                  <span class="hint"><span class="kbd">⌘ ↵</span> to submit</span>
+                  <button class="btn ghost">Skip</button>
+                  <button class="btn accent">Submit answer →</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- rail -->
+      <aside class="frl">
+        <div class="frl-section">
+          <div class="frl-h">Questions · 3 / 6</div>
+          <div class="qprog">
+            <div class="qprog-item done">
+              <div class="qprog-num done">✓</div>
+              <div><div class="qprog-grp">Topology</div><div class="qprog-text">Single vs per-type topic?</div><div class="qprog-ans">Single topic</div></div>
+            </div>
+            <div class="qprog-item done">
+              <div class="qprog-num done">✓</div>
+              <div><div class="qprog-grp">Semantics</div><div class="qprog-text">Delivery guarantee?</div><div class="qprog-ans">At-least-once</div></div>
+            </div>
+            <div class="qprog-item done">
+              <div class="qprog-num done">✓</div>
+              <div><div class="qprog-grp">Storage</div><div class="qprog-text">Where outbox lives?</div><div class="qprog-ans">Per-tenant DB</div></div>
+            </div>
+            <div class="qprog-item on">
+              <div class="qprog-num cur">4</div>
+              <div><div class="qprog-grp">Failure modes</div><div class="qprog-text">Retry strategy on outage?</div></div>
+            </div>
+            <div class="qprog-item">
+              <div class="qprog-num">5</div>
+              <div><div class="qprog-grp">Lifecycle</div><div class="qprog-text" style="color:var(--muted)">Purge or archive?</div></div>
+            </div>
+            <div class="qprog-item">
+              <div class="qprog-num">6</div>
+              <div><div class="qprog-grp">Out of scope</div><div class="qprog-text" style="color:var(--muted)">Anything to exclude?</div></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="frl-h">Next steps</div>
+          <div style="font-size:11px;color:var(--text-2);line-height:1.7">
+            → patch Jira description<br/>
+            → hand off to sdd-expert<br/>
+            → then architect-agent<br/>
+            → human gate at phase 1d
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════ VARIANT B ═════════════════════ -->
+<section class="panel" data-panel="B">
+  <div class="section">
+    <div class="section-head">
+      <div>
+        <div class="section-tag">Variant B · batch interview in the right pane</div>
+        <h2>Form rail</h2>
+        <p class="section-desc">The live event stream keeps running on the left. The right pane becomes a stacked form of all questions with a progress bar — answer them in any order, submit as a batch. Best when you want to bang through clarifications fast and keep watching the agent's prep work.</p>
+      </div>
+      <div class="pros-cons">
+        <div class="pros">
+          <div class="pc-h g">Strengths</div>
+          <div class="pc-item">Live stream stays visible alongside</div>
+          <div class="pc-item">Answer out of order, see total scope</div>
+          <div class="pc-item">Batch submit feels fast for short interviews</div>
+        </div>
+        <div class="cons">
+          <div class="pc-h a">Trade-offs</div>
+          <div class="pc-item">Less conversational; no per-Q dialogue</div>
+          <div class="pc-item">Awkward for follow-up questions later</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" style="grid-template-columns:200px 1fr 380px">
+      <aside class="fs">
+        <div class="fs-brand"><span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span><span class="brandword">claud<span class="wbd">board</span></span></div>
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item"><span class="fs-ico"></span>Overview</div>
+        <div class="fs-item"><span class="fs-ico"></span>Project · health</div>
+        <div class="fs-item"><span class="fs-ico"></span>Start feature</div>
+        <div class="fs-item on"><span class="fs-ico"></span>Active run</div>
+        <div class="fs-running">
+          <div class="rt"><span class="pulse"></span>ASKING · 3m 12s</div>
+          <div class="rn">MEAS-7140 · Outbox dispatcher</div>
+        </div>
+      </aside>
+
+      <div class="ftb">
+        <span>meas.cloud.datahandler</span>
+        <span class="sep">/</span>
+        <span>runs</span>
+        <span class="sep">/</span>
+        <span class="now mono">MEAS-7140</span>
+      </div>
+
+      <div class="fbn">
+        <div class="fbn-ico">?</div>
+        <div>
+          <div class="fbn-t">6 questions waiting in the right pane</div>
+          <div class="fbn-s">Phase 1a · clarify scope · 3 of 6 answered</div>
+        </div>
+      </div>
+
+      <!-- body: stream stays running -->
+      <div class="fbd">
+        <div class="stream">
+          <div class="ev"><span class="t">09:47:02</span><span class="ag">main</span><span class="m">Workflow started · ticket=MEAS-7140</span></div>
+          <div class="ev t2"><span class="t">09:47:04</span><span class="ag">jira-agent</span><span class="m">→ atlassian.createIssue project=MEAS</span></div>
+          <div class="ev ok"><span class="t">09:47:23</span><span class="ag">jira-agent</span><span class="m">Created MEAS-7140 · labels=[AI, backend]</span></div>
+          <div class="ev"><span class="t">09:47:24</span><span class="ag">main</span><span class="m">Phase 1a · clarify scope</span></div>
+          <div class="ev"><span class="t">09:47:30</span><span class="ag">main</span><span class="m">Loaded rules: kafka-producer.md, mongodb-conventions.md</span></div>
+          <div class="ev"><span class="t">09:47:32</span><span class="ag">main</span><span class="m">Identified 6 scope decisions before sdd-expert can write the spec</span></div>
+          <div class="ev u"><span class="t">09:48:14</span><span class="ag">user</span><span class="m">→ q1 Topology: single topic</span></div>
+          <div class="ev u"><span class="t">09:48:50</span><span class="ag">user</span><span class="m">→ q2 Semantics: at-least-once</span></div>
+          <div class="ev u"><span class="t">09:49:32</span><span class="ag">user</span><span class="m">→ q3 Storage: per-tenant DB</span></div>
+          <div class="sep-line">── interview in progress · 3 of 6 ──</div>
+          <div class="ev"><span class="t">—</span><span class="ag" style="color:var(--amber)">user</span><span class="m"><span class="pulse" style="background:var(--amber);margin-right:6px;vertical-align:middle"></span>answer remaining 3 in the right pane</span></div>
+        </div>
+      </div>
+
+      <!-- rail: form -->
+      <aside class="frl" style="padding:0;display:flex;flex-direction:column">
+        <div style="padding:12px 14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg, var(--violet-dim), transparent)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+            <span style="color:var(--violet);font-weight:700">●</span>
+            <span style="font-weight:600;font-size:12px">Clarify scope · 6 questions</span>
+            <span style="margin-left:auto;font-size:10px;color:var(--muted);font-family:var(--font-mono)">3 / 6</span>
+          </div>
+        </div>
+        <div class="form-prog"><div class="form-prog-fill"></div></div>
+        <div class="form-body">
+
+          <div class="form-q done">
+            <div class="form-q-h"><div class="form-q-num">✓</div><span class="form-q-grp">Topology</span></div>
+            <div class="form-q-t">Single topic or per-event-type?</div>
+            <div style="margin-top:6px"><span class="chip g">✓ Single topic</span></div>
+          </div>
+
+          <div class="form-q done">
+            <div class="form-q-h"><div class="form-q-num">✓</div><span class="form-q-grp">Semantics</span></div>
+            <div class="form-q-t">Delivery guarantee?</div>
+            <div style="margin-top:6px"><span class="chip g">✓ At-least-once</span></div>
+          </div>
+
+          <div class="form-q done">
+            <div class="form-q-h"><div class="form-q-num">✓</div><span class="form-q-grp">Storage</span></div>
+            <div class="form-q-t">Where outbox lives?</div>
+            <div style="margin-top:6px"><span class="chip g">✓ Per-tenant DB</span></div>
+          </div>
+
+          <div class="form-q cur">
+            <div class="form-q-h"><div class="form-q-num">4</div><span class="form-q-grp">Failure modes</span></div>
+            <div class="form-q-t">On broker outage, retry strategy?</div>
+            <div class="form-q-why">Platform default is fixed 30s; backoff would diverge.</div>
+            <div class="form-opts">
+              <div class="ans-opt on"><div class="rad"></div><div><div class="lbl">Fixed 30s tick</div><span class="sub">Matches platform retry</span></div></div>
+              <div class="ans-opt"><div class="rad"></div><div><div class="lbl">Exponential 5s → 5m</div></div></div>
+              <div class="ans-opt"><div class="rad"></div><div><div class="lbl">Halt + alert</div></div></div>
+            </div>
+          </div>
+
+          <div class="form-q">
+            <div class="form-q-h"><div class="form-q-num">5</div><span class="form-q-grp">Lifecycle</span></div>
+            <div class="form-q-t">After dispatch, purge or archive?</div>
+            <div class="form-opts">
+              <div class="ans-opt"><div class="rad"></div><div><div class="lbl">Purge after 30d</div></div></div>
+              <div class="ans-opt"><div class="rad"></div><div><div class="lbl">Move to archive</div></div></div>
+              <div class="ans-opt"><div class="rad"></div><div><div class="lbl">Keep forever</div></div></div>
+            </div>
+          </div>
+
+        </div>
+        <div class="form-foot">
+          <span class="hint">3 unanswered</span>
+          <button class="btn ghost">Defaults</button>
+          <button class="btn v">Submit all · resume</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════ VARIANT C ═════════════════════ -->
+<section class="panel" data-panel="C">
+  <div class="section">
+    <div class="section-head">
+      <div>
+        <div class="section-tag">Variant C · interview is just another event in the stream</div>
+        <h2>Inline stream cards</h2>
+        <p class="section-desc">Question cards live in the live event stream alongside tool calls and agent events. Answered questions collapse to a one-liner; the current one expands. Reinforces the mental model: an interview is just a particular kind of agent event — which makes follow-up questions in any later phase feel natural.</p>
+      </div>
+      <div class="pros-cons">
+        <div class="pros">
+          <div class="pc-h g">Strengths</div>
+          <div class="pc-item">Unifies all agent communication in one place</div>
+          <div class="pc-item">Works for any phase, any agent</div>
+          <div class="pc-item">Tight scroll behavior; no panel mode-switch</div>
+        </div>
+        <div class="cons">
+          <div class="pc-h a">Trade-offs</div>
+          <div class="pc-item">Can get lost in noisy streams</div>
+          <div class="pc-item">No bird's-eye view of total questions</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <aside class="fs">
+        <div class="fs-brand"><span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span><span class="brandword">claud<span class="wbd">board</span></span></div>
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item"><span class="fs-ico"></span>Overview</div>
+        <div class="fs-item"><span class="fs-ico"></span>Project · health</div>
+        <div class="fs-item"><span class="fs-ico"></span>Start feature</div>
+        <div class="fs-item on"><span class="fs-ico"></span>Active run</div>
+        <div class="fs-running">
+          <div class="rt"><span class="pulse"></span>ASKING · 3m</div>
+          <div class="rn">MEAS-7140 · Outbox dispatcher</div>
+        </div>
+      </aside>
+
+      <div class="ftb">
+        <span>meas.cloud.datahandler</span>
+        <span class="sep">/</span>
+        <span class="now mono">MEAS-7140</span>
+      </div>
+
+      <div class="fbn">
+        <div class="fbn-ico">?</div>
+        <div>
+          <div class="fbn-t">interview lives in the stream — answers flow into the run</div>
+          <div class="fbn-s">Phase 1a · 3 of 6 answered</div>
+        </div>
+      </div>
+
+      <div class="fbd">
+        <div class="stream" style="padding:12px 16px">
+          <div class="ev"><span class="t">09:47:02</span><span class="ag">main</span><span class="m">Workflow started · ticket=MEAS-7140</span></div>
+          <div class="ev t2"><span class="t">09:47:04</span><span class="ag">jira-agent</span><span class="m">→ atlassian.createIssue</span></div>
+          <div class="ev ok"><span class="t">09:47:23</span><span class="ag">jira-agent</span><span class="m">Created MEAS-7140</span></div>
+          <div class="ev"><span class="t">09:47:24</span><span class="ag">main</span><span class="m">Phase 1a · clarify scope</span></div>
+
+          <div class="inline-card">
+            <span class="t">09:48:14</span>
+            <div><span class="q-mark">?</span><span class="qt">Single topic or per-event-type?</span><span class="ans">→ ✓ Single topic</span></div>
+            <button class="btn ghost" style="padding:2px 6px;font-size:10px">edit</button>
+          </div>
+          <div class="inline-card">
+            <span class="t">09:48:50</span>
+            <div><span class="q-mark">?</span><span class="qt">Delivery guarantee?</span><span class="ans">→ ✓ At-least-once</span></div>
+            <button class="btn ghost" style="padding:2px 6px;font-size:10px">edit</button>
+          </div>
+          <div class="inline-card">
+            <span class="t">09:49:32</span>
+            <div><span class="q-mark">?</span><span class="qt">Where outbox lives?</span><span class="ans">→ ✓ Per-tenant DB</span></div>
+            <button class="btn ghost" style="padding:2px 6px;font-size:10px">edit</button>
+          </div>
+
+          <div class="inline-card cur inline-cur">
+            <div class="inline-cur-h">
+              <div class="q-badge">?</div>
+              <span class="grp">question 4 of 6 · failure modes</span>
+              <span class="ts">09:50:12</span>
+            </div>
+            <div class="qt-big">On broker outage, how should the dispatcher retry?</div>
+            <div class="why">Existing platform retry uses fixed 30s ticks. Backoff would diverge from default.</div>
+            <div class="ans-opts" style="margin-top:10px">
+              <div class="ans-opt on"><div class="rad"></div><div><div class="lbl">Fixed 30s tick</div><span class="sub">Matches platform retry policy</span></div></div>
+              <div class="ans-opt"><div class="rad"></div><div><div class="lbl">Exponential 5s → 5m</div></div></div>
+              <div class="ans-opt"><div class="rad"></div><div><div class="lbl">Halt + alert</div></div></div>
+            </div>
+            <div class="ans-actions" style="margin-top:10px">
+              <input class="ans-input" placeholder="optional note…" style="margin:0;flex:1" />
+              <button class="btn ghost" style="padding:5px 9px">Skip</button>
+              <button class="btn v" style="padding:5px 9px">Submit</button>
+            </div>
+          </div>
+
+          <div class="ev" style="opacity:.5;margin-top:8px"><span class="t">—</span><span class="ag">main</span><span class="m">2 more questions queued (Lifecycle · Out of scope)</span></div>
+        </div>
+      </div>
+
+      <aside class="frl">
+        <div class="frl-section">
+          <div class="frl-h">Interview progress</div>
+          <div style="height:4px;background:var(--surface-3);border-radius:2px;margin-bottom:8px">
+            <div style="width:50%;height:100%;background:var(--violet);border-radius:2px"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:8px;font-size:11px;color:var(--text-2);line-height:1.7">
+            <span style="color:var(--muted)">Asked</span><span class="mono">3 / 6</span>
+            <span style="color:var(--muted)">Avg reply</span><span class="mono">42s</span>
+            <span style="color:var(--muted)">Est total</span><span class="mono">4m 20s</span>
+          </div>
+        </div>
+        <div class="frl-section">
+          <div class="frl-h">What the agent learned</div>
+          <div style="font-size:11px;color:var(--text-2);line-height:1.7">
+            ✓ Single topic, tenant-partitioned<br/>
+            ✓ At-least-once semantics<br/>
+            ✓ Outbox in per-tenant DB
+          </div>
+        </div>
+        <div>
+          <div class="frl-h">Why this pattern</div>
+          <div style="font-size:11px;color:var(--text-2);line-height:1.55">
+            Follow-up questions can pop up later from sdd-expert, architect, or implementation — and they slot into the stream the same way.
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════ VARIANT D ═════════════════════ -->
+<section class="panel" data-panel="D">
+  <div class="section">
+    <div class="section-head">
+      <div>
+        <div class="section-tag">Variant D · hero takeover · one question at a time</div>
+        <h2>Focus mode</h2>
+        <p class="section-desc">Full-frame takeover when an interview starts: large question, "Why I'm asking" callout, big radio options with rich context, and a rail showing what files the agent consulted and what's already been decided. Demands attention — reserved for high-stakes decisions or pre-Phase-1 framing.</p>
+      </div>
+      <div class="pros-cons">
+        <div class="pros">
+          <div class="pc-h g">Strengths</div>
+          <div class="pc-item">Most deliberate — feels like a real decision</div>
+          <div class="pc-item">Strong "why I'm asking" framing</div>
+          <div class="pc-item">Carries the most context per question</div>
+        </div>
+        <div class="cons">
+          <div class="pc-h a">Trade-offs</div>
+          <div class="pc-item">Heavy for fast/cheap clarifications</div>
+          <div class="pc-item">Hides the rest of the workflow</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame focus">
+      <div class="ftb">
+        <span>meas.cloud.datahandler</span><span class="sep">/</span>
+        <span class="now mono">MEAS-7140</span>
+        <span class="sep">/</span>
+        <span style="color:var(--violet)">● clarify scope · focus mode</span>
+        <button class="btn ghost" style="margin-left:auto">⌃ exit focus</button>
+      </div>
+
+      <div class="focus-progress" style="grid-area:body">
+        <span class="lt">Clarify scope</span>
+        <span style="color:var(--dim)">·</span>
+        <span class="ls">MEAS-7140 · Outbox dispatcher · phase 1a</span>
+        <div class="focus-dots">
+          <div class="focus-dot done">✓</div>
+          <div class="focus-dot done">✓</div>
+          <div class="focus-dot done">✓</div>
+          <div class="focus-dot cur">4</div>
+          <div class="focus-dot">5</div>
+          <div class="focus-dot">6</div>
+        </div>
+      </div>
+
+      <div class="focus-body" style="grid-area:body;grid-row:span 1;border-top:1px solid var(--border)">
+        <div class="focus-main">
+          <div class="focus-tag">Question 4 of 6 · Failure modes</div>
+          <h1 class="focus-h1">On broker outage, how should the dispatcher retry?</h1>
+          <div class="focus-why">
+            <span class="focus-why-h">Why I'm asking</span>
+            Existing platform retry config uses fixed 30s intervals. Backoff would diverge from the platform default and add a new retry policy to maintain.
+          </div>
+
+          <div style="display:grid;gap:8px">
+            <button class="focus-opt on">
+              <div class="rad"></div>
+              <div>
+                <div class="l">Fixed 30s tick</div>
+                <div class="s">Default. Matches platform retry policy. Predictable behavior.</div>
+              </div>
+            </button>
+            <button class="focus-opt">
+              <div class="rad"></div>
+              <div>
+                <div class="l">Exponential 5s → 5m</div>
+                <div class="s">Reduces load on unhealthy brokers. New pattern in this repo.</div>
+              </div>
+            </button>
+            <button class="focus-opt">
+              <div class="rad"></div>
+              <div>
+                <div class="l">Halt + alert</div>
+                <div class="s">No automatic retry. Ops handles via runbook.</div>
+              </div>
+            </button>
+          </div>
+
+          <input class="ans-input" placeholder="Add a note — examples, constraints, links to existing patterns…" style="padding:8px 12px;margin-top:6px" />
+
+          <div class="focus-foot">
+            <button class="btn ghost">← Previous</button>
+            <button class="btn ghost">Skip</button>
+            <span class="hint">
+              <span class="kbd">⌘ ↵</span> to continue
+              <button class="btn v" style="padding:7px 12px">Next question →</button>
+            </span>
+          </div>
+        </div>
+
+        <aside class="focus-rail">
+          <div class="section">
+            <div class="h">Ticket</div>
+            <div style="display:flex;gap:6px;margin-bottom:6px"><span class="chip v">MEAS-7140</span><span class="chip">Story</span></div>
+            <div style="font-size:11px;color:var(--text-2);line-height:1.5">Outbox dispatcher for entitlement events</div>
+          </div>
+          <div class="section">
+            <div class="h">Agent context</div>
+            <div class="ctx-line hi">· kafka-producer.md</div>
+            <div class="ctx-line hi">· mongodb-conventions.md</div>
+            <div class="ctx-line" style="color:var(--muted)">· OrderEvent dispatcher (sibling)</div>
+            <div class="ctx-line" style="color:var(--muted)">· AuditLogger pattern</div>
+          </div>
+          <div class="section" style="border:0">
+            <div class="h">Already decided</div>
+            <div class="done-line"><span class="ck">✓</span><span style="color:var(--muted)">Topology:</span><b style="color:var(--text);font-weight:500">Single topic</b></div>
+            <div class="done-line"><span class="ck">✓</span><span style="color:var(--muted)">Semantics:</span><b style="color:var(--text);font-weight:500">At-least-once</b></div>
+            <div class="done-line"><span class="ck">✓</span><span style="color:var(--muted)">Storage:</span><b style="color:var(--text);font-weight:500">Per-tenant DB</b></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer style="padding:32px 48px;background:var(--bg-2);text-align:center;font-size:12px;color:var(--muted);border-top:1px solid var(--border)">
+  Same Phase 1a content (6 questions) · four containers · tap a tab to switch
+</footer>
+
+<script>
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+      document.querySelectorAll('.panel').forEach(x => x.classList.remove('on'));
+      t.classList.add('on');
+      document.querySelector('.panel[data-panel="' + t.dataset.tab + '"]').classList.add('on');
+      window.scrollTo({top: 0});
+    });
+  });
+</script>
+
+</body>
+</html>

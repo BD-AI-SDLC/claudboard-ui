@@ -1,0 +1,1204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>claudboard — active run v3 (states)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --bg:#08090a; --bg-2:#0e0f11; --surface:#131418; --surface-2:#181a1f; --surface-3:#20232a;
+    --border:#23252b; --border-hi:#2e3138; --border-bright:#3b3f48;
+    --text:#ededef; --text-2:#b8b9be; --muted:#797b83; --dim:#4d4f57;
+    --teal:oklch(78% 0.13 195);   --teal-dim:oklch(78% 0.13 195 / 0.18);
+    --green:oklch(78% 0.13 150);  --green-dim:oklch(78% 0.13 150 / 0.18);
+    --amber:oklch(80% 0.13 78);   --amber-dim:oklch(80% 0.13 78 / 0.18);
+    --red:oklch(70% 0.16 25);     --red-dim:oklch(70% 0.16 25 / 0.18);
+    --violet:oklch(72% 0.13 295); --violet-dim:oklch(72% 0.13 295 / 0.18);
+    --amber-ink:#1a1300; --green-ink:#04190f; --teal-ink:#001016;
+    --font-sans:'Geist',-apple-system,system-ui,sans-serif;
+    --font-mono:'Geist Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:13px;-webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01","ss03"}
+  button{font:inherit;color:inherit;cursor:pointer;background:transparent;border:0}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+  /* ── page chrome ── */
+  .pg-head{padding:32px 48px 24px;background:var(--bg-2);border-bottom:1px solid var(--border)}
+  .pg-head .brand{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);margin-bottom:10px}
+  .pg-head .brand-mark{width:22px;height:22px;border-radius:5px;background:var(--text);color:var(--bg);display:grid;place-items:center;font:700 11px var(--font-mono)}
+  .pg-head h1{margin:0 0 8px;font-size:28px;font-weight:600;letter-spacing:-0.018em}
+  .pg-head p{margin:0;max-width:960px;color:var(--text-2);line-height:1.55;font-size:14px}
+
+  .tabs{display:flex;padding:0 48px;background:var(--bg-2);border-bottom:1px solid var(--border);gap:0;position:sticky;top:0;z-index:10;flex-wrap:wrap}
+  .tab{padding:12px 16px;display:flex;align-items:center;gap:8px;color:var(--muted);border-radius:7px 7px 0 0;font:500 13px var(--font-sans);position:relative;top:1px;margin-right:2px;border:1px solid transparent;border-bottom:0;white-space:nowrap}
+  .tab.on{background:var(--bg);border-color:var(--border);color:var(--text);font-weight:600}
+  .tab .tag{padding:2px 7px;border-radius:4px;background:var(--surface-2);color:var(--muted);font:600 10px var(--font-mono);letter-spacing:.04em}
+  .tab.on[data-tab="gate"]    .tag{background:var(--amber-dim);color:var(--amber)}
+  .tab.on[data-tab="running"] .tag{background:var(--teal-dim);color:var(--teal)}
+  .tab.on[data-tab="clarify"] .tag{background:var(--violet-dim);color:var(--violet)}
+  .tab.on[data-tab="artifact"].tag{background:var(--green-dim);color:var(--green)}
+  .panel{display:none}
+  .panel.on{display:block}
+
+  .intro{display:grid;grid-template-columns:1.4fr 1fr;gap:48px;padding:28px 48px 12px;max-width:1400px}
+  .intro-tag{font:700 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+  .intro h2{margin:0 0 6px;font-size:21px;font-weight:600;letter-spacing:-0.012em}
+  .intro p{font-size:13px;color:var(--text-2);line-height:1.6;margin:0;max-width:640px}
+  .intro [data-key=gate]    .intro-tag{color:var(--amber)}
+  .intro [data-key=running] .intro-tag{color:var(--teal)}
+  .intro [data-key=clarify] .intro-tag{color:var(--violet)}
+  .intro [data-key=artifact].intro-tag{color:var(--green)}
+  .scen-meta{padding-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .meta-h{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .meta-item{font-size:12px;color:var(--text-2);line-height:1.5;padding-left:14px;position:relative;margin-bottom:4px}
+  .meta-item::before{content:"·";position:absolute;left:2px;color:var(--violet);font-weight:700}
+
+  /* ── frame ── */
+  .frame{width:1280px;height:840px;background:var(--bg);border:1px solid var(--border-hi);border-radius:12px;
+    overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4);margin:0 auto 48px;
+    display:grid;grid-template-columns:220px 1fr;grid-template-rows:48px 1fr;
+    grid-template-areas:"side topbar" "side body";position:relative}
+
+  /* sidebar */
+  .fs{grid-area:side;background:var(--bg-2);border-right:1px solid var(--border);padding:12px 10px;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+  .fs-brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;padding:0 4px 10px;border-bottom:1px solid var(--border)}
+  .fs-mark{width:20px;height:20px;border-radius:5px;background:var(--text);color:var(--bg);display:grid;place-items:center;font:700 11px var(--font-mono)}
+  .fs-brand small{margin-left:auto;font:500 9px var(--font-sans);color:var(--muted);border:1px solid var(--border-hi);border-radius:999px;padding:1px 6px;letter-spacing:.05em;text-transform:uppercase}
+  .ws{margin-top:10px;display:flex;align-items:center;gap:7px;padding:7px 9px;background:var(--surface);border:1px solid var(--border-hi);border-radius:6px}
+  .ws-ico{width:18px;height:18px;border-radius:4px;display:grid;place-items:center;font:600 9px var(--font-mono);background:var(--violet-dim);color:var(--violet)}
+  .ws-name{font-weight:500;font-size:12px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ws-chev{color:var(--muted);font-size:10px}
+  .fs-nav{margin-top:10px;display:flex;flex-direction:column;gap:1px;flex:1;min-height:0}
+  .fs-label{font:600 10px var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:8px 8px 4px}
+  .fs-item{display:flex;align-items:center;gap:9px;padding:5px 8px;border-radius:5px;color:var(--text-2);font-size:12px;cursor:pointer}
+  .fs-item.on{background:var(--surface-2);color:var(--text)}
+  .fs-item .fs-ico{width:13px;height:13px;color:var(--muted);flex-shrink:0}
+  .fs-item.on .fs-ico{color:var(--teal)}
+  .fs-running{margin-top:6px;padding:8px 10px;border-radius:0 6px 6px 0;border-left:2px solid}
+  .fs-running.gate    {border-color:var(--amber);background:var(--amber-dim)}
+  .fs-running.running {border-color:var(--teal);background:var(--teal-dim)}
+  .fs-running.clarify {border-color:var(--violet);background:var(--violet-dim)}
+  .fs-running .nr-top{display:flex;align-items:center;gap:6px;font:600 10.5px var(--font-sans);margin-bottom:3px;letter-spacing:.02em}
+  .fs-running.gate    .nr-top{color:var(--amber)}
+  .fs-running.running .nr-top{color:var(--teal)}
+  .fs-running.clarify .nr-top{color:var(--violet)}
+  .fs-running .nr-title{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fs-running .nr-meta{font:500 10px var(--font-mono);color:var(--muted);margin-top:2px}
+  .pulse-dot{display:inline-block;width:6px;height:6px;border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.85)}}
+
+  /* topbar */
+  .ftb{grid-area:topbar;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;background:var(--bg);position:relative;z-index:5}
+  .crumb{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;min-width:0}
+  .crumb .sep{color:var(--dim)}
+  .crumb .now{color:var(--text);font-weight:500}
+  .spacer{flex:1}
+  .key{font:500 10px var(--font-mono);border:1px solid var(--border-hi);background:var(--surface);border-radius:4px;padding:2px 5px;color:var(--muted)}
+  .fbd{grid-area:body;min-width:0;min-height:0;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);position:relative}
+
+  /* ── shared atoms ── */
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;border-radius:999px;border:1px solid var(--border-hi);background:var(--surface);color:var(--text-2);font-size:11px;font-weight:500}
+  .chip.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+  .chip.teal{border-color:transparent;background:var(--teal-dim);color:var(--teal)}
+  .chip.green{border-color:transparent;background:var(--green-dim);color:var(--green)}
+  .chip.amber{border-color:transparent;background:var(--amber-dim);color:var(--amber)}
+  .chip.violet{border-color:transparent;background:var(--violet-dim);color:var(--violet)}
+  .chip .dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border:1px solid var(--border-hi);background:var(--surface);color:var(--text);border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0}
+  .btn:hover{border-color:var(--border-bright);background:var(--surface-2)}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--text-2)}
+  .btn.ghost:hover{background:var(--surface)}
+  .btn.amber{background:var(--amber);color:var(--amber-ink);border-color:var(--amber);font-weight:600}
+  .btn.teal{background:var(--teal);color:var(--teal-ink);border-color:var(--teal);font-weight:600}
+  .btn.violet{background:var(--violet);color:#fff;border-color:var(--violet);font-weight:600}
+  .btn.sm{padding:4px 8px;font-size:11px}
+  .btn.icn{padding:6px 8px}
+
+  /* topbar action cluster */
+  .topbar-actions{display:flex;align-items:center;gap:8px}
+  .runctrl{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border-hi);border-radius:6px;padding:2px;gap:1px}
+  .runctrl .rc{padding:5px 9px;border-radius:4px;color:var(--text-2);display:flex;align-items:center;gap:5px;font-size:11.5px;cursor:pointer;font-weight:500}
+  .runctrl .rc:hover{background:var(--surface-2);color:var(--text)}
+  .runctrl .rc.primary{color:var(--text);font-weight:600}
+  .runctrl .rc.danger{color:var(--muted);padding:5px 8px}
+  .runctrl .rc.danger:hover{color:var(--red);background:var(--red-dim)}
+  .runctrl .div{width:1px;height:14px;background:var(--border)}
+
+  /* artifacts dropdown */
+  .art-pill{position:relative;display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:var(--surface);border:1px solid var(--border-hi);border-radius:6px;font-size:11.5px;color:var(--text-2);cursor:pointer;font-weight:500}
+  .art-pill:hover{border-color:var(--border-bright);color:var(--text)}
+  .art-pill .ct{font:700 9px var(--font-mono);background:var(--surface-3);color:var(--muted);padding:1px 6px;border-radius:999px}
+  .art-pop{position:absolute;right:0;top:calc(100% + 6px);width:340px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;box-shadow:0 12px 36px rgba(0,0,0,.45);z-index:30;padding:6px;display:none}
+  .art-pill.open .art-pop{display:block}
+  .art-pop .ah{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:7px 9px 5px}
+  .art-pop .ali{display:grid;grid-template-columns:24px 1fr auto;gap:10px;padding:8px 9px;border-radius:5px;align-items:center;cursor:pointer}
+  .art-pop .ali:hover{background:var(--surface-2)}
+  .art-pop .ali .ico{width:22px;height:22px;border-radius:5px;background:var(--violet-dim);color:var(--violet);display:grid;place-items:center}
+  .art-pop .ali .ali-n{font-family:var(--font-mono);font-size:11.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
+  .art-pop .ali .ali-n .open-ico{color:var(--muted);opacity:0;transition:opacity .15s}
+  .art-pop .ali:hover .open-ico{opacity:1}
+  .art-pop .ali .ali-s{font-size:10.5px;color:var(--muted);font-family:var(--font-sans);margin-top:1px}
+  .art-pop .ali .meta{font:500 10px var(--font-mono);color:var(--muted)}
+  .art-pop-foot{padding:8px 9px;border-top:1px solid var(--border);margin-top:4px;font-size:10.5px;color:var(--muted);font-family:var(--font-mono);text-align:center}
+
+  /* ── status strip ── */
+  .statusbar{display:grid;grid-template-columns:1fr auto;align-items:center;padding:12px 22px;gap:14px;border-bottom:1px solid var(--border)}
+  .statusbar.gate    {background:linear-gradient(180deg,var(--amber-dim),transparent 90%)}
+  .statusbar.running {background:linear-gradient(180deg,var(--teal-dim),transparent 90%)}
+  .statusbar.clarify {background:linear-gradient(180deg,var(--violet-dim),transparent 95%)}
+  .statusbar .sl{display:flex;align-items:center;gap:14px;min-width:0}
+  .statusbar .icb{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;flex-shrink:0}
+  .statusbar.gate    .icb{background:var(--amber);color:var(--amber-ink)}
+  .statusbar.running .icb{background:var(--teal);color:var(--teal-ink)}
+  .statusbar.clarify .icb{background:var(--violet);color:#fff}
+  .statusbar .t{font:600 14.5px var(--font-sans);letter-spacing:-0.005em;color:var(--text);display:flex;align-items:center;gap:9px}
+  .statusbar .ttkt{font-family:var(--font-mono);color:var(--violet);font-size:13px}
+  .statusbar .s{font:500 12px var(--font-sans);color:var(--text-2);margin-top:2px}
+  .statusbar .s b{color:var(--text);font-weight:600}
+  .statusbar .sr{display:flex;align-items:center;gap:6px;flex-shrink:0}
+
+  /* ── pipeline ribbon ── */
+  .ribbon{padding:16px 22px 14px;border-bottom:1px solid var(--border);background:var(--bg)}
+  .ribbon-h{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+  .ribbon-h h3{margin:0;font-size:13px;font-weight:600;letter-spacing:-0.005em}
+  .ribbon-h .sub{color:var(--muted);font-size:11.5px;font-family:var(--font-mono)}
+  .ribbon-h .legend{margin-left:auto;display:flex;gap:14px;font-size:10.5px;color:var(--muted)}
+  .ribbon-h .legend .dt{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}
+
+  .flow{display:grid;grid-template-columns:1.2fr 1.4fr 1.1fr 2.4fr 1fr 1.2fr .9fr 1fr;column-gap:0;position:relative;padding:0 6px;align-items:start}
+  .flow::before{content:"";position:absolute;left:46px;right:46px;top:16px;height:2px;background:var(--surface-3);border-radius:1px;z-index:0}
+  .flow .pseg{display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;z-index:1;padding:0 4px;min-width:0;text-align:center}
+  .flow .pseg .node{width:30px;height:30px;border-radius:50%;background:var(--surface-2);border:3px solid var(--bg);display:grid;place-items:center;font:700 11.5px var(--font-mono);color:var(--muted);transition:all .2s}
+  .flow .pseg.done .node{background:var(--green);color:var(--green-ink)}
+  .flow .pseg.active .node{background:var(--teal);color:var(--teal-ink);box-shadow:0 0 0 4px color-mix(in oklab,var(--teal) 28%,transparent)}
+  .flow .pseg .pname{font-size:11.5px;color:var(--text-2);line-height:1.3;font-weight:500;padding:0 3px}
+  .flow .pseg.pending .pname{color:var(--muted)}
+  .flow .pseg.active .pname{color:var(--text);font-weight:600}
+  .flow .pseg .pdur{font:500 10px var(--font-mono);color:var(--muted)}
+  .flow .pseg.done .pdur{color:var(--green)}
+  .flow .pseg.active .pdur{color:var(--teal)}
+  .flow .pseg .pmeta{font-size:10px;color:var(--dim);margin-top:1px}
+  .flow .pseg.active .pmeta{color:var(--text-2)}
+
+  /* mini progress bar inside active phase */
+  .flow .pseg.active .pcp{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;width:100%;margin-top:3px}
+  .flow .pseg.active .pcp .b{height:3px;border-radius:1px;background:var(--surface-3)}
+  .flow .pseg.active .pcp .b.done{background:var(--teal)}
+  .flow .pseg.active .pcp .b.now{background:var(--teal);animation:pulse 1.5s infinite}
+
+  /* gate waypoint */
+  .flow .gate-mk{display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;z-index:2;min-width:0;text-align:center;padding:0 6px}
+  .flow .gate-mk .gnode{width:44px;height:44px;transform:rotate(45deg);border-radius:8px;display:grid;place-items:center;position:relative;margin-top:-7px}
+  .flow .gate-mk.active .gnode{background:var(--amber);box-shadow:0 0 0 4px var(--bg), 0 0 0 8px color-mix(in oklab,var(--amber) 40%,transparent);animation:gatepulse 2s ease-in-out infinite}
+  .flow .gate-mk.passed .gnode{background:var(--green);box-shadow:0 0 0 4px var(--bg)}
+  @keyframes gatepulse{
+    0%,100%{box-shadow:0 0 0 4px var(--bg), 0 0 0 8px color-mix(in oklab,var(--amber) 35%,transparent)}
+    50%{box-shadow:0 0 0 4px var(--bg), 0 0 0 12px color-mix(in oklab,var(--amber) 12%,transparent)}
+  }
+  .flow .gate-mk .gnode svg{transform:rotate(-45deg)}
+  .flow .gate-mk.active .gnode svg{color:var(--amber-ink)}
+  .flow .gate-mk.passed .gnode svg{color:var(--green-ink)}
+  .flow .gate-mk .glabel{font:700 10px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+  .flow .gate-mk.active .glabel{color:var(--amber)}
+  .flow .gate-mk.passed .glabel{color:var(--green)}
+  .flow .gate-mk .gsub{font-size:10.5px;color:var(--text-2);font-weight:500;line-height:1.3}
+
+  /* ── decision queue (gate) ── */
+  .deck{padding:14px 22px;border-bottom:1px solid var(--border);background:var(--bg)}
+  .decision{border:1px solid var(--amber);border-radius:12px;background:linear-gradient(180deg,var(--amber-dim),transparent 70%);padding:16px 18px;display:grid;grid-template-columns:1fr 200px;gap:16px;align-items:flex-start}
+  .decision .dq-l{min-width:0}
+  .decision .dh{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .decision .dh-tag{font:700 10px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--amber);padding:3px 9px;border-radius:5px;background:var(--amber-dim);display:inline-flex;align-items:center;gap:6px}
+  .decision .dh-meta{font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+  .decision .dt{font-size:16px;font-weight:600;letter-spacing:-0.012em;color:var(--text);margin-bottom:4px}
+  .decision .ds{font-size:12.5px;color:var(--text-2);line-height:1.55;max-width:780px}
+  .decision .ds strong{color:var(--text);font-weight:600}
+
+  /* artifacts inline in decision card — clickable file cards */
+  .dec-art{margin-top:11px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .dec-art .af{display:grid;grid-template-columns:26px 1fr auto;gap:9px;align-items:center;padding:8px 10px;border-radius:7px;background:var(--surface);border:1px solid var(--border-hi);cursor:pointer;transition:all .15s;min-width:0}
+  .dec-art .af:hover{border-color:var(--violet);background:var(--surface-2)}
+  .dec-art .af:hover .af-open{opacity:1;color:var(--violet)}
+  .dec-art .af-ico{width:26px;height:26px;border-radius:5px;background:var(--violet-dim);color:var(--violet);display:grid;place-items:center;flex-shrink:0}
+  .dec-art .af-body{min-width:0}
+  .dec-art .af-name{font-family:var(--font-mono);font-size:11.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+  .dec-art .af-sub{font-size:10.5px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dec-art .af-open{color:var(--muted);opacity:.5;transition:all .15s}
+  .decision .dq-r{display:flex;flex-direction:column;gap:7px;align-items:stretch;min-width:0}
+  .decision .dq-r .btn{justify-content:center}
+
+  /* ── current-work card (running state, replaces decision) ── */
+  .runcard{margin:14px 22px;border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:14px 18px}
+  .runcard-h{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+  .runcard-h .tag{font:700 10px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--teal);padding:3px 9px;border-radius:5px;background:var(--teal-dim);display:inline-flex;align-items:center;gap:6px}
+  .runcard-h .meta{font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+  .runcard-h .right{margin-left:auto;display:flex;gap:6px}
+  .runcard-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:14px}
+  .runcard-col{display:flex;flex-direction:column;gap:6px}
+  .runcard-col .l{font:600 9px var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .runcard-col .v{font-size:13.5px;color:var(--text);font-weight:600;letter-spacing:-0.005em;line-height:1.35}
+  .runcard-col .vm{font-family:var(--font-mono);font-size:12px;color:var(--text);font-weight:500}
+  .runcard-col .s{font-size:11.5px;color:var(--text-2);line-height:1.45}
+  .runcard-col .s code{font-family:var(--font-mono);color:var(--teal);font-size:10.5px}
+  .runcard-now{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;background:var(--teal-dim);border:1px solid color-mix(in oklab,var(--teal) 25%,transparent);margin-top:4px}
+  .runcard-now .pl-ind{width:14px;height:14px;border-radius:50%;background:var(--teal);display:grid;place-items:center;flex-shrink:0}
+  .runcard-now .pl-ind::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal-ink);animation:pulse 1.2s infinite}
+  .runcard-now .nv{font-size:12px;color:var(--text);font-weight:500;min-width:0}
+  .runcard-now .nv .file{font-family:var(--font-mono);color:var(--teal);font-size:11.5px}
+
+  /* ── clarification (lightweight question) ── */
+  .clar-wrap{padding:14px 22px;border-bottom:1px solid var(--border)}
+  .clarify{border:1px solid var(--violet);border-radius:10px;background:linear-gradient(180deg,var(--violet-dim),transparent 80%);padding:14px 16px;display:grid;grid-template-columns:34px 1fr auto;gap:14px;align-items:flex-start}
+  .clarify .cl-ico{width:30px;height:30px;border-radius:50%;background:var(--violet);color:#fff;display:grid;place-items:center;flex-shrink:0;margin-top:2px}
+  .clarify .cl-body{min-width:0}
+  .clarify .cl-head{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .clarify .cl-tag{font:700 10px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--violet);padding:2px 8px;border-radius:5px;background:var(--violet-dim)}
+  .clarify .cl-meta{font-size:10.5px;color:var(--muted);font-family:var(--font-mono)}
+  .clarify .cl-meta b{color:var(--text-2)}
+  .clarify .cl-q{font-size:14px;color:var(--text);font-weight:500;line-height:1.45;margin-bottom:4px}
+  .clarify .cl-q b{font-weight:600}
+  .clarify .cl-ctx{font-size:11.5px;color:var(--text-2);line-height:1.5;margin-bottom:9px}
+  .clarify .cl-ctx code{font-family:var(--font-mono);color:var(--violet);font-size:10.5px}
+  .clarify .cl-opts{display:flex;flex-wrap:wrap;gap:6px}
+  .clarify .cl-opt{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:6px;background:var(--surface);border:1px solid var(--border-hi);font-size:12px;color:var(--text);cursor:pointer;font-weight:500}
+  .clarify .cl-opt:hover{border-color:var(--violet);background:var(--violet-dim)}
+  .clarify .cl-opt kbd{font:600 9.5px var(--font-mono);background:var(--surface-2);color:var(--muted);padding:1px 5px;border-radius:3px;border:1px solid var(--border)}
+  .clarify .cl-opt.custom{color:var(--muted)}
+  .clarify .cl-right{display:flex;flex-direction:column;gap:5px;align-items:flex-end;font-size:10.5px;color:var(--muted);font-family:var(--font-mono)}
+  .clarify .cl-right .who{display:flex;align-items:center;gap:5px}
+  .clarify .cl-right .pause{padding:3px 8px;border:1px solid var(--border-hi);border-radius:5px;color:var(--text-2);cursor:pointer;font-size:11px;font-family:var(--font-sans);font-weight:500}
+
+  /* ── activity log ── */
+  .actlog{border-bottom:1px solid var(--border);background:var(--bg)}
+  .actlog.collapsed .actlog-body{display:none}
+  .actlog-head{padding:9px 22px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+  .actlog-head:hover{background:var(--surface-2)}
+  .actlog-head .ico{width:22px;height:22px;border-radius:5px;background:var(--surface-2);color:var(--muted);display:grid;place-items:center}
+  .actlog-head .at{font-size:12.5px;font-weight:600;color:var(--text)}
+  .actlog-head .as{font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+  .actlog-head .ar{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .actlog-head .chev{color:var(--muted);transition:transform .2s}
+  .actlog.collapsed .chev{transform:rotate(-90deg)}
+  .actlog-body{padding:4px 22px 14px;font-family:var(--font-mono);font-size:11.5px;line-height:1.65;color:var(--text-2);max-height:160px;overflow-y:auto}
+  .actlog-body .ev{display:grid;grid-template-columns:60px 84px 1fr;gap:12px;padding:1px 0}
+  .actlog-body .ev .t{color:var(--dim)}
+  .actlog-body .ev .ag{color:var(--muted)}
+  .actlog-body .ev .ag.violet{color:var(--violet)}
+  .actlog-body .ev .ag.green{color:var(--green)}
+  .actlog-body .ev .ag.amber{color:var(--amber)}
+  .actlog-body .ev .ag.teal{color:var(--teal)}
+  .actlog-body .ev .msg{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .actlog-body .sep{text-align:center;color:var(--dim);padding:6px 0;font-size:10px;letter-spacing:.1em}
+
+  /* ── body split + right rail (telemetry → tasks order) ── */
+  .body-split{display:grid;grid-template-columns:1fr 320px;flex:1;min-height:0;overflow:hidden}
+  .body-main{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .body-rail{border-left:1px solid var(--border);background:var(--bg-2);overflow:auto;min-height:0;display:flex;flex-direction:column}
+  .rail-sec{padding:14px 18px;border-bottom:1px solid var(--border)}
+  .rail-sec:last-child{border-bottom:0;flex:1}
+  .rail-h{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .rail-h .badge{margin-left:auto;font:600 9px var(--font-mono);color:var(--muted);background:var(--surface-2);padding:1px 7px;border-radius:999px;letter-spacing:.04em}
+  .rail-h .badge.amber{background:var(--amber-dim);color:var(--amber)}
+  .rail-h .badge.teal{background:var(--teal-dim);color:var(--teal)}
+  .rail-h .badge.green{background:var(--green-dim);color:var(--green)}
+
+  /* telemetry block */
+  .telem{display:grid;grid-template-columns:92px 1fr;font-size:11.5px;gap:5px 10px}
+  .telem .k{color:var(--muted)}
+  .telem .v{color:var(--text)}
+  .telem .v.mono{font-family:var(--font-mono);font-size:11px}
+  .telem .v.amber{color:var(--amber)}
+  .telem .v.teal{color:var(--teal)}
+  .telem .v.violet{color:var(--violet)}
+  .telem-prog{height:5px;background:var(--surface-3);border-radius:3px;overflow:hidden;margin:9px 0 4px;grid-column:1/-1}
+  .telem-prog .fill{height:100%;border-radius:3px}
+  .telem-prog .fill.amber{background:var(--amber)}
+  .telem-prog .fill.teal{background:var(--teal)}
+  .telem-sub{grid-column:1/-1;font-size:10.5px;color:var(--muted);font-family:var(--font-mono);margin-top:-2px;margin-bottom:4px}
+
+  /* tasks tree */
+  .tasks-note{font-size:11.5px;line-height:1.5;margin-bottom:11px;padding:8px 10px;border-radius:6px}
+  .tasks-note.locked{background:var(--amber-dim);border:1px solid color-mix(in oklab,var(--amber) 30%,transparent);color:var(--amber)}
+  .tasks-note.running{background:var(--teal-dim);border:1px solid color-mix(in oklab,var(--teal) 25%,transparent);color:var(--teal)}
+  .tasks-note b{font-weight:600}
+  .cp-block{margin-bottom:11px}
+  .cp-block:last-child{margin-bottom:0}
+  .cp-header{display:grid;grid-template-columns:22px 1fr auto;gap:9px;align-items:center;padding:3px 0}
+  .cp-header .cpn{width:20px;height:20px;border-radius:5px;background:var(--surface-2);color:var(--muted);display:grid;place-items:center;font:700 10px var(--font-mono)}
+  .cp-header .cpt{font-size:12px;font-weight:600;color:var(--text);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cp-header .cpm{font:500 10px var(--font-mono);color:var(--muted)}
+  .cp-block.locked .cp-header .cpn{opacity:.6}
+  .cp-block.locked .cp-header .cpt{color:var(--text-2)}
+  .cp-block.done .cp-header .cpn{background:var(--green-dim);color:var(--green)}
+  .cp-block.now  .cp-header .cpn{background:var(--teal-dim);color:var(--teal)}
+  .cp-tasks{padding:4px 0 0 28px;display:flex;flex-direction:column;gap:4px;border-left:1px dashed var(--border-hi);margin-left:9px;padding-left:14px;margin-top:2px}
+  .ti{display:grid;grid-template-columns:14px 1fr;gap:8px;align-items:center;padding:1.5px 0;font-size:11.5px;color:var(--text-2);line-height:1.4}
+  .ti .box{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--border-bright);background:transparent;display:grid;place-items:center;flex-shrink:0}
+  .ti.done .box{background:var(--green);border-color:var(--green)}
+  .ti.done .box svg{color:var(--green-ink)}
+  .ti.done .tl{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--dim)}
+  .ti.now{color:var(--text)}
+  .ti.now .box{border-color:var(--teal);background:var(--teal-dim);position:relative}
+  .ti.now .box::after{content:"";display:block;width:5px;height:5px;border-radius:50%;background:var(--teal);animation:pulse 1.5s infinite}
+  .ti.locked{color:var(--muted)}
+  .ti.locked .box{border-color:var(--dim);border-style:dashed}
+
+  /* ── artifact viewer overlay ── */
+  .art-overlay{position:absolute;inset:0;background:color-mix(in oklab,#000 55%,transparent);backdrop-filter:blur(2px);z-index:20;display:flex;justify-content:flex-end;animation:fadein .2s ease-out}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  .art-sheet{width:75%;height:100%;background:var(--bg);border-left:1px solid var(--border-hi);display:flex;flex-direction:column;min-width:0;animation:slidein .25s cubic-bezier(.22,.6,.32,1)}
+  @keyframes slidein{from{transform:translateX(20%);opacity:.6}to{transform:translateX(0);opacity:1}}
+  .art-head{display:flex;align-items:center;padding:10px 16px;gap:12px;border-bottom:1px solid var(--border);background:var(--bg-2)}
+  .art-back{display:flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--border-hi);border-radius:6px;color:var(--text-2);font:500 11.5px var(--font-sans);cursor:pointer}
+  .art-back:hover{color:var(--text);background:var(--surface)}
+  .art-tabs{display:flex;align-items:center;gap:2px;background:var(--surface);border:1px solid var(--border-hi);border-radius:6px;padding:2px;margin-left:6px;flex:1;min-width:0;overflow:hidden}
+  .art-tabs .atb{display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:4px;font-size:11.5px;color:var(--muted);cursor:pointer;font-family:var(--font-mono);max-width:200px;min-width:0}
+  .art-tabs .atb.on{background:var(--surface-3);color:var(--text)}
+  .art-tabs .atb .atb-ico{flex-shrink:0;color:var(--violet)}
+  .art-tabs .atb .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .art-tabs .atb .x{margin-left:2px;color:var(--dim);font-size:13px;line-height:1}
+  .art-tabs .atb .x:hover{color:var(--text)}
+  .art-meta{display:flex;align-items:center;gap:8px;flex-shrink:0;font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+
+  .art-content{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:160px 1fr;background:var(--surface)}
+  .art-toc{border-right:1px solid var(--border);background:var(--bg-2);padding:14px 14px;font-size:11.5px;color:var(--text-2)}
+  .art-toc .toc-h{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .art-toc .toc-item{padding:4px 0;cursor:pointer;line-height:1.4}
+  .art-toc .toc-item:hover{color:var(--text)}
+  .art-toc .toc-item.on{color:var(--violet);font-weight:500}
+  .art-code{padding:18px 22px;font-family:var(--font-mono);font-size:12.5px;line-height:1.7;color:var(--text);overflow:auto;background:var(--bg)}
+  .art-code .kw{color:var(--violet);font-weight:600}
+  .art-code .str{color:var(--green)}
+  .art-code .comment{color:var(--dim)}
+  .art-code .scenario{color:var(--teal);font-weight:600}
+  .art-code .step{color:var(--amber)}
+  .art-code .num{color:var(--muted)}
+  .art-code .ln{display:grid;grid-template-columns:32px 1fr;gap:14px}
+  .art-code .ln .n{color:var(--dim);text-align:right;user-select:none}
+
+  .art-foot{padding:8px 16px;border-top:1px solid var(--border);background:var(--bg-2);display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+  .art-foot .l{margin-right:auto}
+  .art-foot .src{display:inline-flex;align-items:center;gap:5px;color:var(--text-2)}
+
+  /* dim main view */
+  .frame.has-overlay .fbd > .body-split,
+  .frame.has-overlay .fbd > .statusbar{opacity:.42}
+
+  .brandword{display:inline-flex;align-items:baseline}
+  .wbd{color:var(--teal,#1ed1d1)}
+</style>
+</head>
+<body>
+
+<header class="pg-head">
+  <div class="brand">
+    <span class="brand-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span>
+    <span class="brandword">claud<span class="wbd">board</span></span> · UX exploration · active run · v3 (states)
+  </div>
+  <h1>Active run · v3 — run states &amp; artifact viewer</h1>
+  <p>Three states of the same screen, plus the artifact-viewing flow. <b>Gate</b> shows the human-approval pause we've been iterating on — now with clickable spec/plan cards inside the decision box. <b>Running</b> is what 90% of the time looks like: no decision needed, agents producing under their own steam, tasks ticking off in the rail, telemetry climbing. <b>Clarification</b> is for the in-between case — a lightweight question the run can't quite resolve on its own, presented inline without halting the whole pipeline. <b>Artifact viewer</b> shows what happens when you click a file from any of those states. Right rail is now <b>telemetry first, then tasks</b>.</p>
+</header>
+
+<div class="tabs">
+  <button class="tab on" data-tab="gate"><span class="tag">1</span>Gate · awaiting approval</button>
+  <button class="tab"     data-tab="running"><span class="tag">2</span>Running · autonomous</button>
+  <button class="tab"     data-tab="clarify"><span class="tag">3</span>Clarification · light question</button>
+  <button class="tab"     data-tab="artifact"><span class="tag">4</span>Artifact viewer</button>
+</div>
+
+<!-- ═════════════════════════════════════════════════════════════════════
+     STATE 1 — GATE
+     ═════════════════════════════════════════════════════════════════════ -->
+<section class="panel on" data-panel="gate">
+  <div class="intro" data-key="gate">
+    <div>
+      <div class="intro-tag">State 1 · Gate</div>
+      <h2>Paused at the human checkpoint between phase 1 and phase 2.</h2>
+      <p>The gate box is now the home for spec + plan artifacts: each is a clickable card with file name, what it is, and a metric. Clicking opens the file in the viewer (state 4). The artifacts dropdown in the topbar offers the same files for access at any moment in the run.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">What's on this screen</div>
+        <div class="meta-item">Pipeline ribbon with gate diamond active</div>
+        <div class="meta-item">Decision box with 3 clickable artifact cards</div>
+        <div class="meta-item">Topbar: artifacts dropdown · run controls</div>
+        <div class="meta-item">Rail: telemetry first, then tasks (locked)</div>
+      </div>
+      <div>
+        <div class="meta-h">Try interacting</div>
+        <div class="meta-item">Click "Artifacts" pill in topbar</div>
+        <div class="meta-item">Click any artifact card in decision box</div>
+        <div class="meta-item">Click activity log header to expand</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame" id="frame-gate">
+    <aside class="fs">
+      <div class="fs-brand"><span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span><span class="brandword">claud<span class="wbd">board</span></span><small>v1.4</small></div>
+      <div class="ws"><span class="ws-ico">M</span><span class="ws-name">meas</span><span class="ws-chev">▾</span></div>
+      <nav class="fs-nav">
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11 12 3l9 8M5 9.5V21h14V9.5"/></svg>Overview</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2 4 6v6c0 5 4 9 8 10 4-1 8-5 8-10V6l-8-4z"/></svg>Project · health</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19c0-3 2-6 5-7l9-9-1 9c-1 3-4 5-7 5l-3 3-3-1z"/></svg>Start feature</div>
+        <div class="fs-item on"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>Active run</div>
+        <div class="fs-label">Project</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Run history</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M5 17V9M11 17V5M17 17v-7"/></svg>Analytics</div>
+        <div class="fs-running gate">
+          <div class="nr-top"><span class="pulse-dot" style="background:var(--amber)"></span>HUMAN GATE</div>
+          <div class="nr-title">MEAS-7140 · Outbox dispatcher</div>
+          <div class="nr-meta">phase 1 / 7 · 13m</div>
+        </div>
+      </nav>
+    </aside>
+
+    <div class="ftb">
+      <div class="crumb"><span>meas.cloud.datahandler</span><span class="sep">/</span><span>runs</span><span class="sep">/</span><span class="now mono">MEAS-7140</span></div>
+      <div class="spacer"></div>
+      <div class="topbar-actions">
+        <div class="art-pill" data-pill="gate" onclick="window.cb.togglePill(event,this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+          Artifacts<span class="ct">3</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="runctrl">
+          <button class="rc primary"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8V4z"/></svg>Resume</button>
+          <button class="rc"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+          <span class="div"></span>
+          <button class="rc danger"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg></button>
+        </div>
+        <span class="key">⌘ K</span>
+      </div>
+    </div>
+
+    <div class="fbd">
+      <div class="statusbar gate">
+        <div class="sl">
+          <div class="icb"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></div>
+          <div>
+            <div class="t"><span class="ttkt">MEAS-7140</span><span>Outbox dispatcher for entitlement events</span></div>
+            <div class="s">Paused at human gate · phase 1 of 7 · 13m 28s elapsed · est. <b>3h 24m</b> to merge after approval</div>
+          </div>
+        </div>
+        <div class="sr"><span class="chip mono"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="7" r="2"/><path d="M6 7v10M6 13c0-4 4-6 12-6"/></svg>feature/MEAS-7140/outbox-dispatcher</span></div>
+      </div>
+
+      <div class="body-split">
+        <div class="body-main">
+          <div class="ribbon">
+            <div class="ribbon-h"><h3>Pipeline</h3><span class="sub">7 phases · 1 gate · 8 agents</span>
+              <div class="legend"><span><span class="dt" style="background:var(--green)"></span>done</span><span><span class="dt" style="background:var(--amber)"></span>gate</span><span><span class="dt" style="background:var(--surface-3)"></span>pending</span></div>
+            </div>
+            <div class="flow">
+              <div class="pseg done"><div class="node"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg></div><div class="pname">Ticket · Spec · Plan</div><div class="pdur">12m 04s</div></div>
+              <div class="gate-mk active"><div class="gnode"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 21V3"/><path d="M4 4h12l-2 4 2 4H4"/></svg></div><div class="glabel">Gate</div><div class="gsub">Approve to enter<br>autonomous mode</div></div>
+              <div class="pseg pending"><div class="node">2</div><div class="pname">Branch</div><div class="pdur">~ 20s</div></div>
+              <div class="pseg pending"><div class="node">3</div><div class="pname">Develop · 4 checkpoints</div><div class="pdur">~ 2h 40m</div><div class="pmeta">0 / 11 tasks</div></div>
+              <div class="pseg pending"><div class="node">4</div><div class="pname">Commit</div><div class="pdur">~ 1m</div></div>
+              <div class="pseg pending"><div class="node">5</div><div class="pname">Review</div><div class="pdur">~ 12m</div></div>
+              <div class="pseg pending"><div class="node">6</div><div class="pname">PR</div><div class="pdur">~ 2m</div></div>
+              <div class="pseg pending"><div class="node">7</div><div class="pname">Finalize</div><div class="pdur">~ 30s</div></div>
+            </div>
+          </div>
+
+          <div class="deck">
+            <div class="decision">
+              <div class="dq-l">
+                <div class="dh">
+                  <span class="dh-tag"><span class="pulse-dot" style="background:var(--amber-ink)"></span>Decision queue · 1 item</span>
+                  <span class="dh-meta">phase 1d · waiting 4m 22s</span>
+                </div>
+                <div class="dt">Approve spec + plan to start autonomous execution</div>
+                <div class="ds">3 BDD scenarios cover happy path, FIFO ordering, and broker-outage retry. The 4-checkpoint plan respects the project's hexagonal layering. <strong>No schema-registry checkpoint</strong> — architect believes Avro isn't in use here; confirm intentional.</div>
+
+                <div class="dec-art">
+                  <div class="af" onclick="window.cb.openArtifact('spec')">
+                    <div class="af-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg></div>
+                    <div class="af-body">
+                      <div class="af-name">outbox-dispatcher.feature</div>
+                      <div class="af-sub">BDD spec · 3 scenarios · sdd-expert</div>
+                    </div>
+                    <svg class="af-open" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg>
+                  </div>
+                  <div class="af" onclick="window.cb.openArtifact('plan')">
+                    <div class="af-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 7-7M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+                    <div class="af-body">
+                      <div class="af-name">plan.md</div>
+                      <div class="af-sub">Execution plan · 4 checkpoints, 11 tasks · architect</div>
+                    </div>
+                    <svg class="af-open" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg>
+                  </div>
+                  <div class="af" onclick="window.cb.openArtifact('jira')">
+                    <div class="af-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/><path d="M13 5v14"/></svg></div>
+                    <div class="af-body">
+                      <div class="af-name">MEAS-7140</div>
+                      <div class="af-sub">Jira story · 2 acceptance criteria · jira-agent</div>
+                    </div>
+                    <svg class="af-open" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg>
+                  </div>
+                </div>
+              </div>
+              <div class="dq-r">
+                <button class="btn amber"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>Approve · start autonomy</button>
+                <button class="btn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17.25V21h3.75L17.8 9.9l-3.7-3.7L3 17.25z"/></svg>Request changes</button>
+                <button class="btn ghost"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg>Reject &amp; abort</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="actlog collapsed" id="actlog-gate" onclick="event.target.closest('.actlog-head')&&this.classList.toggle('collapsed')">
+            <div class="actlog-head">
+              <div class="ico"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></div>
+              <div><div class="at">Activity log</div><div class="as">17 events · last @ 09:58:52 · click to expand</div></div>
+              <div class="ar"><span class="chip mono amber" style="font-size:10px">paused at gate</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+            </div>
+            <div class="actlog-body">
+              <div class="ev"><span class="t">09:55:18</span><span class="ag">architect</span><span class="msg">Reading kafka-producer.md, mongodb-conventions.md</span></div>
+              <div class="ev"><span class="t">09:58:50</span><span class="ag green">architect</span><span class="msg">Wrote plan.md · 4 checkpoints, 11 tasks, 7 contracts</span></div>
+              <div class="ev"><span class="t">09:58:52</span><span class="ag amber">main</span><span class="msg">⏸  Waiting for user approval</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- right rail: TELEMETRY FIRST, THEN TASKS -->
+        <div class="body-rail">
+          <div class="rail-sec">
+            <div class="rail-h">Telemetry<span class="badge amber">paused</span></div>
+            <div class="telem">
+              <span class="k">Status</span><span class="v amber">Awaiting approval</span>
+              <span class="k">Phase</span><span class="v">1 of 7</span>
+              <span class="k">Checkpoint</span><span class="v">0 of 4</span>
+              <div class="telem-prog"><div class="fill amber" style="width:14%"></div></div>
+              <span class="telem-sub">14% of estimated run</span>
+              <span class="k">Elapsed</span><span class="v mono">13m 28s</span>
+              <span class="k">ETA · merge</span><span class="v mono">+3h 24m</span>
+              <span class="k">Cost</span><span class="v mono">$0.84 / ~$5.20</span>
+              <span class="k">Tokens</span><span class="v mono">143,250</span>
+            </div>
+          </div>
+
+          <div class="rail-sec">
+            <div class="rail-h">Implementation tasks<span class="badge amber">locked</span></div>
+            <div class="tasks-note locked">Prepared by <b>architect</b> · 11 tasks · unlocks once you approve.</div>
+            <div class="cp-block locked"><div class="cp-header"><span class="cpn">1</span><span class="cpt">OutboxEvent entity + repo</span><span class="cpm">0/3</span></div>
+              <div class="cp-tasks"><div class="ti locked"><span class="box"></span><span class="tl">Add @Document OutboxEvent</span></div><div class="ti locked"><span class="box"></span><span class="tl">Reactive repo · findPendingByTenant</span></div><div class="ti locked"><span class="box"></span><span class="tl">MongoOutboxEventAdapter</span></div></div></div>
+            <div class="cp-block locked"><div class="cp-header"><span class="cpn">2</span><span class="cpt">Dispatcher worker</span><span class="cpm">0/3</span></div></div>
+            <div class="cp-block locked"><div class="cp-header"><span class="cpn">3</span><span class="cpt">Kafka producer wiring</span><span class="cpm">0/3</span></div></div>
+            <div class="cp-block locked"><div class="cp-header"><span class="cpn">4</span><span class="cpt">Integration tests</span><span class="cpm">0/2</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════════════════════
+     STATE 2 — RUNNING (autonomous, no question)
+     ═════════════════════════════════════════════════════════════════════ -->
+<section class="panel" data-panel="running">
+  <div class="intro" data-key="running">
+    <div>
+      <div class="intro-tag">State 2 · Running</div>
+      <h2>Autonomous mode — no decision required, just progress.</h2>
+      <p>Once the gate is approved, the screen calms down: amber drops out, teal becomes the working accent. The amber "Decision queue" card is replaced by a quieter <b>Current work</b> card that tells you what checkpoint and task are running right now, and which file is being touched. Tasks in the right rail tick off as they complete. The activity log is one click away if you want the technical view.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">What's on this screen</div>
+        <div class="meta-item">Gate diamond shown as <b>passed</b> (green, no glow)</div>
+        <div class="meta-item">Phase 3 (Develop) is active · checkpoint 2 in progress</div>
+        <div class="meta-item">"Current work" card replaces decision queue</div>
+        <div class="meta-item">Tasks rail: 5 of 11 done, 1 in progress</div>
+      </div>
+      <div>
+        <div class="meta-h">Affordances when nothing needs you</div>
+        <div class="meta-item">Pause button stops at next safe boundary</div>
+        <div class="meta-item">Artifacts dropdown still has spec + plan</div>
+        <div class="meta-item">Telemetry shows live progress percent</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <aside class="fs">
+      <div class="fs-brand"><span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span><span class="brandword">claud<span class="wbd">board</span></span><small>v1.4</small></div>
+      <div class="ws"><span class="ws-ico">M</span><span class="ws-name">meas</span><span class="ws-chev">▾</span></div>
+      <nav class="fs-nav">
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11 12 3l9 8M5 9.5V21h14V9.5"/></svg>Overview</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2 4 6v6c0 5 4 9 8 10 4-1 8-5 8-10V6l-8-4z"/></svg>Project · health</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19c0-3 2-6 5-7l9-9-1 9c-1 3-4 5-7 5l-3 3-3-1z"/></svg>Start feature</div>
+        <div class="fs-item on"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>Active run</div>
+        <div class="fs-label">Project</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Run history</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M5 17V9M11 17V5M17 17v-7"/></svg>Analytics</div>
+        <div class="fs-running running">
+          <div class="nr-top"><span class="pulse-dot" style="background:var(--teal)"></span>RUNNING</div>
+          <div class="nr-title">MEAS-7140 · Outbox dispatcher</div>
+          <div class="nr-meta">phase 3 / 7 · 1h 18m</div>
+        </div>
+      </nav>
+    </aside>
+
+    <div class="ftb">
+      <div class="crumb"><span>meas.cloud.datahandler</span><span class="sep">/</span><span>runs</span><span class="sep">/</span><span class="now mono">MEAS-7140</span></div>
+      <div class="spacer"></div>
+      <div class="topbar-actions">
+        <div class="art-pill" data-pill="run" onclick="window.cb.togglePill(event,this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+          Artifacts<span class="ct">3</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="runctrl">
+          <button class="rc primary"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>Pause</button>
+          <span class="div"></span>
+          <button class="rc danger"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg></button>
+        </div>
+        <span class="key">⌘ K</span>
+      </div>
+    </div>
+
+    <div class="fbd">
+      <div class="statusbar running">
+        <div class="sl">
+          <div class="icb"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 4l13 8-13 8V4z" fill="currentColor"/></svg></div>
+          <div>
+            <div class="t"><span class="ttkt">MEAS-7140</span><span>Outbox dispatcher for entitlement events</span></div>
+            <div class="s">Running autonomously · phase 3 of 7 · 1h 18m elapsed · est. <b>2h 06m</b> remaining</div>
+          </div>
+        </div>
+        <div class="sr"><span class="chip mono"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="7" r="2"/><path d="M6 7v10M6 13c0-4 4-6 12-6"/></svg>feature/MEAS-7140/outbox-dispatcher</span></div>
+      </div>
+
+      <div class="body-split">
+        <div class="body-main">
+          <div class="ribbon">
+            <div class="ribbon-h"><h3>Pipeline</h3><span class="sub">7 phases · 1 gate · 8 agents</span>
+              <div class="legend"><span><span class="dt" style="background:var(--green)"></span>done</span><span><span class="dt" style="background:var(--teal)"></span>active</span><span><span class="dt" style="background:var(--surface-3)"></span>pending</span></div>
+            </div>
+            <div class="flow">
+              <div class="pseg done"><div class="node"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg></div><div class="pname">Ticket · Spec · Plan</div><div class="pdur">12m 04s</div></div>
+              <div class="gate-mk passed"><div class="gnode"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg></div><div class="glabel">Gate passed</div><div class="gsub">approved 09:59</div></div>
+              <div class="pseg done"><div class="node"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg></div><div class="pname">Branch</div><div class="pdur">18s</div></div>
+              <div class="pseg active">
+                <div class="node">3</div>
+                <div class="pname">Develop · 4 checkpoints</div>
+                <div class="pdur">1h 06m / ~2h 40m</div>
+                <div class="pmeta">checkpoint 2 of 4</div>
+                <div class="pcp"><div class="b done"></div><div class="b now"></div><div class="b"></div><div class="b"></div></div>
+              </div>
+              <div class="pseg pending"><div class="node">4</div><div class="pname">Commit</div><div class="pdur">~ 1m</div></div>
+              <div class="pseg pending"><div class="node">5</div><div class="pname">Review</div><div class="pdur">~ 12m</div></div>
+              <div class="pseg pending"><div class="node">6</div><div class="pname">PR</div><div class="pdur">~ 2m</div></div>
+              <div class="pseg pending"><div class="node">7</div><div class="pname">Finalize</div><div class="pdur">~ 30s</div></div>
+            </div>
+          </div>
+
+          <!-- Current-work card (replaces decision queue) -->
+          <div class="runcard">
+            <div class="runcard-h">
+              <span class="tag"><span class="pulse-dot" style="background:var(--teal-ink)"></span>Now working</span>
+              <span class="meta">checkpoint 2 · task 2 of 3 · since 11:01</span>
+              <div class="right"><button class="btn ghost sm">View timeline →</button></div>
+            </div>
+            <div class="runcard-grid">
+              <div class="runcard-col">
+                <div class="l">Checkpoint</div>
+                <div class="v">Dispatcher worker</div>
+                <div class="s">Scheduled component that claims pending outbox events, batches them per tenant, and hands them off to the producer port.</div>
+                <div class="runcard-now">
+                  <div class="pl-ind"></div>
+                  <div class="nv">Writing <span class="file">OutboxDispatcherWorker.java</span></div>
+                </div>
+              </div>
+              <div class="runcard-col">
+                <div class="l">Agent</div>
+                <div class="v">implementation</div>
+                <div class="s">Spawned 4 times so far this checkpoint · last finished 47s ago.</div>
+                <div class="l" style="margin-top:6px">Touches</div>
+                <div class="s"><code>src/main/java/.../OutboxDispatcherWorker.java</code><br><code>src/main/java/.../OutboxDispatcherProperties.java</code></div>
+              </div>
+              <div class="runcard-col">
+                <div class="l">Progress</div>
+                <div class="vm">5 / 11 tasks</div>
+                <div class="s">2 of 4 checkpoints complete · on track for est.</div>
+                <div class="l" style="margin-top:6px">Next up</div>
+                <div class="s">Batch by tenant + handoff to port<br><span style="color:var(--muted)">then · OutboxDispatcherProperties</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="actlog collapsed" onclick="event.target.closest('.actlog-head')&&this.classList.toggle('collapsed')">
+            <div class="actlog-head">
+              <div class="ico"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></div>
+              <div><div class="at">Activity log</div><div class="as">194 events · streaming · click to expand</div></div>
+              <div class="ar"><span class="chip mono teal" style="font-size:10px"><span class="dot" style="background:currentColor;animation:pulse 1.5s infinite"></span>live</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+            </div>
+            <div class="actlog-body">
+              <div class="ev"><span class="t">11:01:12</span><span class="ag teal">main</span><span class="msg">▶ checkpoint 2 · task 2 of 3 · Batch by tenant</span></div>
+              <div class="ev"><span class="t">11:01:44</span><span class="ag violet">implementation</span><span class="msg">→ fs.write src/main/java/.../OutboxDispatcherWorker.java</span></div>
+              <div class="ev"><span class="t">11:01:52</span><span class="ag green">implementation</span><span class="msg">Wrote OutboxDispatcherWorker.java · 87 LOC</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="body-rail">
+          <div class="rail-sec">
+            <div class="rail-h">Telemetry<span class="badge teal">live</span></div>
+            <div class="telem">
+              <span class="k">Status</span><span class="v teal">Running · checkpoint 2</span>
+              <span class="k">Phase</span><span class="v">3 of 7</span>
+              <span class="k">Checkpoint</span><span class="v">2 of 4</span>
+              <div class="telem-prog"><div class="fill teal" style="width:42%"></div></div>
+              <span class="telem-sub">42% of estimated run</span>
+              <span class="k">Elapsed</span><span class="v mono">1h 18m 06s</span>
+              <span class="k">ETA · merge</span><span class="v mono">+2h 06m</span>
+              <span class="k">Cost</span><span class="v mono">$2.41 / ~$5.20</span>
+              <span class="k">Tokens</span><span class="v mono">412,800</span>
+              <span class="k">Tok/min</span><span class="v mono">~5,300</span>
+            </div>
+          </div>
+
+          <div class="rail-sec">
+            <div class="rail-h">Implementation tasks<span class="badge teal">5 / 11</span></div>
+            <div class="tasks-note running"><b>Checkpoint 2</b> · task 2 of 3 in progress.</div>
+
+            <div class="cp-block done">
+              <div class="cp-header"><span class="cpn"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="cpt">OutboxEvent entity + repo</span><span class="cpm">3/3</span></div>
+              <div class="cp-tasks">
+                <div class="ti done"><span class="box"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M5 13l4 4L19 7"/></svg></span><span class="tl">Add @Document OutboxEvent</span></div>
+                <div class="ti done"><span class="box"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M5 13l4 4L19 7"/></svg></span><span class="tl">Reactive repo · findPendingByTenant</span></div>
+                <div class="ti done"><span class="box"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M5 13l4 4L19 7"/></svg></span><span class="tl">MongoOutboxEventAdapter</span></div>
+              </div>
+            </div>
+
+            <div class="cp-block now">
+              <div class="cp-header"><span class="cpn">2</span><span class="cpt">Dispatcher worker</span><span class="cpm">1/3</span></div>
+              <div class="cp-tasks">
+                <div class="ti done"><span class="box"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M5 13l4 4L19 7"/></svg></span><span class="tl">@Scheduled component · lock-and-claim</span></div>
+                <div class="ti now"><span class="box"></span><span class="tl">Batch by tenant + handoff to port</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">OutboxDispatcherProperties</span></div>
+              </div>
+            </div>
+
+            <div class="cp-block locked"><div class="cp-header"><span class="cpn">3</span><span class="cpt">Kafka producer wiring</span><span class="cpm">0/3</span></div></div>
+            <div class="cp-block locked"><div class="cp-header"><span class="cpn">4</span><span class="cpt">Integration tests</span><span class="cpm">0/2</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════════════════════
+     STATE 3 — CLARIFICATION (lightweight question)
+     ═════════════════════════════════════════════════════════════════════ -->
+<section class="panel" data-panel="clarify">
+  <div class="intro" data-key="clarify">
+    <div>
+      <div class="intro-tag">State 3 · Clarification</div>
+      <h2>A small, in-flight question — not a full gate.</h2>
+      <p>For decisions the run can't quite resolve on its own but that don't warrant pausing the entire workflow. Renders as a compact violet card between the pipeline and the now-working card, with 2–4 quick-reply options and a "decide later" affordance. Other tasks in the same checkpoint that don't depend on the answer keep running — the run only really stalls when it hits something downstream of the choice.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">Visual weight vs. gate</div>
+        <div class="meta-item">Single-row card, violet accent (not amber)</div>
+        <div class="meta-item">Status bar stays green-ish; only the question is highlighted</div>
+        <div class="meta-item">Quick-reply chips with keyboard shortcuts</div>
+        <div class="meta-item">"Decide later" defers to a sensible default after timeout</div>
+      </div>
+      <div>
+        <div class="meta-h">Examples this fits</div>
+        <div class="meta-item">"Use tenantId or compositeKey for partition?"</div>
+        <div class="meta-item">"PR target branch — main or develop?"</div>
+        <div class="meta-item">"Pin lib X to v3 or stay on v2?"</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <aside class="fs">
+      <div class="fs-brand"><span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span><span class="brandword">claud<span class="wbd">board</span></span><small>v1.4</small></div>
+      <div class="ws"><span class="ws-ico">M</span><span class="ws-name">meas</span><span class="ws-chev">▾</span></div>
+      <nav class="fs-nav">
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11 12 3l9 8M5 9.5V21h14V9.5"/></svg>Overview</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2 4 6v6c0 5 4 9 8 10 4-1 8-5 8-10V6l-8-4z"/></svg>Project · health</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19c0-3 2-6 5-7l9-9-1 9c-1 3-4 5-7 5l-3 3-3-1z"/></svg>Start feature</div>
+        <div class="fs-item on"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>Active run</div>
+        <div class="fs-label">Project</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Run history</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M5 17V9M11 17V5M17 17v-7"/></svg>Analytics</div>
+        <div class="fs-running clarify">
+          <div class="nr-top"><span class="pulse-dot" style="background:var(--violet)"></span>QUICK QUESTION</div>
+          <div class="nr-title">MEAS-7140 · Outbox dispatcher</div>
+          <div class="nr-meta">phase 3 / 7 · 1h 24m</div>
+        </div>
+      </nav>
+    </aside>
+
+    <div class="ftb">
+      <div class="crumb"><span>meas.cloud.datahandler</span><span class="sep">/</span><span>runs</span><span class="sep">/</span><span class="now mono">MEAS-7140</span></div>
+      <div class="spacer"></div>
+      <div class="topbar-actions">
+        <div class="art-pill" data-pill="clar" onclick="window.cb.togglePill(event,this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+          Artifacts<span class="ct">3</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="runctrl">
+          <button class="rc primary"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>Pause</button>
+          <span class="div"></span>
+          <button class="rc danger"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg></button>
+        </div>
+        <span class="key">⌘ K</span>
+      </div>
+    </div>
+
+    <div class="fbd">
+      <div class="statusbar running">
+        <div class="sl">
+          <div class="icb"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 4l13 8-13 8V4z" fill="currentColor"/></svg></div>
+          <div>
+            <div class="t"><span class="ttkt">MEAS-7140</span><span>Outbox dispatcher for entitlement events</span></div>
+            <div class="s">Running autonomously · phase 3 of 7 · 1 quick question · est. <b>2h 00m</b> remaining</div>
+          </div>
+        </div>
+        <div class="sr"><span class="chip mono"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="7" r="2"/><path d="M6 7v10M6 13c0-4 4-6 12-6"/></svg>feature/MEAS-7140/outbox-dispatcher</span></div>
+      </div>
+
+      <div class="body-split">
+        <div class="body-main">
+          <div class="ribbon">
+            <div class="ribbon-h"><h3>Pipeline</h3><span class="sub">7 phases · 1 gate · 8 agents</span>
+              <div class="legend"><span><span class="dt" style="background:var(--green)"></span>done</span><span><span class="dt" style="background:var(--teal)"></span>active</span><span><span class="dt" style="background:var(--violet)"></span>quick q</span><span><span class="dt" style="background:var(--surface-3)"></span>pending</span></div>
+            </div>
+            <div class="flow">
+              <div class="pseg done"><div class="node"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg></div><div class="pname">Ticket · Spec · Plan</div><div class="pdur">12m 04s</div></div>
+              <div class="gate-mk passed"><div class="gnode"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg></div><div class="glabel">Gate passed</div><div class="gsub">approved 09:59</div></div>
+              <div class="pseg done"><div class="node"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg></div><div class="pname">Branch</div><div class="pdur">18s</div></div>
+              <div class="pseg active">
+                <div class="node">3</div>
+                <div class="pname">Develop · 4 checkpoints</div>
+                <div class="pdur">1h 12m / ~2h 40m</div>
+                <div class="pmeta">checkpoint 3 of 4 · 1 question</div>
+                <div class="pcp"><div class="b done"></div><div class="b done"></div><div class="b now" style="background:var(--violet)"></div><div class="b"></div></div>
+              </div>
+              <div class="pseg pending"><div class="node">4</div><div class="pname">Commit</div><div class="pdur">~ 1m</div></div>
+              <div class="pseg pending"><div class="node">5</div><div class="pname">Review</div><div class="pdur">~ 12m</div></div>
+              <div class="pseg pending"><div class="node">6</div><div class="pname">PR</div><div class="pdur">~ 2m</div></div>
+              <div class="pseg pending"><div class="node">7</div><div class="pname">Finalize</div><div class="pdur">~ 30s</div></div>
+            </div>
+          </div>
+
+          <!-- clarification card -->
+          <div class="clar-wrap">
+            <div class="clarify">
+              <div class="cl-ico">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4M12 17.5h.01"/></svg>
+              </div>
+              <div class="cl-body">
+                <div class="cl-head">
+                  <span class="cl-tag">Quick question</span>
+                  <span class="cl-meta">from <b>implementation-agent</b> · checkpoint 3 · waiting 42s</span>
+                </div>
+                <div class="cl-q"><b>Kafka partition key:</b> use <code>tenantId</code> alone, or <code>tenantId + aggregateId</code> for stricter ordering inside a tenant?</div>
+                <div class="cl-ctx">Spec asks for FIFO ordering per tenant. <code>tenantId</code> alone satisfies it but allows interleaving across aggregates in one partition. The compound key narrows ordering to the aggregate but increases partition count. Other dispatchers in this repo use <code>tenantId</code>.</div>
+                <div class="cl-opts">
+                  <button class="cl-opt"><kbd>1</kbd>tenantId <span style="color:var(--muted);font-size:10px;margin-left:3px">(matches repo)</span></button>
+                  <button class="cl-opt"><kbd>2</kbd>tenantId + aggregateId</button>
+                  <button class="cl-opt custom"><kbd>3</kbd>Custom answer…</button>
+                  <button class="cl-opt custom"><kbd>↩</kbd>Decide later — default to <code style="color:var(--violet)">tenantId</code> after 5 min</button>
+                </div>
+              </div>
+              <div class="cl-right">
+                <div class="who"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>KafkaOutboxProducer<wbr>Adapter.java</div>
+                <button class="pause">Pause whole run</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- still-running card, smaller -->
+          <div class="runcard" style="margin-top:0">
+            <div class="runcard-h">
+              <span class="tag"><span class="pulse-dot" style="background:var(--teal-ink)"></span>Still working</span>
+              <span class="meta">2 tasks running in parallel · question doesn't block them</span>
+            </div>
+            <div class="runcard-grid" style="grid-template-columns:1fr 1fr">
+              <div class="runcard-col">
+                <div class="l">Task</div>
+                <div class="v">Topic from config</div>
+                <div class="runcard-now"><div class="pl-ind"></div><div class="nv">Editing <span class="file">application.yml</span></div></div>
+              </div>
+              <div class="runcard-col">
+                <div class="l">Task</div>
+                <div class="v">KafkaOutboxProducerAdapter</div>
+                <div class="runcard-now"><div class="pl-ind"></div><div class="nv">Waiting for partition-key answer ↑</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="actlog collapsed" onclick="event.target.closest('.actlog-head')&&this.classList.toggle('collapsed')">
+            <div class="actlog-head">
+              <div class="ico"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></div>
+              <div><div class="at">Activity log</div><div class="as">228 events · streaming · click to expand</div></div>
+              <div class="ar"><span class="chip mono violet" style="font-size:10px"><span class="dot" style="background:currentColor"></span>quick q</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="body-rail">
+          <div class="rail-sec">
+            <div class="rail-h">Telemetry<span class="badge teal">live</span></div>
+            <div class="telem">
+              <span class="k">Status</span><span class="v violet">Quick question · still working</span>
+              <span class="k">Phase</span><span class="v">3 of 7</span>
+              <span class="k">Checkpoint</span><span class="v">3 of 4</span>
+              <div class="telem-prog"><div class="fill teal" style="width:58%"></div></div>
+              <span class="telem-sub">58% of estimated run</span>
+              <span class="k">Elapsed</span><span class="v mono">1h 24m 11s</span>
+              <span class="k">ETA · merge</span><span class="v mono">+2h 00m</span>
+              <span class="k">Cost</span><span class="v mono">$2.74 / ~$5.20</span>
+            </div>
+          </div>
+
+          <div class="rail-sec">
+            <div class="rail-h">Implementation tasks<span class="badge teal">7 / 11</span></div>
+            <div class="tasks-note running"><b>Checkpoint 3</b> · 1 task paused on quick question, 2 still running.</div>
+
+            <div class="cp-block done"><div class="cp-header"><span class="cpn"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="cpt">OutboxEvent entity + repo</span><span class="cpm">3/3</span></div></div>
+            <div class="cp-block done"><div class="cp-header"><span class="cpn"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="cpt">Dispatcher worker</span><span class="cpm">3/3</span></div></div>
+
+            <div class="cp-block now">
+              <div class="cp-header"><span class="cpn">3</span><span class="cpt">Kafka producer wiring</span><span class="cpm">1/3</span></div>
+              <div class="cp-tasks">
+                <div class="ti now" style="color:var(--violet)"><span class="box" style="border-color:var(--violet);background:var(--violet-dim)"></span><span class="tl">KafkaOutboxProducerAdapter <span style="color:var(--muted);font-size:10px">· awaits answer</span></span></div>
+                <div class="ti now"><span class="box"></span><span class="tl">Partition key <span style="color:var(--violet);font-size:10px">· question raised</span></span></div>
+                <div class="ti now"><span class="box"></span><span class="tl">Topic from config <span style="color:var(--muted);font-size:10px">· in progress</span></span></div>
+              </div>
+            </div>
+
+            <div class="cp-block locked"><div class="cp-header"><span class="cpn">4</span><span class="cpt">Integration tests</span><span class="cpm">0/2</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════════════════════
+     STATE 4 — ARTIFACT VIEWER
+     ═════════════════════════════════════════════════════════════════════ -->
+<section class="panel" data-panel="artifact">
+  <div class="intro" data-key="artifact">
+    <div>
+      <div class="intro-tag">State 4 · Artifact viewer</div>
+      <h2>Open the file inline — go back to the run when you're done.</h2>
+      <p>Clicking any artifact (from the gate box, the topbar dropdown, or anywhere else) slides a viewer in over the run. The run is dimmed but still visible behind, so you don't lose context. A "← Back to run" button is always front and centre. Multiple artifacts you've opened become tabs at the top of the viewer, so you can flip between spec and plan without re-opening.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">What's on this screen</div>
+        <div class="meta-item">75%-width sheet, run dimmed behind</div>
+        <div class="meta-item">"Back to run" button on the left</div>
+        <div class="meta-item">File tabs (multi-file viewing)</div>
+        <div class="meta-item">Section TOC in left rail of viewer</div>
+        <div class="meta-item">Syntax-highlighted preview</div>
+      </div>
+      <div>
+        <div class="meta-h">Why a sheet, not a separate page</div>
+        <div class="meta-item">You don't lose the run — it's literally behind</div>
+        <div class="meta-item">Esc / Back / clicking the dim area returns instantly</div>
+        <div class="meta-item">Run keeps streaming events; no risk of "where am I"</div>
+        <div class="meta-item">Same flow during gate, autonomous, and post-merge</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame has-overlay">
+    <aside class="fs">
+      <div class="fs-brand"><span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span><span class="brandword">claud<span class="wbd">board</span></span><small>v1.4</small></div>
+      <div class="ws"><span class="ws-ico">M</span><span class="ws-name">meas</span><span class="ws-chev">▾</span></div>
+      <nav class="fs-nav">
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11 12 3l9 8M5 9.5V21h14V9.5"/></svg>Overview</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2 4 6v6c0 5 4 9 8 10 4-1 8-5 8-10V6l-8-4z"/></svg>Project · health</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19c0-3 2-6 5-7l9-9-1 9c-1 3-4 5-7 5l-3 3-3-1z"/></svg>Start feature</div>
+        <div class="fs-item on"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>Active run</div>
+        <div class="fs-label">Project</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Run history</div>
+        <div class="fs-running gate">
+          <div class="nr-top"><span class="pulse-dot" style="background:var(--amber)"></span>HUMAN GATE</div>
+          <div class="nr-title">MEAS-7140 · Outbox dispatcher</div>
+          <div class="nr-meta">phase 1 / 7 · 13m</div>
+        </div>
+      </nav>
+    </aside>
+
+    <div class="ftb">
+      <div class="crumb"><span>meas.cloud.datahandler</span><span class="sep">/</span><span>runs</span><span class="sep">/</span><span class="now mono">MEAS-7140</span></div>
+      <div class="spacer"></div>
+      <div class="topbar-actions">
+        <div class="art-pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Artifacts<span class="ct">3</span></div>
+      </div>
+    </div>
+
+    <div class="fbd">
+      <!-- dim run behind (just sketch what's there) -->
+      <div class="statusbar gate"><div class="sl"><div class="icb"></div><div><div class="t">MEAS-7140 · Outbox dispatcher</div><div class="s">Paused at human gate · phase 1 of 7</div></div></div></div>
+      <div class="body-split">
+        <div class="body-main">
+          <div class="ribbon"><div class="ribbon-h"><h3>Pipeline</h3></div><div class="flow"><div class="pseg done"><div class="node">✓</div></div></div></div>
+        </div>
+      </div>
+
+      <!-- OVERLAY -->
+      <div class="art-overlay">
+        <div class="art-sheet">
+          <div class="art-head">
+            <button class="art-back"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>Back to run</button>
+            <div class="art-tabs">
+              <div class="atb on"><svg class="atb-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span class="nm">outbox-dispatcher.feature</span><span class="x">×</span></div>
+              <div class="atb"><svg class="atb-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span class="nm">plan.md</span><span class="x">×</span></div>
+            </div>
+            <div class="art-meta">
+              <span>BDD spec · 142 LOC</span>
+              <button class="btn ghost sm"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h6"/><path d="M14 4h6v6M10 14L20 4"/></svg>Open in editor</button>
+              <button class="btn ghost sm"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v8M8 6l4-4 4 4M3 14v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/></svg></button>
+              <button class="btn ghost sm" title="Close"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+            </div>
+          </div>
+
+          <div class="art-content">
+            <div class="art-toc">
+              <div class="toc-h">Sections</div>
+              <div class="toc-item">Feature overview</div>
+              <div class="toc-item">Background</div>
+              <div class="toc-item on">Scenario 1 · Happy path</div>
+              <div class="toc-item">Scenario 2 · FIFO ordering</div>
+              <div class="toc-item">Scenario 3 · Broker outage</div>
+              <div class="toc-h" style="margin-top:14px">Produced by</div>
+              <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-2);line-height:1.7">
+                sdd-expert<br>
+                <span style="color:var(--muted)">at 09:55:16</span>
+              </div>
+              <div class="toc-h" style="margin-top:14px">References</div>
+              <div style="font-size:11.5px;line-height:1.7">
+                <a style="color:var(--violet);cursor:pointer">testing-rules.md</a><br>
+                <a style="color:var(--violet);cursor:pointer">MEAS-7140 ↗</a>
+              </div>
+            </div>
+            <div class="art-code">
+<div class="ln"><span class="n">1</span><span><span class="comment"># language: en</span></span></div>
+<div class="ln"><span class="n">2</span><span><span class="kw">Feature:</span> Outbox dispatcher for entitlement events</span></div>
+<div class="ln"><span class="n">3</span><span></span></div>
+<div class="ln"><span class="n">4</span><span>  <span class="comment">As the meas.cloud.datahandler service</span></span></div>
+<div class="ln"><span class="n">5</span><span>  <span class="comment">I want to publish entitlement-domain events to Kafka exactly-once</span></span></div>
+<div class="ln"><span class="n">6</span><span>  <span class="comment">So that downstream services react in near-real-time</span></span></div>
+<div class="ln"><span class="n">7</span><span></span></div>
+<div class="ln"><span class="n">8</span><span>  <span class="kw">Background:</span></span></div>
+<div class="ln"><span class="n">9</span><span>    <span class="step">Given</span> the dispatcher worker is scheduled every <span class="num">500ms</span></span></div>
+<div class="ln"><span class="n">10</span><span>    <span class="step">And</span> the Kafka topic <span class="str">"entitlement.events.v1"</span> is reachable</span></div>
+<div class="ln"><span class="n">11</span><span></span></div>
+<div class="ln"><span class="n">12</span><span>  <span class="scenario">Scenario:</span> Happy path · single tenant publishes once</span></div>
+<div class="ln"><span class="n">13</span><span>    <span class="step">Given</span> tenant <span class="str">"acme"</span> has <span class="num">3</span> pending outbox events</span></div>
+<div class="ln"><span class="n">14</span><span>    <span class="step">When</span> the dispatcher tick runs</span></div>
+<div class="ln"><span class="n">15</span><span>    <span class="step">Then</span> all <span class="num">3</span> events are published to <span class="str">"entitlement.events.v1"</span></span></div>
+<div class="ln"><span class="n">16</span><span>    <span class="step">And</span> they are marked <span class="kw">PUBLISHED</span> in the outbox collection</span></div>
+<div class="ln"><span class="n">17</span><span>    <span class="step">And</span> no event is published a second time on a subsequent tick</span></div>
+<div class="ln"><span class="n">18</span><span></span></div>
+<div class="ln"><span class="n">19</span><span>  <span class="scenario">Scenario:</span> FIFO order preserved within a tenant</span></div>
+<div class="ln"><span class="n">20</span><span>    <span class="step">Given</span> tenant <span class="str">"acme"</span> has events A, B, C inserted in order</span></div>
+<div class="ln"><span class="n">21</span><span>    <span class="step">When</span> the dispatcher tick runs</span></div>
+<div class="ln"><span class="n">22</span><span>    <span class="step">Then</span> Kafka offsets for those events are in the same order</span></div>
+<div class="ln"><span class="n">23</span><span></span></div>
+<div class="ln"><span class="n">24</span><span>  <span class="scenario">Scenario:</span> Broker outage · events stay pending and retry</span></div>
+<div class="ln"><span class="n">25</span><span>    <span class="step">Given</span> the Kafka broker is unreachable for <span class="num">10s</span></span></div>
+<div class="ln"><span class="n">26</span><span>    <span class="step">When</span> <span class="num">3</span> ticks elapse</span></div>
+<div class="ln"><span class="n">27</span><span>    <span class="step">Then</span> events remain <span class="kw">PENDING</span> with claim counter incremented</span></div>
+<div class="ln"><span class="n">28</span><span>    <span class="step">When</span> the broker becomes reachable again</span></div>
+<div class="ln"><span class="n">29</span><span>    <span class="step">Then</span> the next tick publishes all pending events in original order</span></div>
+            </div>
+          </div>
+
+          <div class="art-foot">
+            <span class="l">142 lines · Gherkin</span>
+            <span class="src"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>src/test/resources/features/outbox-dispatcher.feature</span>
+            <span>·</span>
+            <span>generated <b style="color:var(--text-2)">09:55:16</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  window.cb = {
+    togglePill(e, el){
+      if(e.target.closest('.art-pop')) return;
+      const wasOpen = el.classList.contains('open');
+      document.querySelectorAll('.art-pill.open').forEach(p=>p.classList.remove('open'));
+      if(!wasOpen){
+        // inject the popover lazily
+        if(!el.querySelector('.art-pop')){
+          el.insertAdjacentHTML('beforeend', window.cb.popHtml());
+        }
+        el.classList.add('open');
+      }
+      e.stopPropagation();
+    },
+    popHtml(){
+      return `<div class="art-pop">
+        <div class="ah">From this run</div>
+        <div class="ali" onclick="window.cb.openArtifact('spec',event)">
+          <div class="ico"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg></div>
+          <div><div class="ali-n">outbox-dispatcher.feature <svg class="open-ico" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></div><div class="ali-s">BDD spec · sdd-expert</div></div>
+          <div class="meta">142 LOC</div>
+        </div>
+        <div class="ali" onclick="window.cb.openArtifact('plan',event)">
+          <div class="ico"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg></div>
+          <div><div class="ali-n">plan.md <svg class="open-ico" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></div><div class="ali-s">Execution plan · architect</div></div>
+          <div class="meta">11 tasks</div>
+        </div>
+        <div class="ali" onclick="window.cb.openArtifact('jira',event)">
+          <div class="ico"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/><path d="M13 5v14"/></svg></div>
+          <div><div class="ali-n">MEAS-7140 <svg class="open-ico" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></div><div class="ali-s">Jira story · 2 ACs</div></div>
+          <div class="meta">link ↗</div>
+        </div>
+        <div class="art-pop-foot">stays accessible after gate passes · ⌘O</div>
+      </div>`;
+    },
+    openArtifact(which, e){
+      if(e) e.stopPropagation();
+      // jump to artifact tab to demonstrate the flow
+      document.querySelectorAll('.art-pill.open').forEach(p=>p.classList.remove('open'));
+      document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on', x.dataset.tab==='artifact'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on', p.dataset.panel==='artifact'));
+      window.scrollTo({top:0, behavior:'instant'});
+    }
+  };
+
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
+      document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.dataset.panel === t.dataset.tab));
+      window.scrollTo({top: 0, behavior: 'instant'});
+    });
+  });
+
+  document.addEventListener('click', e => {
+    document.querySelectorAll('.art-pill.open').forEach(p => { if(!p.contains(e.target)) p.classList.remove('open'); });
+  });
+</script>
+
+</body>
+</html>

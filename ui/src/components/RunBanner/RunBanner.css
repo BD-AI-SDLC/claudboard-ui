@@ -1,0 +1,107 @@
+.run-banner__root {
+  padding: 14px 18px;
+  background: linear-gradient(180deg, var(--amber-dim), transparent);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.run-banner__root--teal {
+  background: linear-gradient(180deg, var(--teal-dim), transparent);
+}
+
+.run-banner__root--green {
+  background: linear-gradient(180deg, var(--green-dim), transparent);
+}
+
+.run-banner__root--violet {
+  background: linear-gradient(180deg, var(--violet-dim), transparent);
+}
+
+.run-banner__root--violet .run-banner__icon {
+  background: var(--violet);
+  color: var(--ink-on-accent);
+}
+
+.run-banner__btn--ghost {
+  background: transparent;
+  border-color: var(--border-hi);
+  color: var(--text-2);
+}
+
+.run-banner__btn--ghost:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.run-banner__icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  background: var(--amber);
+  color: var(--ink-on-amber);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.run-banner__root--teal  .run-banner__icon { background: var(--teal);  color: var(--bg-2); }
+.run-banner__root--green .run-banner__icon { background: var(--green); color: var(--bg-2); }
+
+.run-banner__message {
+  font-weight: 600;
+  font-size: var(--fs-md);
+}
+
+.run-banner__sub {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+
+.run-banner__cta {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.run-banner__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border: 1px solid var(--amber);
+  background: var(--amber);
+  color: var(--ink-on-amber);
+  border-radius: var(--radius);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.12s;
+}
+
+.run-banner__btn:hover {
+  filter: brightness(1.1);
+}
+
+.run-banner__clarify-ptr {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  border: 1px solid var(--amber);
+  background: transparent;
+  color: var(--amber);
+  border-radius: var(--radius);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.run-banner__clarify-ptr:hover {
+  background: var(--amber);
+  color: var(--ink-on-amber);
+}

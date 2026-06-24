@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>claudboard — logo concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#08090a; --bg-2:#0e0f11; --surface:#131418; --surface-2:#181a1f; --surface-3:#20232a;
+    --border:#23252b; --border-hi:#2e3138; --border-bright:#3b3f48;
+    --text:#ededef; --text-2:#b8b9be; --muted:#797b83; --dim:#4d4f57;
+    --teal:oklch(78% 0.13 195); --teal-dim:oklch(78% 0.13 195 / 0.18);
+    --green:oklch(78% 0.13 150); --amber:oklch(80% 0.13 78); --violet:oklch(72% 0.13 295);
+    --font-sans:'Geist',-apple-system,system-ui,sans-serif;
+    --font-mono:'Geist Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+
+  /* ── dark presentation panel shared by every artboard ── */
+  .stage{background:var(--bg);border:1px solid var(--border-hi);border-radius:12px;overflow:hidden;
+    font-family:var(--font-sans);color:var(--text);-webkit-font-smoothing:antialiased;
+    font-feature-settings:"cv11","ss01","ss03"}
+  .stage *{box-sizing:border-box}
+  .st-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);background:var(--bg-2)}
+  .st-kick{font:700 10px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:7px}
+  .st-name{font-size:17px;font-weight:600;letter-spacing:-0.012em;margin:0 0 5px}
+  .st-rat{font-size:11.5px;color:var(--text-2);line-height:1.5;margin:0}
+  .st-body{padding:22px 20px}
+
+  /* hero spot */
+  .hero{display:grid;place-items:center;padding:30px 0 26px;background:
+    radial-gradient(120px 120px at 50% 42%, rgba(255,255,255,0.035), transparent 70%)}
+  .row-lab{font:600 9px var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:0 0 11px}
+
+  /* size strip */
+  .sizes{display:flex;align-items:flex-end;gap:26px;padding:18px 4px 14px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-top:8px}
+  .sz{display:flex;flex-direction:column;align-items:center;gap:9px}
+  .sz span{font:500 9px var(--font-mono);color:var(--muted)}
+
+  /* lockup */
+  .lockup{display:flex;align-items:center;gap:10px}
+  .wm{font:600 17px var(--font-sans);letter-spacing:-0.012em;color:var(--text)}
+  .pill{font:500 9px var(--font-sans);color:var(--muted);border:1px solid var(--border-hi);border-radius:999px;padding:1px 7px;letter-spacing:.05em;text-transform:uppercase}
+  .ctx-row{display:flex;align-items:center;gap:24px;flex-wrap:wrap;padding-top:18px;margin-top:6px;border-top:1px solid var(--border)}
+
+  /* sidebar slice */
+  .side{width:190px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:10px}
+  .side .srow{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+  .side .srow small{margin-left:auto;font:500 8px var(--font-sans);color:var(--muted);border:1px solid var(--border-hi);border-radius:999px;padding:1px 6px;letter-spacing:.05em;text-transform:uppercase}
+  .side .sstub{height:7px;border-radius:3px;background:var(--surface-2);margin-top:9px}
+  .side .sstub.w1{width:70%}.side .sstub.w2{width:88%}.side .sstub.w3{width:54%}
+
+  /* browser tab */
+  .btab{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border-hi);border-bottom:0;border-radius:8px 8px 0 0;padding:8px 13px;font-size:11px;color:var(--text-2);max-width:200px}
+  .btab .tx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ════════ MARKS (parametrized by --m) ════════ */
+  /* 1 · grid / board */
+  .m-grid{width:var(--m);height:var(--m);border-radius:calc(var(--m)*0.22);background:var(--surface-2);
+    border:1px solid var(--border-hi);padding:calc(var(--m)*0.15);display:grid;
+    grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:calc(var(--m)*0.09)}
+  .m-grid i{border-radius:calc(var(--m)*0.045);background:var(--dim);opacity:.55}
+  .m-grid i.on{background:var(--teal);opacity:1;box-shadow:0 0 calc(var(--m)*0.1) oklch(78% 0.13 195 / .55)}
+  .m-grid i.on2{background:var(--teal);opacity:.4}
+
+  /* 2 · pulse */
+  .m-pulse{width:var(--m);height:var(--m);border-radius:calc(var(--m)*0.22);background:var(--surface-2);
+    border:1px solid var(--border-hi);display:grid;place-items:center;position:relative;overflow:hidden}
+  .m-pulse b{width:calc(var(--m)*0.2);height:calc(var(--m)*0.2);border-radius:50%;background:var(--teal);
+    position:relative;z-index:2;box-shadow:0 0 calc(var(--m)*0.14) oklch(78% 0.13 195 / .7)}
+  .m-pulse .ring{position:absolute;border:1.5px solid var(--teal);border-radius:50%;opacity:.45;
+    width:calc(var(--m)*0.46);height:calc(var(--m)*0.46)}
+  .m-pulse.anim .ring{animation:rpulse 2.1s ease-out infinite}
+  .m-pulse.anim .ring.r2{animation-delay:1.05s}
+  @keyframes rpulse{0%{transform:scale(.5);opacity:.6}80%{opacity:0}100%{transform:scale(1.25);opacity:0}}
+
+  /* 3 · bracket monogram */
+  .m-brk{display:inline-flex;align-items:center;justify-content:center;
+    font:700 calc(var(--m)*0.92) var(--font-mono);color:var(--text);line-height:1;letter-spacing:-0.03em}
+  .m-brk i{width:calc(var(--m)*0.2);height:calc(var(--m)*0.2);border-radius:50%;background:var(--teal);
+    display:inline-block;margin:0 calc(var(--m)*0.03);box-shadow:0 0 calc(var(--m)*0.12) oklch(78% 0.13 195 / .6)}
+  /* boxed bracket variant */
+  .m-brkbox{width:var(--m);height:var(--m);border-radius:calc(var(--m)*0.22);background:var(--surface-2);
+    border:1px solid var(--border-hi);display:grid;place-items:center;
+    font:700 calc(var(--m)*0.52) var(--font-mono);color:var(--text);letter-spacing:-0.04em}
+  .m-brkbox em{color:var(--teal);font-style:normal}
+
+  /* 4 · track / checkpoint */
+  .m-trk{width:var(--m);height:var(--m);border-radius:calc(var(--m)*0.22);background:var(--surface-2);
+    border:1px solid var(--border-hi);display:flex;align-items:center;justify-content:center;gap:calc(var(--m)*0.05)}
+  .m-trk .rail{width:calc(var(--m)*0.2);height:calc(var(--m)*0.07);border-radius:99px;background:var(--dim)}
+  .m-trk .node{width:calc(var(--m)*0.2);height:calc(var(--m)*0.2);border-radius:50%;background:var(--teal);
+    box-shadow:0 0 calc(var(--m)*0.1) oklch(78% 0.13 195 / .6)}
+  .m-trk .gate{width:calc(var(--m)*0.16);height:calc(var(--m)*0.32);border-radius:99px;background:var(--border-bright)}
+
+  /* 5 · refined wordmark mark (cb evolved) */
+  .m-cb{width:var(--m);height:var(--m);border-radius:calc(var(--m)*0.24);position:relative;
+    background:linear-gradient(160deg,#fbfbfc,#e7e8ea);display:grid;place-items:center;overflow:hidden}
+  .m-cb span{font:700 calc(var(--m)*0.46) var(--font-mono);color:#0c0d0f;letter-spacing:-0.05em}
+  .m-cb::after{content:"";position:absolute;left:calc(var(--m)*0.2);right:calc(var(--m)*0.2);
+    bottom:calc(var(--m)*0.18);height:calc(var(--m)*0.05);border-radius:99px;background:var(--teal)}
+
+  /* ── quieter takes on the cell ── */
+  /* 2x2 quartet */
+  .m-quad{width:var(--m);height:var(--m);border-radius:calc(var(--m)*0.24);background:var(--surface-2);
+    border:1px solid var(--border-hi);padding:calc(var(--m)*0.2);display:grid;
+    grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:calc(var(--m)*0.1)}
+  .m-quad i{border-radius:calc(var(--m)*0.07);background:var(--dim);opacity:.5}
+  .m-quad i.on{background:var(--teal);opacity:1;box-shadow:0 0 calc(var(--m)*0.1) oklch(78% 0.13 195 / .5)}
+
+  /* single placed card */
+  .m-single{width:var(--m);height:var(--m);border-radius:calc(var(--m)*0.24);background:var(--surface-2);
+    border:1px solid var(--border-hi);position:relative}
+  .m-single i{position:absolute;width:calc(var(--m)*0.27);height:calc(var(--m)*0.27);
+    border-radius:calc(var(--m)*0.08);background:var(--teal);left:calc(var(--m)*0.2);bottom:calc(var(--m)*0.2);
+    box-shadow:0 0 calc(var(--m)*0.13) oklch(78% 0.13 195 / .55)}
+  .m-single i.ghost{background:var(--dim);opacity:.45;box-shadow:none;
+    left:auto;bottom:auto;right:calc(var(--m)*0.2);top:calc(var(--m)*0.2)}
+
+  /* knockout / negative cell */
+  .m-neg{width:var(--m);height:var(--m);border-radius:calc(var(--m)*0.24);background:var(--teal);
+    position:relative;overflow:hidden}
+  .m-neg i{position:absolute;width:calc(var(--m)*0.28);height:calc(var(--m)*0.28);
+    border-radius:calc(var(--m)*0.08);background:var(--bg);left:calc(var(--m)*0.2);bottom:calc(var(--m)*0.2)}
+  .m-neg i.t2{background:oklch(40% 0.06 195 / .55);left:auto;bottom:auto;right:calc(var(--m)*0.2);top:calc(var(--m)*0.2)}
+
+  /* ── PH-nod wordmark lockups (original, in claudboard amber) ── */
+  .wmk{display:inline-flex;align-items:baseline;font-family:var(--font-sans);font-weight:600;letter-spacing:-0.03em;line-height:1;color:var(--text)}
+  .wmk .box{background:var(--teal);color:var(--teal-ink,#001016);border-radius:.22em;padding:.05em .26em .12em;margin-left:.05em;font-weight:600}
+  .wmk2{font-family:var(--font-sans);font-weight:600;letter-spacing:-0.03em;line-height:1;color:var(--text)}
+  .wmk2 b{color:var(--teal);font-weight:600}
+  .phmark{position:relative;overflow:hidden;display:inline-block;flex-shrink:0;background:var(--teal)}
+  .phmark i{position:absolute;background:var(--teal-ink,#001016)}
+  .phmark i.b{opacity:.34}
+  .phlock{display:flex;align-items:center;gap:13px}
+  .phbar{display:flex;align-items:center;gap:10px;padding:9px 13px;background:var(--bg);border:1px solid var(--border);border-radius:9px}
+  .phside{width:210px;background:var(--bg-2);border:1px solid var(--border);border-radius:9px;padding:12px}
+  .phside .r{display:flex;align-items:center;gap:9px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .phside .stub{height:7px;border-radius:3px;background:var(--surface-2);margin-top:10px}
+
+  /* big wordmark for concept 5 */
+  .bigwm{font:600 30px var(--font-sans);letter-spacing:-0.022em;color:var(--text)}
+  .bigwm b{color:var(--teal);font-weight:600}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+
+<script type="text/babel">
+const { useState } = React;
+
+/* ── mark factory: render a concept's mark at any size --m ── */
+function Mark({ type, m, anim }) {
+  const s = { ['--m']: m + 'px' };
+  switch (type) {
+    case 'grid':
+      return <div className="m-grid" style={s}>
+        {Array.from({length:9}).map((_,i)=>(
+          <i key={i} className={i===6?'on':i===3?'on2':''} />
+        ))}
+      </div>;
+    case 'pulse':
+      return <div className={'m-pulse'+(anim?' anim':'')} style={s}>
+        <span className="ring"></span><span className="ring r2"></span><b></b>
+      </div>;
+    case 'bracket':
+      return <span className="m-brk" style={s}>[<i></i>]</span>;
+    case 'bracketbox':
+      return <span className="m-brkbox" style={s}>[<em>·</em>]</span>;
+    case 'track':
+      return <div className="m-trk" style={s}>
+        <span className="rail"></span><span className="node"></span><span className="gate"></span>
+      </div>;
+    case 'cb':
+      return <span className="m-cb" style={s}><span>cb</span></span>;
+    case 'quad':
+      return <div className="m-quad" style={s}>
+        <i></i><i></i><i className="on"></i><i></i>
+      </div>;
+    case 'single':
+      return <div className="m-single" style={s}><i className="ghost"></i><i></i></div>;
+    case 'neg':
+      return <div className="m-neg" style={s}><i className="t2"></i><i></i></div>;
+    default: return null;
+  }
+}
+
+/* ── reusable lockups ── */
+const Lockup = ({type, m=22}) => (
+  <div className="lockup"><Mark type={type} m={m}/><span className="wm">claudboard</span><span className="pill">v1.4</span></div>
+);
+const SidebarSlice = ({type}) => (
+  <div className="side">
+    <div className="srow"><Mark type={type} m={20}/>claudboard<small>v1.4</small></div>
+    <div className="sstub w2"></div><div className="sstub w1"></div><div className="sstub w3"></div>
+  </div>
+);
+const BrowserTab = ({type}) => (
+  <div className="btab"><Mark type={type} m={15}/><span className="tx">claudboard — active run</span></div>
+);
+
+/* ── PH-nod wordmark pieces (amber, original) ── */
+const PhMark = ({m=34}) => (
+  <span className="phmark" style={{width:m,height:m,borderRadius:m*0.26}}>
+    <i className="b" style={{width:m*0.26,height:m*0.26,right:m*0.2,top:m*0.2,borderRadius:m*0.09}}></i>
+    <i className="a" style={{width:m*0.26,height:m*0.26,left:m*0.2,bottom:m*0.2,borderRadius:m*0.09}}></i>
+  </span>
+);
+const WmkBox = ({size=40}) => (
+  <span className="wmk" style={{fontSize:size}}>claud<span className="box">board</span></span>
+);
+const WmkTwo = ({size=40}) => (
+  <span className="wmk2" style={{fontSize:size}}>claud<b>board</b></span>
+);
+function PhCard({kick,name,rat,hero,ctx}){
+  return (
+    <div className="stage">
+      <div className="st-head">
+        <div className="st-kick" style={{color:'var(--teal)'}}>{kick}</div>
+        <h3 className="st-name">{name}</h3>
+        <p className="st-rat">{rat}</p>
+      </div>
+      <div className="st-body">
+        <div className="hero" style={{padding:'38px 0'}}>{hero}</div>
+        <div className="ctx-row" style={{borderTop:'none',paddingTop:16,gap:22}}>{ctx}</div>
+      </div>
+    </div>
+  );
+}
+
+/* ── one full concept artboard ── */
+function Concept({ kick, name, rat, type, hero, extra }) {
+  return (
+    <div className="stage">
+      <div className="st-head">
+        <div className="st-kick">{kick}</div>
+        <h3 className="st-name">{name}</h3>
+        <p className="st-rat">{rat}</p>
+      </div>
+      <div className="st-body">
+        <div className="hero">{hero || <Mark type={type} m={92} anim/>}</div>
+        <div className="sizes">
+          {[32,20,16].map(sz=>(
+            <div className="sz" key={sz}><Mark type={type} m={sz}/><span>{sz}px</span></div>
+          ))}
+          <div style={{flex:1}}></div>
+          {extra}
+        </div>
+        <div className="ctx-row">
+          <Lockup type={type}/>
+          <BrowserTab type={type}/>
+        </div>
+        <div className="ctx-row" style={{borderTop:'none',paddingTop:14}}>
+          <SidebarSlice type={type}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  return (
+    <DesignCanvas>
+      <DCSection id="strong" title="Strongest directions" subtitle="True to the product — a board of agent runs moving through states. Both survive 16px.">
+        <DCArtboard id="grid" label="01 · Live cell" width={440}>
+          <Concept
+            kick="board + status"
+            name="The live cell"
+            rat="A 3×3 board with one cell lit teal — a run active on the board. Draws the product noun literally and reuses your state palette. All rectangles, so it stays crisp at favicon size."
+            type="grid"
+            hero={<Mark type="grid" m={92}/>}
+          />
+        </DCArtboard>
+        <DCArtboard id="pulse" label="02 · Pulse" width={440}>
+          <Concept
+            kick="run in progress"
+            name="The pulse"
+            rat="Your pulse-dot is already brand equity — promote it to the logo. A dot breathing inside the tile. Monochrome by default, but it can shift hue to the active run's state. A mark that doubles as a status light."
+            type="pulse"
+            hero={<Mark type="pulse" m={92} anim/>}
+          />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="alt" title="Alternates" subtitle="Developer-native and pipeline metaphors — stronger as wordmark companions.">
+        <DCArtboard id="bracket" label="03 · Bracket monogram" width={440}>
+          <Concept
+            kick="developer-native"
+            name="The bracket"
+            rat="Leans into the monospace / CLI heritage: a cursor sitting inside brackets — a terminal prompt waiting to run. Pairs naturally with Geist Mono. Shown free-standing; a boxed variant sits in the size strip."
+            type="bracket"
+            hero={<Mark type="bracket" m={78}/>}
+            extra={<div className="sz"><Mark type="bracketbox" m={32}/><span>boxed</span></div>}
+          />
+        </DCArtboard>
+        <DCArtboard id="track" label="04 · Track + gate" width={440}>
+          <Concept
+            kick="pipeline"
+            name="The track"
+            rat="A node on a rail approaching a gate — a run progressing through checkpoints. The most literal of the set; reads best at lockup size, gets dense at 16px. A good companion graphic even if not the primary mark."
+            type="track"
+            hero={<Mark type="track" m={92}/>}
+          />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="evo" title="Evolution, not redesign" subtitle="If you'd rather keep the cb mark and just fix the lockup + typography.">
+        <DCArtboard id="cb" label="05 · Refined wordmark" width={440}>
+          <Concept
+            kick="keep the cb"
+            name="Refined cb"
+            rat="Softer off-white tile, tighter cb ligature, and a teal baseline accent tying it to the system. The real upgrade is the wordmark: deliberate tracking and a colored seam in 'claud·board'."
+            type="cb"
+            hero={<div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:20}}>
+              <Mark type="cb" m={84}/>
+              <div className="bigwm">claud<b>·</b>board</div>
+            </div>}
+          />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="quiet" title="Quieter takes on the cell" subtitle="Same board DNA as 01, dialled down so it reads as a mark — not a literal apps-grid.">
+        <DCArtboard id="quad" label="06 · 2×2 quartet" width={440}>
+          <Concept
+            kick="fewer divisions"
+            name="The quartet"
+            rat="Drop from nine cells to four — one lit. Fewer divisions stops it looking like a generic grid icon and starts reading as a deliberate mark. Still unmistakably the board, just calmer."
+            type="quad"
+            hero={<Mark type="quad" m={92}/>}
+          />
+        </DCArtboard>
+        <DCArtboard id="single" label="07 · One placed card" width={440}>
+          <Concept
+            kick="most restrained"
+            name="The placed card"
+            rat="Just the tile and a single lit card, with one faint ghost cell to keep the board hint. The grid is implied, not drawn — the subtlest take, and the most glyph-like at favicon size."
+            type="single"
+            hero={<Mark type="single" m={92}/>}
+          />
+        </DCArtboard>
+        <DCArtboard id="neg" label="08 · Knockout cell" width={440}>
+          <Concept
+            kick="figure / ground flip"
+            name="The knockout"
+            rat="Invert it: a solid teal tile with one cell punched out to the background. The accent becomes the surface behind the mark — quieter, a touch more premium, and distinct from anything literal."
+            type="neg"
+            hero={<Mark type="neg" m={92}/>}
+          />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="ph" title="Wordmark · the boxed nod" subtitle="A two-tone lockup with one word in a turquoise box — that structure, redrawn in claudboard's own accent and Geist. Original, not a copy. Shares the turquoise of the 08 knockout mark.">
+        <DCArtboard id="ph-box" label="A · Boxed" width={460}>
+          <PhCard
+            kick="the nod"
+            name="Boxed wordmark"
+            rat="'board' sits in a rounded turquoise box against a plain 'claud'. The two-tone, one-word-boxed structure is the reference — but in Geist and claudboard's turquoise it reads as its own mark, not a parody."
+            hero={<WmkBox size={44}/>}
+            ctx={<><div className="phbar"><PhMark m={20}/><WmkBox size={17}/></div><div className="szi" style={{display:'flex',flexDirection:'column',alignItems:'center',gap:8}}><PhMark m={40}/><span style={{font:'500 10px var(--font-mono)',color:'var(--muted)'}}>favicon</span></div></>}
+          />
+        </DCArtboard>
+        <DCArtboard id="ph-two" label="B · Two-tone · subtlest" width={460}>
+          <PhCard
+            kick="least obvious"
+            name="Two-tone, no box"
+            rat="Drop the box entirely — keep only the two-tone idea: 'claud' in ink, 'board' in turquoise. The reference is felt, not seen. Cleanest in dense UI and the safest distance from the source."
+            hero={<WmkTwo size={44}/>}
+            ctx={<><div className="phbar"><PhMark m={20}/><WmkTwo size={17}/></div></>}
+          />
+        </DCArtboard>
+        <DCArtboard id="ph-mark" label="C · Mark + box" width={460}>
+          <PhCard
+            kick="full lockup"
+            name="Knockout + boxed word"
+            rat="The chosen 08 knockout mark beside the boxed wordmark — mark, box and accent all on one turquoise. A complete, cohesive identity: the icon and the wordmark finally speak the same colour."
+            hero={<div className="phlock"><PhMark m={42}/><WmkBox size={38}/></div>}
+            ctx={<div className="phside"><div className="r"><PhMark m={20}/><WmkBox size={15}/></div><div className="stub" style={{width:'82%'}}></div><div className="stub" style={{width:'60%'}}></div><div className="stub" style={{width:'70%'}}></div></div>}
+          />
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

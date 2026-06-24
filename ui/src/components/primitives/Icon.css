@@ -1,0 +1,6 @@
+.icon__root {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  line-height: 1;
+}
