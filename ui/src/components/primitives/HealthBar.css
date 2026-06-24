@@ -1,0 +1,17 @@
+.health-bar__root {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.health-bar__seg {
+  height: 6px;
+  flex: 1;
+  border-radius: 1px;
+  background: var(--surface-3);
+}
+
+.health-bar__seg--done    { background: var(--green); }
+.health-bar__seg--stale   { background: var(--amber); }
+.health-bar__seg--missing { background: var(--red); }
+.health-bar__seg--running { background: var(--teal); }

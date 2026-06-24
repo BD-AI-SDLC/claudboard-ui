@@ -1,0 +1,14 @@
+.app__root {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app__main {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}

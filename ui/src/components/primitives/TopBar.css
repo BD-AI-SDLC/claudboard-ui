@@ -1,0 +1,59 @@
+.topbar__root {
+  height: 48px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  gap: 12px;
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+.topbar__crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: var(--fs-md);
+}
+
+.topbar__crumb-sep {
+  color: var(--dim);
+}
+
+.topbar__crumb-now {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.topbar__spacer {
+  flex: 1;
+}
+
+.topbar__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border: 1px solid var(--text);
+  background: var(--text);
+  color: var(--bg);
+  border-radius: var(--radius);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.topbar__cta:hover:not(:disabled) {
+  background: var(--text-2);
+  border-color: var(--text-2);
+}
+
+.topbar__cta:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: var(--surface-2);
+  border-color: var(--border-hi);
+  color: var(--muted);
+}

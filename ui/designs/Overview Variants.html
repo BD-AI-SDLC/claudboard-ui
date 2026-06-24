@@ -1,0 +1,1183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>claudboard — overview variants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg:#08090a; --bg-2:#0e0f11; --surface:#131418; --surface-2:#181a1f; --surface-3:#20232a;
+    --border:#23252b; --border-hi:#2e3138; --border-bright:#3b3f48;
+    --text:#ededef; --text-2:#b8b9be; --muted:#797b83; --dim:#4d4f57;
+    --teal:oklch(78% 0.13 195);   --teal-dim:oklch(78% 0.13 195 / 0.18);
+    --green:oklch(78% 0.13 150);  --green-dim:oklch(78% 0.13 150 / 0.18);
+    --amber:oklch(80% 0.13 78);   --amber-dim:oklch(80% 0.13 78 / 0.18);
+    --red:oklch(70% 0.16 25);     --red-dim:oklch(70% 0.16 25 / 0.18);
+    --violet:oklch(72% 0.13 295); --violet-dim:oklch(72% 0.13 295 / 0.18);
+    --blue:oklch(70% 0.14 245);   --blue-dim:oklch(70% 0.14 245 / 0.18);
+    --pink:oklch(76% 0.14 0);     --pink-dim:oklch(76% 0.14 0 / 0.18);
+    --font-sans:'Geist',-apple-system,system-ui,sans-serif;
+    --font-mono:'Geist Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:13px;-webkit-font-smoothing:antialiased}
+  button{font:inherit;color:inherit;cursor:pointer;background:transparent;border:0}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+  .num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+  /* page header */
+  .pg-head{padding:32px 48px 24px;background:var(--bg-2);border-bottom:1px solid var(--border)}
+  .brand{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);margin-bottom:10px}
+  .brand-mark{width:22px;height:22px;border-radius:5px;background:var(--text);color:var(--bg);display:grid;place-items:center;font:700 11px var(--font-mono)}
+  .pg-head h1{margin:0 0 8px;font-size:28px;font-weight:600;letter-spacing:-0.018em}
+  .pg-head p{margin:0;max-width:880px;color:var(--text-2);line-height:1.55;font-size:14px}
+
+  /* tabs */
+  .tabs{display:flex;padding:0 48px;background:var(--bg-2);border-bottom:1px solid var(--border);gap:0;position:sticky;top:0;z-index:10}
+  .tab{padding:12px 16px;display:flex;align-items:center;gap:8px;color:var(--muted);border-radius:7px 7px 0 0;font:500 13px var(--font-sans);position:relative;top:1px;margin-right:2px;border:1px solid transparent;border-bottom:0}
+  .tab.on{background:var(--bg);border-color:var(--border);color:var(--text);font-weight:600}
+  .tab .tag{padding:2px 7px;border-radius:4px;background:var(--surface-2);color:var(--muted);font:600 10px var(--font-mono);letter-spacing:.04em}
+  .tab.on .tag{background:var(--teal-dim);color:var(--teal)}
+  .panel{display:none}
+  .panel.on{display:block}
+
+  /* intro per panel */
+  .intro{display:grid;grid-template-columns:1.4fr 1fr;gap:48px;padding:32px 48px 16px;max-width:1380px}
+  .intro-tag{font:700 11px var(--font-mono);color:var(--teal);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+  .intro h2{margin:0 0 6px;font-size:22px;font-weight:600;letter-spacing:-0.012em}
+  .intro p{font-size:13px;color:var(--text-2);line-height:1.6;margin:0;max-width:600px}
+  .scen-meta{padding-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .meta-h{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .meta-item{font-size:12px;color:var(--text-2);line-height:1.5;padding-left:14px;position:relative;margin-bottom:4px}
+  .meta-item::before{content:"·";position:absolute;left:2px;color:var(--violet);font-weight:700}
+
+  /* frame */
+  .frame{width:1280px;height:840px;background:var(--bg);border:1px solid var(--border-hi);border-radius:12px;
+    overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4);margin:0 auto 48px;
+    display:grid;grid-template-columns:240px 1fr;grid-template-rows:48px 1fr;
+    grid-template-areas:"side topbar" "side body";position:relative}
+  .fs{grid-area:side;background:var(--bg-2);border-right:1px solid var(--border);padding:12px 10px;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+  .fs-brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;padding:0 4px 10px;border-bottom:1px solid var(--border)}
+  .fs-mark{width:20px;height:20px;border-radius:5px;background:var(--text);color:var(--bg);display:grid;place-items:center;font:700 11px var(--font-mono)}
+  .fs-brand small{margin-left:auto;font:500 9px var(--font-sans);color:var(--muted);border:1px solid var(--border-hi);border-radius:999px;padding:1px 6px;letter-spacing:.05em;text-transform:uppercase}
+
+  /* workspace switcher */
+  .ws{margin-top:10px;display:flex;flex-direction:column;gap:2px;padding:7px 9px;background:var(--surface);border:1px solid var(--border-hi);border-radius:6px;position:relative}
+  .ws-top{display:flex;align-items:center;gap:7px;cursor:pointer}
+  .ws-ico{width:18px;height:18px;border-radius:4px;display:grid;place-items:center;font:600 9px var(--font-mono)}
+  .ws-ico.mono{background:var(--violet-dim);color:var(--violet)}
+  .ws-ico.multi{background:var(--teal-dim);color:var(--teal)}
+  .ws-ico.monoz{background:var(--amber-dim);color:var(--amber)}
+  .ws-name{font-weight:500;font-size:12px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ws-type{font:500 9px var(--font-mono);color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+  .ws-chev{color:var(--muted);font-size:10px}
+
+  /* opened dropdown */
+  .ws-dd{position:absolute;left:0;top:calc(100% + 4px);width:280px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;box-shadow:0 12px 36px rgba(0,0,0,.45);z-index:50;padding:6px;display:none}
+  .ws.open .ws-dd{display:block}
+  .ws-row{display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:center;padding:7px 9px;border-radius:5px;cursor:pointer;font-size:12px}
+  .ws-row:hover{background:var(--surface-2)}
+  .ws-row.on{background:var(--surface-2)}
+  .ws-row .nm{font-weight:500}
+  .ws-row .ty{font:500 9px var(--font-mono);color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+  .ws-row .dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+  .ws-row.on .dot{background:var(--teal)}
+  .ws-dd .sep{height:1px;background:var(--border);margin:4px 6px}
+  .ws-dd .add{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:5px;color:var(--text-2);font-size:12px;cursor:pointer}
+  .ws-dd .add:hover{background:var(--surface-2);color:var(--text)}
+  .ws-dd .add .plus{width:18px;height:18px;border-radius:4px;background:var(--surface-2);color:var(--text-2);display:grid;place-items:center;font-weight:700}
+  .ws-dd .add.muted{color:var(--muted)}
+
+  /* sidebar nav */
+  .fs-nav{flex:1;min-height:0;overflow-y:auto;padding-top:14px}
+  .fs-label{font:600 9px var(--font-sans);color:var(--dim);padding:8px 6px 4px;letter-spacing:.08em;text-transform:uppercase}
+  .fs-item{display:flex;align-items:center;gap:8px;padding:5px 7px;border-radius:5px;color:var(--text-2);font-size:12px;margin-bottom:1px}
+  .fs-item.on{background:var(--surface-2);color:var(--text)}
+  .fs-ico{width:5px;height:5px;border-radius:50%;background:var(--muted);display:inline-block}
+  .fs-item.on .fs-ico{background:var(--teal)}
+  .fs-count{margin-left:auto;font:500 10px var(--font-mono);color:var(--muted);background:var(--surface-2);padding:1px 6px;border-radius:999px;min-width:18px;text-align:center}
+  .fs-item.on .fs-count{background:var(--teal-dim);color:var(--teal)}
+  .fs-running{margin-top:6px;padding:7px 9px;border-left:2px solid var(--teal);background:var(--teal-dim);border-radius:0 5px 5px 0}
+  .fs-running .rt{font:600 10px var(--font-sans);color:var(--teal);margin-bottom:2px;display:flex;align-items:center;gap:5px}
+  .fs-running .rn{font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fs-running .rm{font:400 10px var(--font-mono);color:var(--muted);margin-top:2px}
+  .pulse{width:5px;height:5px;border-radius:50%;background:currentColor;animation:pulse 1.6s ease-in-out infinite;display:inline-block}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* topbar */
+  .ftb{grid-area:topbar;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:10px;font-size:12px;color:var(--muted)}
+  .ftb .now{color:var(--text);font-weight:500}
+  .ftb .sep{color:var(--dim)}
+  .spacer{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border:1px solid var(--border-hi);background:var(--surface);color:var(--text);border-radius:6px;font-size:12px;font-weight:500}
+  .btn.primary{background:var(--text);color:var(--bg);border-color:var(--text);font-weight:600}
+  .btn.accent{background:var(--teal);color:var(--bg-2);border-color:var(--teal);font-weight:600}
+  .btn.amber{background:var(--amber);color:#1a1300;border-color:var(--amber);font-weight:600}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--text-2)}
+  .btn.sm{padding:4px 8px;font-size:11px}
+
+  /* body */
+  .fbd{grid-area:body;overflow-y:auto;padding:24px 28px}
+
+  /* project header */
+  .proj{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px}
+  .pmark{width:42px;height:42px;border-radius:9px;background:var(--surface-2);border:1px solid var(--border);display:grid;place-items:center;font:700 14px var(--font-mono)}
+  .pmark.violet{background:var(--violet-dim);color:var(--violet);border-color:transparent}
+  .pmark.teal{background:var(--teal-dim);color:var(--teal);border-color:transparent}
+  .pmark.amber{background:var(--amber-dim);color:var(--amber);border-color:transparent}
+  .pinfo{flex:1;min-width:0}
+  .pn{font-size:20px;font-weight:600;letter-spacing:-0.015em;display:flex;align-items:center;gap:8px}
+  .ptype{font:600 9px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:999px}
+  .ptype.mono{background:var(--violet-dim);color:var(--violet)}
+  .ptype.multi{background:var(--teal-dim);color:var(--teal)}
+  .ptype.monoz{background:var(--amber-dim);color:var(--amber)}
+  .pp{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:2px}
+  .pchips{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+  .chip{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:500;border:1px solid var(--border-hi);background:var(--surface);color:var(--text-2)}
+  .chip.t{border:0;background:var(--teal-dim);color:var(--teal)}
+  .chip.g{border:0;background:var(--green-dim);color:var(--green)}
+  .chip.a{border:0;background:var(--amber-dim);color:var(--amber)}
+  .chip.r{border:0;background:var(--red-dim);color:var(--red)}
+  .chip.v{border:0;background:var(--violet-dim);color:var(--violet)}
+  .chip.b{border:0;background:var(--blue-dim);color:var(--blue)}
+  .chip .dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+  /* stats grid */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
+  .stat{padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+  .stat .l{font-size:11px;color:var(--muted)}
+  .stat .v{font:600 26px var(--font-mono);letter-spacing:-0.02em;margin:6px 0 4px;color:var(--text)}
+  .stat .v.teal{color:var(--teal)}
+  .stat .v.amber{color:var(--amber)}
+  .stat .v.green{color:var(--green)}
+  .stat .v small{font-size:13px;color:var(--muted)}
+  .stat .s{font-size:11px;color:var(--muted)}
+
+  /* sections */
+  .gh{display:flex;align-items:baseline;gap:10px;margin:24px 0 10px}
+  .gh h2{margin:0;font-size:14px;font-weight:600}
+  .gh .sub{font-size:11px;color:var(--muted)}
+  .gh .more{margin-left:auto;font-size:11px;color:var(--muted)}
+
+  /* card */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px}
+  .ch{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .ch h3{margin:0;font-size:13px;font-weight:600}
+  .ch .sub{font-size:11px;color:var(--muted)}
+  .ch .actions{margin-left:auto;display:flex;gap:4px}
+
+  /* repo / module row */
+  .dir-row{display:grid;align-items:center;gap:14px;padding:11px 16px;border-bottom:1px solid var(--border);font-size:12px;cursor:pointer}
+  .dir-row:hover{background:var(--surface-2)}
+  .dir-row:last-child{border-bottom:0}
+  .dir-row.repo{grid-template-columns:32px 1fr 1fr 100px 80px}
+  .dir-row.module{grid-template-columns:32px 1fr 1fr 100px}
+  .dir-row .mk{width:32px;height:32px;border-radius:7px;background:var(--surface-2);border:1px solid var(--border);display:grid;place-items:center;font:700 11px var(--font-mono)}
+  .dir-row .nm{font-weight:500}
+  .dir-row .pa{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:2px}
+  .dir-row .stack{display:flex;gap:4px;flex-wrap:wrap}
+  .dir-row .last{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+  .dir-row .ic{font-family:var(--font-mono);font-size:10px;color:var(--muted);display:flex;justify-content:flex-end;gap:6px}
+
+  /* activity feed */
+  .feed-item{padding:9px 14px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:20px 1fr auto;gap:10px;font-size:12px;align-items:start}
+  .feed-item:last-child{border:0}
+  .feed-item .fi{width:20px;height:20px;border-radius:5px;background:var(--surface-2);color:var(--muted);display:grid;place-items:center;font:600 10px var(--font-mono);margin-top:1px}
+  .feed-item.g .fi{background:var(--green-dim);color:var(--green)}
+  .feed-item.t .fi{background:var(--teal-dim);color:var(--teal)}
+  .feed-item.a .fi{background:var(--amber-dim);color:var(--amber)}
+  .feed-item.r .fi{background:var(--red-dim);color:var(--red)}
+  .feed-item.v .fi{background:var(--violet-dim);color:var(--violet)}
+  .feed-item .fm{color:var(--text);line-height:1.45}
+  .feed-item .fm em{font-style:normal;color:var(--muted)}
+  .feed-item .fm b{font-weight:600}
+  .feed-item .ft{color:var(--dim);font-family:var(--font-mono);font-size:10px;white-space:nowrap}
+
+  /* recent features (compact rows) */
+  .feat-row{display:grid;grid-template-columns:90px 1fr auto 60px;gap:12px;align-items:center;padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px}
+  .feat-row:last-child{border:0}
+  .feat-row .tkt{font-family:var(--font-mono);color:var(--violet);font-weight:500;font-size:11px}
+  .feat-row .ttl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+  .feat-row .ttl .sb{color:var(--muted);font-family:var(--font-mono);font-size:10px;display:block;margin-top:1px}
+  .feat-row .ago{color:var(--dim);font-family:var(--font-mono);font-size:10px}
+
+  /* throughput chart */
+  .spark{display:flex;align-items:flex-end;gap:3px;height:38px}
+  .spark .b{flex:1;min-width:4px;background:var(--teal);border-radius:1px 1px 0 0;opacity:.7}
+  .spark .b.muted{background:var(--surface-3);opacity:1}
+
+  /* edge map (multirepo) */
+  .edges{padding:14px;font-family:var(--font-mono);font-size:11px;color:var(--text-2);line-height:1.7}
+  .edges .e-row{display:grid;grid-template-columns:140px auto 140px;gap:14px;align-items:center;padding:5px 0}
+  .edges .e-from{text-align:right;color:var(--text)}
+  .edges .e-to{color:var(--text)}
+  .edges .arr{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:10px;justify-content:center}
+  .edges .arr .kp{padding:1px 6px;border-radius:3px;background:var(--surface-2);color:var(--violet)}
+
+  /* split layouts */
+  .split-2{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+  .split-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+  /* first-run */
+  .first-run{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:48px}
+  .fr-mark{width:64px;height:64px;border-radius:14px;background:var(--text);color:var(--bg);display:grid;place-items:center;font:700 28px var(--font-mono);margin-bottom:20px}
+  .first-run h1{margin:0 0 8px;font-size:28px;font-weight:600;letter-spacing:-0.018em}
+  .first-run .lead{font-size:14px;color:var(--text-2);margin-bottom:32px;text-align:center;max-width:520px;line-height:1.55}
+  .import-cards{display:grid;grid-template-columns:1fr;gap:10px;width:520px}
+  .import-card{display:grid;grid-template-columns:40px 1fr auto;gap:14px;align-items:center;padding:18px 20px;background:var(--surface);border:1px solid var(--border-hi);border-radius:10px;cursor:pointer;transition:border-color .15s,background .15s}
+  .import-card:hover{border-color:var(--teal);background:var(--surface-2)}
+  .import-card.detected{border-color:var(--green);background:linear-gradient(180deg, var(--green-dim) 0%, var(--surface) 80%)}
+  .import-card .ic-ico{width:40px;height:40px;border-radius:9px;background:var(--surface-2);color:var(--text-2);display:grid;place-items:center}
+  .import-card.detected .ic-ico{background:var(--green);color:var(--bg-2)}
+  .import-card .ic-t{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .import-card .ic-s{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.45}
+  .import-card .ic-arrow{color:var(--muted);font-size:18px}
+  .first-run .alt{margin-top:24px;font-size:12px;color:var(--muted);display:flex;gap:14px;align-items:center}
+  .first-run .alt a{color:var(--text-2);border-bottom:1px dashed var(--border-hi);padding-bottom:1px}
+
+  /* small svg helper */
+  .svg-ico{display:inline-block;vertical-align:-2px}
+  .brandword{display:inline-flex;align-items:baseline}
+  .wbd{color:var(--teal,#1ed1d1)}
+</style>
+</head>
+<body>
+
+<header class="pg-head">
+  <div class="brand">
+    <span class="brand-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span>
+    <span class="brandword">claud<span class="wbd">board</span></span> · UX exploration
+  </div>
+  <h1>Overview — three project setups, plus first-run</h1>
+  <p>The Overview surface should adapt to the project's setup type. Universal blocks (active runs, gates, activity, throughput) stay; scenario-specific blocks (repo list, module list, edge map) appear only where they make sense. The workspace switcher at the top of the sidebar is the single entry point for adding or switching workspaces — first-run is its empty state.</p>
+</header>
+
+<div class="tabs">
+  <button class="tab on" data-tab="mono"><span class="tag">1</span>Monolith</button>
+  <button class="tab" data-tab="multi"><span class="tag">2</span>Multi-repo workspace</button>
+  <button class="tab" data-tab="monoz"><span class="tag">3</span>Monorepo workspace</button>
+  <button class="tab" data-tab="first"><span class="tag">4</span>First-run · import</button>
+  <button class="tab" data-tab="dd"><span class="tag">↓</span>Workspace switcher</button>
+</div>
+
+<!-- ═════════════════════ MONOLITH ═════════════════════ -->
+<section class="panel on" data-panel="mono">
+  <div class="intro">
+    <div>
+      <div class="intro-tag">Scenario 1 · Monolith</div>
+      <h2>One repo, one git history</h2>
+      <p>Smallest case. No "repositories" list — there's only one. <b>Recent runs</b> is the main content card; in-flight runs sit at the top. If claudboard's analysis surfaces natural subareas (controllers / persistence / messaging in a Spring app, for example), they show as a compact <b>modules</b> list — purely informational, not a directory of separate units.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">Setup</div>
+        <div class="meta-item">1 analyse · 1 generate · 1 workflow</div>
+        <div class="meta-item">No workspace meta-repo</div>
+        <div class="meta-item">Branches managed in the repo itself</div>
+      </div>
+      <div>
+        <div class="meta-h">What's omitted</div>
+        <div class="meta-item">Repository list</div>
+        <div class="meta-item">Cross-service edge map</div>
+        <div class="meta-item">Per-repo readiness</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <!-- sidebar -->
+    <aside class="fs">
+      <div class="fs-brand">
+        <span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span>
+        <span class="brandword">claud<span class="wbd">board</span></span>
+        <small>v1.4</small>
+      </div>
+      <div class="ws">
+        <div class="ws-top">
+          <span class="ws-ico mono">cb</span>
+          <div style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0">
+            <span class="ws-name">claudboard</span>
+            <span class="ws-type">monolith</span>
+          </div>
+          <span class="ws-chev">▾</span>
+        </div>
+      </div>
+      <nav class="fs-nav">
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item on"><span class="fs-ico"></span>Overview</div>
+        <div class="fs-item"><span class="fs-ico"></span>Project · health</div>
+        <div class="fs-item"><span class="fs-ico"></span>Start feature</div>
+        <div class="fs-item"><span class="fs-ico"></span>Active run</div>
+        <div class="fs-label">Project</div>
+        <div class="fs-item"><span class="fs-ico"></span>Analytics</div>
+        <div class="fs-item"><span class="fs-ico"></span>Run history</div>
+        <div class="fs-item"><span class="fs-ico"></span>Settings</div>
+      </nav>
+    </aside>
+
+    <div class="ftb">
+      <span class="now">claudboard</span><span class="sep">·</span><span style="color:var(--muted)">monolith</span>
+      <div class="spacer"></div>
+      <button class="btn ghost sm">⌘ K</button>
+      <button class="btn primary"><svg class="svg-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 4l13 8-13 8V4z"/></svg> Start feature</button>
+    </div>
+
+    <div class="fbd">
+      <!-- project header -->
+      <div class="proj">
+        <div class="pmark violet">cb</div>
+        <div class="pinfo">
+          <div class="pn">claudboard <span class="ptype mono">Monolith</span></div>
+          <div class="pp">~/dev/claudboard/  ·  branch main  ·  TypeScript · MCP server</div>
+          <div class="pchips">
+            <span class="chip">TypeScript</span>
+            <span class="chip">Node 22</span>
+            <span class="chip v">MCP</span>
+            <span class="chip">Jira · PLAT</span>
+            <span class="chip">GitHub · LUP1BG/claudboard</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- stats -->
+      <div class="stats">
+        <div class="stat">
+          <div class="l">Active runs</div>
+          <div class="v teal">0</div>
+          <div class="s">idle since yesterday</div>
+        </div>
+        <div class="stat">
+          <div class="l">Awaiting gate</div>
+          <div class="v">0</div>
+          <div class="s">no human checkpoints</div>
+        </div>
+        <div class="stat">
+          <div class="l">In review</div>
+          <div class="v">1</div>
+          <div class="s">PR #1492 · 2 reviewers</div>
+        </div>
+        <div class="stat">
+          <div class="l">Merged this week</div>
+          <div class="v green">3</div>
+          <div class="s"><span class="spark" style="height:18px;width:60px;display:inline-flex;vertical-align:middle">
+            <span class="b" style="height:30%"></span><span class="b muted"></span><span class="b" style="height:60%"></span><span class="b" style="height:40%"></span><span class="b" style="height:90%"></span><span class="b muted"></span><span class="b" style="height:50%"></span>
+          </span></div>
+        </div>
+      </div>
+
+      <!-- recent runs (full width) -->
+      <div class="card">
+        <div class="ch">
+          <h3>Recent runs</h3>
+          <span class="sub">last 30 days · 8 merged · 1 in review</span>
+          <div class="actions"><button class="btn ghost sm">View all →</button></div>
+        </div>
+        <div class="feat-row">
+          <span class="tkt">PLAT-4825</span>
+          <div class="ttl">Persist .design-canvas state across reloads<span class="sb">3h 02m · $3.94</span></div>
+          <span class="chip v"><span class="dot"></span>in review</span>
+          <span class="ago">3h</span>
+        </div>
+        <div class="feat-row">
+          <span class="tkt">PLAT-4821</span>
+          <div class="ttl">Add /refresh stale-rule detection<span class="sb">2h 18m · $2.62</span></div>
+          <span class="chip g"><span class="dot"></span>merged</span>
+          <span class="ago">17h</span>
+        </div>
+        <div class="feat-row">
+          <span class="tkt">PLAT-4815</span>
+          <div class="ttl">Surface workflow-signals in analysis report<span class="sb">3h 42m · $4.81</span></div>
+          <span class="chip g"><span class="dot"></span>merged</span>
+          <span class="ago">2d</span>
+        </div>
+        <div class="feat-row">
+          <span class="tkt">PLAT-4810</span>
+          <div class="ttl">Skill-creator eval improvements<span class="sb">1h 14m · $1.04</span></div>
+          <span class="chip g"><span class="dot"></span>merged</span>
+          <span class="ago">3d</span>
+        </div>
+        <div class="feat-row">
+          <span class="tkt">PLAT-4807</span>
+          <div class="ttl">Cross-stack detector unification<span class="sb">5h 02m · $7.21</span></div>
+          <span class="chip g"><span class="dot"></span>merged</span>
+          <span class="ago">5d</span>
+        </div>
+        <div class="feat-row">
+          <span class="tkt">PLAT-4799</span>
+          <div class="ttl">Stack-detectors: add Rust patterns<span class="sb">2h 31m · $3.18</span></div>
+          <span class="chip g"><span class="dot"></span>merged</span>
+          <span class="ago">8d</span>
+        </div>
+        <div class="feat-row">
+          <span class="tkt">PLAT-4790</span>
+          <div class="ttl">Workspace meta-repo bootstrap helper<span class="sb">1h 47m · $2.14</span></div>
+          <span class="chip r"><span class="dot"></span>aborted</span>
+          <span class="ago">11d</span>
+        </div>
+      </div>
+
+      <!-- modules (informational only) -->
+      <div class="gh">
+        <h2>Modules</h2>
+        <span class="sub">detected by /analyse · informational</span>
+      </div>
+      <div class="card">
+        <div class="dir-row module">
+          <div class="mk">sk</div>
+          <div>
+            <div class="nm">skills/</div>
+            <div class="pa">skills/claudboard-{analyse,generate,refresh,techdebt,workflow}/</div>
+          </div>
+          <div class="stack">
+            <span class="chip">7 SKILL.md</span>
+            <span class="chip">references/</span>
+          </div>
+          <div class="last">2h ago</div>
+        </div>
+        <div class="dir-row module">
+          <div class="mk">re</div>
+          <div>
+            <div class="nm">references/</div>
+            <div class="pa">shared detection &amp; pattern catalog</div>
+          </div>
+          <div class="stack">
+            <span class="chip">stack-detectors</span>
+            <span class="chip">workflow-signals</span>
+          </div>
+          <div class="last">2d ago</div>
+        </div>
+        <div class="dir-row module">
+          <div class="mk">ev</div>
+          <div>
+            <div class="nm">evals/</div>
+            <div class="pa">eval cases for diverse repo types</div>
+          </div>
+          <div class="stack">
+            <span class="chip">14 fixtures</span>
+          </div>
+          <div class="last">5d ago</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════ MULTIREPO ═════════════════════ -->
+<section class="panel" data-panel="multi">
+  <div class="intro">
+    <div>
+      <div class="intro-tag">Scenario 2 · Multi-repo workspace</div>
+      <h2>One workspace, many service repos</h2>
+      <p>The richest scenario. Setup runs once at the workspace meta-repo (one analyse, one generate, one feature-workflow that serves all services). Each repo gets its own branches and PRs. The Overview here lists <b>services</b> — not as setup units, but as a directory. <b>Recent runs</b> tags each run with its repo. Adds a cross-service <b>edge map</b> for the architecture.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">Setup</div>
+        <div class="meta-item">1 analyse / generate / workflow at workspace root</div>
+        <div class="meta-item">Meta-repo holds .claude/</div>
+        <div class="meta-item">Per-repo branches &amp; PRs</div>
+      </div>
+      <div>
+        <div class="meta-h">Unique blocks</div>
+        <div class="meta-item">Services directory</div>
+        <div class="meta-item">Cross-service edge map</div>
+        <div class="meta-item">Shared libs &amp; contracts</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <aside class="fs">
+      <div class="fs-brand">
+        <span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span>
+        <span class="brandword">claud<span class="wbd">board</span></span>
+        <small>v1.4</small>
+      </div>
+      <div class="ws">
+        <div class="ws-top">
+          <span class="ws-ico multi">M</span>
+          <div style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0">
+            <span class="ws-name">meas</span>
+            <span class="ws-type">multi-repo · 6 repos</span>
+          </div>
+          <span class="ws-chev">▾</span>
+        </div>
+      </div>
+      <nav class="fs-nav">
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item on"><span class="fs-ico"></span>Overview</div>
+        <div class="fs-item"><span class="fs-ico"></span>Project · health</div>
+        <div class="fs-item"><span class="fs-ico"></span>Start feature</div>
+        <div class="fs-item"><span class="fs-ico"></span>Active run<span class="fs-count">1</span></div>
+        <div class="fs-item"><span class="fs-ico"></span>Review gate<span class="fs-count" style="background:var(--amber-dim);color:var(--amber)">1</span></div>
+        <div class="fs-running">
+          <div class="rt"><span class="pulse"></span>RUNNING · 13m</div>
+          <div class="rn">MEAS-7140 · Outbox dispatcher</div>
+          <div class="rm">datahandler · phase 1/7 · gate</div>
+        </div>
+        <div class="fs-label">Project</div>
+        <div class="fs-item"><span class="fs-ico"></span>Analytics</div>
+        <div class="fs-item"><span class="fs-ico"></span>Run history</div>
+      </nav>
+    </aside>
+
+    <div class="ftb">
+      <span class="now">meas</span><span class="sep">·</span><span style="color:var(--muted)">multi-repo workspace</span>
+      <div class="spacer"></div>
+      <button class="btn ghost sm">⌘ K</button>
+      <button class="btn primary">▶ Start feature</button>
+    </div>
+
+    <div class="fbd">
+      <div class="proj">
+        <div class="pmark teal">M</div>
+        <div class="pinfo">
+          <div class="pn">meas <span class="ptype multi">Multi-repo · 6 repos</span></div>
+          <div class="pp">~/work/meas/  ·  meta-repo: meas.workspace · symlinked .claude/</div>
+          <div class="pchips">
+            <span class="chip">Java 21</span>
+            <span class="chip">Spring Boot 3</span>
+            <span class="chip v">MongoDB</span>
+            <span class="chip v">Kafka</span>
+            <span class="chip">Jira · MEAS</span>
+            <span class="chip">ADO · meas-cloud</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="l">Active runs</div><div class="v teal">1</div><div class="s">MEAS-7140 · 13m elapsed</div></div>
+        <div class="stat"><div class="l">Awaiting gate</div><div class="v amber">1</div><div class="s">phase 1d · spec + plan</div></div>
+        <div class="stat"><div class="l">In review</div><div class="v">2</div><div class="s">PRs open · ADO</div></div>
+        <div class="stat"><div class="l">Merged this week</div><div class="v green">5</div><div class="s"><span class="spark" style="height:18px;width:60px;display:inline-flex;vertical-align:middle"><span class="b" style="height:40%"></span><span class="b" style="height:70%"></span><span class="b" style="height:50%"></span><span class="b" style="height:90%"></span><span class="b" style="height:60%"></span><span class="b" style="height:100%"></span><span class="b" style="height:50%"></span></span></div></div>
+      </div>
+
+      <!-- services directory -->
+      <div class="gh">
+        <h2>Services</h2>
+        <span class="sub">repositories in this workspace</span>
+        <span class="more">6 total · 1 active</span>
+      </div>
+      <div class="card">
+        <div class="dir-row repo">
+          <div class="mk">dh</div>
+          <div>
+            <div class="nm">meas.cloud.datahandler</div>
+            <div class="pa">~/work/meas/datahandler · branch main</div>
+          </div>
+          <div class="stack">
+            <span class="chip">Spring Boot 3</span>
+            <span class="chip v">MongoDB</span>
+            <span class="chip v">Kafka</span>
+          </div>
+          <div class="last">13m ago</div>
+          <div class="ic"><span class="chip t"><span class="dot pulse"></span>active</span></div>
+        </div>
+        <div class="dir-row repo">
+          <div class="mk">ct</div>
+          <div>
+            <div class="nm">meas.cloud.controller</div>
+            <div class="pa">~/work/meas/controller · branch main</div>
+          </div>
+          <div class="stack">
+            <span class="chip">Spring Boot 3</span>
+            <span class="chip v">JPA</span>
+            <span class="chip">Postgres</span>
+          </div>
+          <div class="last">2h ago</div>
+          <div class="ic"><span class="chip v">in review</span></div>
+        </div>
+        <div class="dir-row repo">
+          <div class="mk">dt</div>
+          <div>
+            <div class="nm">meas.cloud.common-dto</div>
+            <div class="pa">~/work/meas/common-dto · branch main</div>
+          </div>
+          <div class="stack">
+            <span class="chip">Java library</span>
+            <span class="chip">Gradle</span>
+          </div>
+          <div class="last">1d ago</div>
+          <div class="ic">—</div>
+        </div>
+        <div class="dir-row repo">
+          <div class="mk">gw</div>
+          <div>
+            <div class="nm">meas.cloud.gateway</div>
+            <div class="pa">~/work/meas/gateway · branch main</div>
+          </div>
+          <div class="stack">
+            <span class="chip">Spring Cloud Gateway</span>
+            <span class="chip">Spring Security</span>
+          </div>
+          <div class="last">3d ago</div>
+          <div class="ic">—</div>
+        </div>
+        <div class="dir-row repo">
+          <div class="mk">we</div>
+          <div>
+            <div class="nm">meas.cloud.web</div>
+            <div class="pa">~/work/meas/web · branch main</div>
+          </div>
+          <div class="stack">
+            <span class="chip">React 18</span>
+            <span class="chip">Vite</span>
+            <span class="chip">TypeScript</span>
+          </div>
+          <div class="last">6h ago</div>
+          <div class="ic">—</div>
+        </div>
+        <div class="dir-row repo">
+          <div class="mk">in</div>
+          <div>
+            <div class="nm">meas.cloud.infra</div>
+            <div class="pa">~/work/meas/infra · branch main</div>
+          </div>
+          <div class="stack">
+            <span class="chip">Helm</span>
+            <span class="chip">Pulumi</span>
+            <span class="chip">Azure DevOps</span>
+          </div>
+          <div class="last">12d ago</div>
+          <div class="ic">—</div>
+        </div>
+      </div>
+
+      <!-- two col: edges + recent runs -->
+      <div class="split-2" style="margin-top:18px">
+        <div class="card">
+          <div class="ch">
+            <h3>Cross-service edges</h3>
+            <span class="sub">from workflow-signals · 4 edges detected</span>
+          </div>
+          <div class="edges">
+            <div class="e-row">
+              <div class="e-from">controller</div>
+              <div class="arr">→<span class="kp">Kafka</span>→</div>
+              <div class="e-to">datahandler</div>
+            </div>
+            <div class="e-row">
+              <div class="e-from">datahandler</div>
+              <div class="arr">→<span class="kp">Kafka</span>→</div>
+              <div class="e-to">controller</div>
+            </div>
+            <div class="e-row">
+              <div class="e-from">web</div>
+              <div class="arr">→<span class="kp">REST</span>→</div>
+              <div class="e-to">gateway</div>
+            </div>
+            <div class="e-row">
+              <div class="e-from">gateway</div>
+              <div class="arr">→<span class="kp">REST</span>→</div>
+              <div class="e-to">controller + datahandler</div>
+            </div>
+            <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:11px;color:var(--muted)">
+              <span>Shared lib: <span style="color:var(--text)">meas.cloud.common-dto</span></span>
+              <span style="color:var(--violet)">3 consumers</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ch">
+            <h3>Recent runs</h3>
+            <span class="sub">last 30 days · 12 merged · 1 at gate</span>
+            <div class="actions"><button class="btn ghost sm">View all →</button></div>
+          </div>
+          <div class="feat-row">
+            <span class="tkt">MEAS-7140</span>
+            <div class="ttl">Outbox dispatcher for entitlement events<span class="sb">datahandler · 13m · $0.84</span></div>
+            <span class="chip a"><span class="dot"></span>at gate</span>
+            <span class="ago">now</span>
+          </div>
+          <div class="feat-row">
+            <span class="tkt">MEAS-7138</span>
+            <div class="ttl">Tenant-scoped audit log endpoint<span class="sb">controller · 3h 41m · $4.21</span></div>
+            <span class="chip v"><span class="dot"></span>in review</span>
+            <span class="ago">2h</span>
+          </div>
+          <div class="feat-row">
+            <span class="tkt">MEAS-7128</span>
+            <div class="ttl">Migrate scheduler off Quartz<span class="sb">controller · 5h 12m · $8.42</span></div>
+            <span class="chip g"><span class="dot"></span>merged</span>
+            <span class="ago">2d</span>
+          </div>
+          <div class="feat-row">
+            <span class="tkt">MEAS-7102</span>
+            <div class="ttl">Add PaymentMethodDto v2<span class="sb">common-dto · 52m · $1.18</span></div>
+            <span class="chip g"><span class="dot"></span>merged</span>
+            <span class="ago">2d</span>
+          </div>
+          <div class="feat-row">
+            <span class="tkt">MEAS-7088</span>
+            <div class="ttl">Reactive entitlement projection<span class="sb">datahandler · 4h 02m · $5.74</span></div>
+            <span class="chip r"><span class="dot"></span>aborted</span>
+            <span class="ago">3d</span>
+          </div>
+          <div class="feat-row">
+            <span class="tkt">MEAS-7081</span>
+            <div class="ttl">Tenant header propagation middleware<span class="sb">controller · 2h 33m · $3.42</span></div>
+            <span class="chip g"><span class="dot"></span>merged</span>
+            <span class="ago">5d</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════ MONOREPO ═════════════════════ -->
+<section class="panel" data-panel="monoz">
+  <div class="intro">
+    <div>
+      <div class="intro-tag">Scenario 3 · Monorepo workspace</div>
+      <h2>One repo, many packages</h2>
+      <p>Single git history, but the codebase ships multiple deployables. Setup runs once at the repo root. The Overview lists <b>modules / packages</b> — auto-detected by /analyse (e.g. <code class="mono">apps/</code>, <code class="mono">services/</code>, <code class="mono">packages/</code>). <b>Recent runs</b> tags each run with the modules it touched.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">Setup</div>
+        <div class="meta-item">1 analyse / generate / workflow at repo root</div>
+        <div class="meta-item">Single branch per feature</div>
+        <div class="meta-item">/analyse detects module roots</div>
+      </div>
+      <div>
+        <div class="meta-h">Unique blocks</div>
+        <div class="meta-item">Modules directory (auto-detected)</div>
+        <div class="meta-item">Per-module tags on runs</div>
+        <div class="meta-item">Build matrix (Turborepo / Nx)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <aside class="fs">
+      <div class="fs-brand">
+        <span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span>
+        <span class="brandword">claud<span class="wbd">board</span></span>
+        <small>v1.4</small>
+      </div>
+      <div class="ws">
+        <div class="ws-top">
+          <span class="ws-ico monoz">A</span>
+          <div style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0">
+            <span class="ws-name">acme-platform</span>
+            <span class="ws-type">monorepo · 12 modules</span>
+          </div>
+          <span class="ws-chev">▾</span>
+        </div>
+      </div>
+      <nav class="fs-nav">
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item on"><span class="fs-ico"></span>Overview</div>
+        <div class="fs-item"><span class="fs-ico"></span>Project · health</div>
+        <div class="fs-item"><span class="fs-ico"></span>Start feature</div>
+        <div class="fs-item"><span class="fs-ico"></span>Active run</div>
+        <div class="fs-label">Project</div>
+        <div class="fs-item"><span class="fs-ico"></span>Analytics</div>
+        <div class="fs-item"><span class="fs-ico"></span>Run history</div>
+      </nav>
+    </aside>
+
+    <div class="ftb">
+      <span class="now">acme-platform</span><span class="sep">·</span><span style="color:var(--muted)">monorepo workspace</span>
+      <div class="spacer"></div>
+      <button class="btn primary">▶ Start feature</button>
+    </div>
+
+    <div class="fbd">
+      <div class="proj">
+        <div class="pmark amber">A</div>
+        <div class="pinfo">
+          <div class="pn">acme-platform <span class="ptype monoz">Monorepo · 12 modules</span></div>
+          <div class="pp">~/dev/acme-platform/  ·  branch main  ·  pnpm workspaces · Turborepo</div>
+          <div class="pchips">
+            <span class="chip">TypeScript</span>
+            <span class="chip">Next.js</span>
+            <span class="chip">NestJS</span>
+            <span class="chip v">Postgres</span>
+            <span class="chip v">Redis</span>
+            <span class="chip">Jira · ACME</span>
+            <span class="chip">GitHub · acme/platform</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="l">Active runs</div><div class="v teal">0</div><div class="s">idle</div></div>
+        <div class="stat"><div class="l">Awaiting gate</div><div class="v">0</div><div class="s">—</div></div>
+        <div class="stat"><div class="l">In review</div><div class="v">2</div><div class="s">PRs open</div></div>
+        <div class="stat"><div class="l">Merged this week</div><div class="v green">8</div><div class="s"><span class="spark" style="height:18px;width:60px;display:inline-flex;vertical-align:middle"><span class="b" style="height:60%"></span><span class="b" style="height:90%"></span><span class="b" style="height:50%"></span><span class="b" style="height:100%"></span><span class="b" style="height:70%"></span><span class="b" style="height:80%"></span><span class="b" style="height:60%"></span></span></div></div>
+      </div>
+
+      <!-- modules directory -->
+      <div class="gh">
+        <h2>Modules</h2>
+        <span class="sub">12 packages detected · apps + services + libs</span>
+        <span class="more">5 shown · view all</span>
+      </div>
+      <div class="card">
+        <div class="dir-row module">
+          <div class="mk">w</div>
+          <div>
+            <div class="nm">apps/web</div>
+            <div class="pa">Next.js · marketing &amp; logged-in shell</div>
+          </div>
+          <div class="stack">
+            <span class="chip">Next.js 14</span>
+            <span class="chip">tRPC</span>
+            <span class="chip">Tailwind</span>
+          </div>
+          <div class="last">1h ago</div>
+        </div>
+        <div class="dir-row module">
+          <div class="mk">d</div>
+          <div>
+            <div class="nm">apps/dashboard</div>
+            <div class="pa">React SPA · admin tools</div>
+          </div>
+          <div class="stack">
+            <span class="chip">React</span>
+            <span class="chip">Vite</span>
+            <span class="chip">TanStack</span>
+          </div>
+          <div class="last">4h ago</div>
+        </div>
+        <div class="dir-row module">
+          <div class="mk">a</div>
+          <div>
+            <div class="nm">services/api</div>
+            <div class="pa">NestJS · main backend</div>
+          </div>
+          <div class="stack">
+            <span class="chip">NestJS</span>
+            <span class="chip v">Postgres</span>
+            <span class="chip v">Redis</span>
+          </div>
+          <div class="last">17h ago</div>
+        </div>
+        <div class="dir-row module">
+          <div class="mk">b</div>
+          <div>
+            <div class="nm">services/billing</div>
+            <div class="pa">NestJS · Stripe integration</div>
+          </div>
+          <div class="stack">
+            <span class="chip">NestJS</span>
+            <span class="chip">Stripe</span>
+          </div>
+          <div class="last">2d ago</div>
+        </div>
+        <div class="dir-row module">
+          <div class="mk">u</div>
+          <div>
+            <div class="nm">packages/ui</div>
+            <div class="pa">Shared component library</div>
+          </div>
+          <div class="stack">
+            <span class="chip">React</span>
+            <span class="chip">Radix</span>
+            <span class="chip">tsup</span>
+          </div>
+          <div class="last">3d ago</div>
+        </div>
+      </div>
+
+      <!-- recent runs (full width) -->
+      <div class="card" style="margin-top:18px">
+        <div class="ch">
+          <h3>Recent runs</h3>
+          <span class="sub">last week · 8 merged · 1 in review</span>
+          <div class="actions"><button class="btn ghost sm">View all →</button></div>
+        </div>
+        <div class="feat-row">
+          <span class="tkt">ACME-3492</span>
+          <div class="ttl">Tier-based feature flags for billing<span class="sb">services/api · 4h 18m · $6.41</span></div>
+          <span class="chip v"><span class="dot"></span>in review</span>
+          <span class="ago">3h</span>
+        </div>
+        <div class="feat-row">
+          <span class="tkt">ACME-3489</span>
+          <div class="ttl">Dark mode toggle in dashboard shell<span class="sb">apps/dashboard + packages/ui · 1h 47m · $2.14</span></div>
+          <span class="chip g"><span class="dot"></span>merged</span>
+          <span class="ago">1d</span>
+        </div>
+        <div class="feat-row">
+          <span class="tkt">ACME-3477</span>
+          <div class="ttl">Stripe webhook idempotency<span class="sb">services/billing · 2h 22m · $3.18</span></div>
+          <span class="chip g"><span class="dot"></span>merged</span>
+          <span class="ago">2d</span>
+        </div>
+        <div class="feat-row">
+          <span class="tkt">ACME-3471</span>
+          <div class="ttl">Multi-tenant audit log middleware<span class="sb">services/api + packages/db · 5h 32m · $7.94</span></div>
+          <span class="chip g"><span class="dot"></span>merged</span>
+          <span class="ago">3d</span>
+        </div>
+        <div class="feat-row">
+          <span class="tkt">ACME-3464</span>
+          <div class="ttl">Add Radix select to design system<span class="sb">packages/ui · 47m · $0.84</span></div>
+          <span class="chip g"><span class="dot"></span>merged</span>
+          <span class="ago">4d</span>
+        </div>
+        <div class="feat-row">
+          <span class="tkt">ACME-3458</span>
+          <div class="ttl">Cron job: nightly entitlement reconciliation<span class="sb">services/api · 3h 11m · $4.62</span></div>
+          <span class="chip g"><span class="dot"></span>merged</span>
+          <span class="ago">5d</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════ FIRST-RUN ═════════════════════ -->
+<section class="panel" data-panel="first">
+  <div class="intro">
+    <div>
+      <div class="intro-tag">Scenario 4 · First run</div>
+      <h2>No workspaces yet</h2>
+      <p>The sidebar's workspace switcher is the empty state. Three import paths: <b>open a local folder</b> (claudboard auto-detects the type), <b>clone from Git URL</b>, or <b>continue from .claude on disk</b> — surfaces only if claudboard finds an existing setup file in your home or common workspace dirs. The detected card has priority styling so power users get the fast path.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">Detection logic</div>
+        <div class="meta-item">.git in selected folder → monolith or monorepo (workspaces detected from package.json / pnpm-workspace.yaml / nx.json)</div>
+        <div class="meta-item">no .git but child folders each have .git → multi-repo workspace</div>
+        <div class="meta-item">.claude/ at root → import existing setup</div>
+      </div>
+      <div>
+        <div class="meta-h">Subsequent flow</div>
+        <div class="meta-item">After import, jump to Project Health setup chain</div>
+        <div class="meta-item">.claude/ found → mark steps as imported</div>
+        <div class="meta-item">Workspace appears in switcher with type tag</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <aside class="fs">
+      <div class="fs-brand">
+        <span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span>
+        <span class="brandword">claud<span class="wbd">board</span></span>
+        <small>v1.4</small>
+      </div>
+      <div class="ws" style="opacity:.5">
+        <div class="ws-top">
+          <span class="ws-ico" style="background:var(--surface-2);color:var(--muted)">—</span>
+          <div style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0">
+            <span class="ws-name" style="color:var(--muted)">no workspace</span>
+            <span class="ws-type">import below</span>
+          </div>
+          <span class="ws-chev">▾</span>
+        </div>
+      </div>
+      <nav class="fs-nav">
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item" style="opacity:.45"><span class="fs-ico"></span>Overview</div>
+        <div class="fs-item" style="opacity:.45"><span class="fs-ico"></span>Project · health <svg class="svg-ico" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+        <div class="fs-item" style="opacity:.45"><span class="fs-ico"></span>Start feature <svg class="svg-ico" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+        <div class="fs-label">Project</div>
+        <div class="fs-item" style="opacity:.45"><span class="fs-ico"></span>Settings</div>
+      </nav>
+    </aside>
+
+    <div class="ftb">
+      <span class="now">Get started</span>
+      <div class="spacer"></div>
+      <button class="btn ghost sm">Docs ↗</button>
+    </div>
+
+    <div class="fbd" style="display:flex;flex-direction:column;padding:0">
+      <div class="first-run">
+        <div class="fr-mark">cb</div>
+        <h1>Get started — point me at a project</h1>
+        <p class="lead">claudboard reads code from disk. It works on any existing project — single repo, monorepo, or a folder of related repos. Pick a starting point below.</p>
+
+        <div class="import-cards">
+          <div class="import-card detected">
+            <div class="ic-ico">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 3v12M6 9l6 6 6-6M4 21h16"/></svg>
+            </div>
+            <div>
+              <div class="ic-t">
+                Continue from existing setup
+                <span class="chip g"><span class="dot"></span>detected</span>
+              </div>
+              <div class="ic-s">Found <code class="mono" style="color:var(--text)">.claude/</code> at <code class="mono" style="color:var(--text)">~/work/meas/</code> — appears to be a multi-repo workspace (6 services, last analysed 2d ago).</div>
+            </div>
+            <div class="ic-arrow">→</div>
+          </div>
+
+          <div class="import-card">
+            <div class="ic-ico">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></svg>
+            </div>
+            <div>
+              <div class="ic-t">Open local folder</div>
+              <div class="ic-s">claudboard auto-detects monolith / multi-repo / monorepo from the folder structure.</div>
+            </div>
+            <div class="ic-arrow">→</div>
+          </div>
+
+          <div class="import-card">
+            <div class="ic-ico">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+            </div>
+            <div>
+              <div class="ic-t">Clone from Git URL</div>
+              <div class="ic-s">github.com, GitLab, Azure DevOps, or any git remote. Paste a URL; we'll clone into <code class="mono" style="color:var(--text)">~/dev/</code>.</div>
+            </div>
+            <div class="ic-arrow">→</div>
+          </div>
+        </div>
+
+        <div class="alt">
+          <span>Already on the CLI? <a href="#">Bring an existing terminal session</a></span>
+          <span>·</span>
+          <a href="#">Skip and explore demo workspace</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════ DROPDOWN OPEN STATE ═════════════════════ -->
+<section class="panel" data-panel="dd">
+  <div class="intro">
+    <div>
+      <div class="intro-tag">The workspace switcher · opened</div>
+      <h2>Single entry point for switching + adding</h2>
+      <p>The dropdown at the top of every sidebar. Lists all workspaces with their type tag (monolith / multi-repo / monorepo) and an active-state dot. Two "add" rows at the bottom — one for a fresh import, one for the management screen. Activity dots on items indicate workspaces with running workflows.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">Each row shows</div>
+        <div class="meta-item">Workspace mark + name</div>
+        <div class="meta-item">Type chip (mono / multi / monoz)</div>
+        <div class="meta-item">Activity dot if a run is in progress</div>
+      </div>
+      <div>
+        <div class="meta-h">Actions</div>
+        <div class="meta-item">Click row → switch</div>
+        <div class="meta-item">+ Add workspace → opens first-run flow</div>
+        <div class="meta-item">⚙ Manage → full workspaces page</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <aside class="fs">
+      <div class="fs-brand">
+        <span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span>
+        <span class="brandword">claud<span class="wbd">board</span></span>
+        <small>v1.4</small>
+      </div>
+      <div class="ws open">
+        <div class="ws-top">
+          <span class="ws-ico multi">M</span>
+          <div style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0">
+            <span class="ws-name">meas</span>
+            <span class="ws-type">multi-repo · 6 repos</span>
+          </div>
+          <span class="ws-chev">▴</span>
+        </div>
+
+        <div class="ws-dd">
+          <div style="font:600 9px var(--font-mono);color:var(--dim);letter-spacing:.08em;text-transform:uppercase;padding:6px 9px 4px">3 workspaces</div>
+
+          <div class="ws-row on">
+            <span class="dot"></span>
+            <div style="min-width:0">
+              <div class="nm">meas</div>
+              <div class="ty">multi-repo · 6 repos</div>
+            </div>
+            <span class="pulse" style="background:var(--teal)"></span>
+          </div>
+          <div class="ws-row">
+            <span class="dot"></span>
+            <div style="min-width:0">
+              <div class="nm">claudboard</div>
+              <div class="ty">monolith</div>
+            </div>
+            <span style="font-size:9px;color:var(--dim);font-family:var(--font-mono)">idle</span>
+          </div>
+          <div class="ws-row">
+            <span class="dot"></span>
+            <div style="min-width:0">
+              <div class="nm">acme-platform</div>
+              <div class="ty">monorepo · 12 modules</div>
+            </div>
+            <span style="font-size:9px;color:var(--dim);font-family:var(--font-mono)">17h</span>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="add">
+            <div class="plus">+</div>
+            <div style="flex:1">
+              <div style="font-weight:500">Add workspace</div>
+              <div style="font-size:10px;color:var(--muted)">import a folder, clone a remote</div>
+            </div>
+          </div>
+          <div class="add">
+            <div class="plus" style="background:var(--violet-dim);color:var(--violet)">↓</div>
+            <div style="flex:1">
+              <div style="font-weight:500">Import from terminal session</div>
+              <div style="font-size:10px;color:var(--muted)">use an existing .claude/ on disk</div>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="add muted">
+            <div class="plus" style="background:transparent;color:var(--muted)">⚙</div>
+            <div>Manage workspaces</div>
+          </div>
+        </div>
+      </div>
+      <nav class="fs-nav" style="opacity:.3;pointer-events:none">
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item on"><span class="fs-ico"></span>Overview</div>
+        <div class="fs-item"><span class="fs-ico"></span>Project · health</div>
+        <div class="fs-item"><span class="fs-ico"></span>Start feature</div>
+        <div class="fs-item"><span class="fs-ico"></span>Active run</div>
+      </nav>
+    </aside>
+
+    <div class="ftb" style="opacity:.4;pointer-events:none">
+      <span class="now">meas</span>
+      <div class="spacer"></div>
+    </div>
+
+    <div class="fbd" style="opacity:.25;pointer-events:none;background:var(--bg)">
+      <!-- empty body — focus is on the dropdown -->
+      <div style="text-align:center;padding-top:140px;color:var(--muted);font-size:13px">
+        Dropdown is open over the sidebar — body content shown faded for focus.
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer style="padding:24px 48px;background:var(--bg-2);text-align:center;font-size:11px;color:var(--muted);border-top:1px solid var(--border)">
+  3 setup types · same universal blocks (active runs, gates, activity, throughput) · scenario-specific blocks below
+</footer>
+
+<script>
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+      document.querySelectorAll('.panel').forEach(x => x.classList.remove('on'));
+      t.classList.add('on');
+      document.querySelector('.panel[data-panel="' + t.dataset.tab + '"]').classList.add('on');
+      window.scrollTo({top: 0});
+    });
+  });
+</script>
+
+</body>
+</html>

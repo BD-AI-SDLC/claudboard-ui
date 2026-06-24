@@ -1,0 +1,85 @@
+.popover-card {
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  border-radius: 8px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.32);
+  padding: 14px 16px;
+  min-width: 240px;
+  max-width: 360px;
+  z-index: 100;
+  font-size: var(--fs-sm);
+  color: var(--text);
+}
+
+.popover-card__title {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 6px;
+}
+
+.popover-card__body {
+  color: var(--text-2);
+  line-height: 1.5;
+  margin: 0 0 14px;
+}
+
+.popover-card__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.popover-card__actions--stack {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.popover-card__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border: 1px solid var(--border-hi);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.popover-card__btn:hover {
+  background: var(--surface-2);
+  border-color: var(--border-bright);
+}
+
+.popover-card__btn--primary {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+.popover-card__btn--primary:hover {
+  background: var(--text-2);
+  border-color: var(--text-2);
+}
+
+.popover-card__btn--danger {
+  background: var(--red);
+  color: var(--bg);
+  border-color: var(--red);
+}
+
+.popover-card__btn--danger:hover {
+  filter: brightness(0.95);
+}
+
+.popover-card__hint {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  margin-top: 8px;
+  text-align: center;
+}

@@ -1,0 +1,361 @@
+/* ═══════════════════ Setup Banner ═══════════════════ */
+
+.setup-banner {
+  background: linear-gradient(180deg, var(--violet-dim) 0%, var(--surface) 80%);
+  border: 1px solid var(--violet);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 14px;
+  align-items: center;
+}
+
+.setup-banner--collapsed {
+  background: var(--green-dim);
+  border-color: var(--green);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--green);
+}
+
+.setup-banner__check {
+  font-weight: 700;
+}
+
+.setup-banner__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--violet);
+  color: var(--bg);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+.setup-banner__body {
+  min-width: 0;
+}
+
+.setup-banner__title {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.setup-banner__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--violet-dim);
+  color: var(--violet);
+  font-size: 10px;
+  font-weight: 500;
+  border: none;
+}
+
+.setup-banner__subtitle {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+
+.setup-banner__progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.setup-banner__bar {
+  flex: 1;
+  max-width: 240px;
+  height: 4px;
+  background: var(--surface-3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.setup-banner__fill {
+  height: 100%;
+  background: var(--violet);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.setup-banner__pct {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--violet);
+}
+
+.setup-banner__action {
+  flex-shrink: 0;
+}
+
+/* ═══════════════════ Group Headers ═══════════════════ */
+
+.group-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 24px 0 10px;
+}
+
+.group-header__title {
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: 600;
+}
+
+.group-header__sub {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+}
+
+.group-header__badge {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════ Foundation Chain ═══════════════════ */
+
+.foundation-chain {
+  display: grid;
+  grid-template-columns: 1fr 14px 1fr 14px 1fr;
+  gap: 0;
+  align-items: stretch;
+}
+
+.foundation-chain__link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dim);
+  font-size: 14px;
+}
+
+/* ═══════════════════ Maintenance Grid ═══════════════════ */
+
+.maintenance-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ═══════════════════ Operation Card ═══════════════════ */
+
+.op-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.op-card[data-state="done"],
+.op-card[data-state="done-imported"] {
+  border-color: color-mix(in oklab, var(--green) 30%, var(--border));
+}
+
+.op-card[data-state="running"] {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--teal) 15%, transparent);
+}
+
+.op-card[data-state="next"] {
+  border-color: var(--violet);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--violet) 15%, transparent);
+}
+
+.op-card[data-state="locked"] {
+  opacity: 0.6;
+  background: var(--bg-2);
+}
+
+.op-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.op-card__step {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--fs-xs);
+  flex-shrink: 0;
+}
+
+.op-card[data-state="done"] .op-card__step,
+.op-card[data-state="done-imported"] .op-card__step {
+  background: var(--green-dim);
+  color: var(--green);
+}
+
+.op-card[data-state="running"] .op-card__step {
+  background: var(--teal-dim);
+  color: var(--teal);
+}
+
+.op-card[data-state="next"] .op-card__step {
+  background: var(--violet-dim);
+  color: var(--violet);
+}
+
+.op-card__title {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  flex: 1;
+}
+
+.op-card__status {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.op-card__status--done,
+.op-card__status--done-imported {
+  color: var(--green);
+}
+
+.op-card__status--running {
+  color: var(--teal);
+}
+
+.op-card__status--next {
+  color: var(--violet);
+}
+
+.op-card__status--stale {
+  color: var(--amber);
+}
+
+.op-card__status--locked {
+  color: var(--dim);
+}
+
+.op-card__cmd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: -4px;
+}
+
+.op-card__desc {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.op-card__stale-reason {
+  font-size: var(--fs-xs);
+  color: var(--amber);
+  font-weight: 500;
+  margin-top: -2px;
+}
+
+.op-card__recommended-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--violet-dim);
+  color: var(--violet);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-right: 6px;
+}
+
+.op-card__meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--dim);
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.op-card__req {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-top: 6px;
+  margin-top: auto;
+}
+
+.op-card__footer {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+/* Foundation locked-setup variant — inert "Setup complete" tile */
+.op-card--locked-setup {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.op-card--locked-setup .op-card__step--check {
+  background: var(--green-dim);
+  color: var(--green);
+}
+
+.op-card__setup-complete {
+  font-size: var(--fs-xs);
+  color: var(--green);
+  font-weight: 500;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.op-card__imported-badge {
+  margin-right: auto;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--blue-dim);
+  color: var(--blue);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

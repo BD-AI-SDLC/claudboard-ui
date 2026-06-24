@@ -1,0 +1,1072 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>claudboard — active run v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --font-sans:'Geist',-apple-system,system-ui,sans-serif;
+    --font-mono:'Geist Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#0c0d0e;color:#ededef;font-family:var(--font-sans);font-size:13px;-webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01","ss03"}
+  button{font:inherit;color:inherit;cursor:pointer;background:transparent;border:0}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+  /* ─── page chrome ─── */
+  .pg-head{padding:32px 48px 24px;background:#0e0f11;border-bottom:1px solid #23252b}
+  .pg-head .brand{display:flex;align-items:center;gap:10px;font-size:13px;color:#797b83;margin-bottom:10px}
+  .pg-head .brand-mark{width:22px;height:22px;border-radius:5px;background:#ededef;color:#08090a;display:grid;place-items:center;font:700 11px var(--font-mono)}
+  .pg-head h1{margin:0 0 8px;font-size:28px;font-weight:600;letter-spacing:-0.018em;color:#ededef}
+  .pg-head p{margin:0;max-width:960px;color:#b8b9be;line-height:1.55;font-size:14px}
+
+  .tabs{display:flex;padding:0 48px;background:#0e0f11;border-bottom:1px solid #23252b;gap:0;position:sticky;top:0;z-index:10}
+  .tab{padding:12px 16px;display:flex;align-items:center;gap:8px;color:#797b83;border-radius:7px 7px 0 0;font:500 13px var(--font-sans);position:relative;top:1px;margin-right:2px;border:1px solid transparent;border-bottom:0}
+  .tab.on{background:#0c0d0e;border-color:#23252b;color:#ededef;font-weight:600}
+  .tab .tag{padding:2px 7px;border-radius:4px;background:#181a1f;color:#797b83;font:600 10px var(--font-mono);letter-spacing:.04em}
+  .tab.on .tag{background:oklch(78% 0.13 195 / 0.18);color:oklch(78% 0.13 195)}
+  .panel{display:none}
+  .panel.on{display:block}
+
+  .intro{display:grid;grid-template-columns:1.4fr 1fr;gap:48px;padding:32px 48px 12px;max-width:1400px}
+  .intro-tag{font:700 11px var(--font-mono);color:oklch(78% 0.13 195);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+  .intro h2{margin:0 0 6px;font-size:22px;font-weight:600;letter-spacing:-0.012em;color:#ededef}
+  .intro p{font-size:13px;color:#b8b9be;line-height:1.6;margin:0;max-width:640px}
+  .scen-meta{padding-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .meta-h{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:#797b83;margin-bottom:6px}
+  .meta-item{font-size:12px;color:#b8b9be;line-height:1.5;padding-left:14px;position:relative;margin-bottom:4px}
+  .meta-item::before{content:"·";position:absolute;left:2px;color:oklch(72% 0.13 295);font-weight:700}
+
+  /* ─── theming on the frame itself ─── */
+  .frame{width:1280px;height:840px;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4);margin:0 auto 48px;
+    display:grid;grid-template-columns:220px 1fr;grid-template-rows:48px 1fr;
+    grid-template-areas:"side topbar" "side body";position:relative;
+    background:var(--bg);color:var(--text);font-family:var(--font-sans)}
+  .frame.dark{
+    --bg:#08090a; --bg-2:#0e0f11; --surface:#131418; --surface-2:#181a1f; --surface-3:#20232a;
+    --border:#23252b; --border-hi:#2e3138; --border-bright:#3b3f48;
+    --text:#ededef; --text-2:#b8b9be; --muted:#797b83; --dim:#4d4f57;
+    --teal:oklch(78% 0.13 195); --teal-dim:oklch(78% 0.13 195 / 0.18);
+    --green:oklch(78% 0.13 150); --green-dim:oklch(78% 0.13 150 / 0.18);
+    --amber:oklch(80% 0.13 78);  --amber-dim:oklch(80% 0.13 78 / 0.18);
+    --red:oklch(70% 0.16 25);    --red-dim:oklch(70% 0.16 25 / 0.18);
+    --violet:oklch(72% 0.13 295);--violet-dim:oklch(72% 0.13 295 / 0.18);
+    --amber-ink:#1a1300; --green-ink:#04190f;
+    border:1px solid #2e3138;
+  }
+  .frame.light{
+    --bg:#fafafa; --bg-2:#f3f3f4; --surface:#ffffff; --surface-2:#f7f7f8; --surface-3:#ecedf0;
+    --border:#e4e5e8; --border-hi:#d6d7dc; --border-bright:#bcbec5;
+    --text:#16171a; --text-2:#393b41; --muted:#6b6d75; --dim:#9a9ca3;
+    --teal:oklch(58% 0.12 195); --teal-dim:oklch(58% 0.12 195 / 0.15);
+    --green:oklch(56% 0.13 150); --green-dim:oklch(56% 0.13 150 / 0.15);
+    --amber:oklch(62% 0.14 70);  --amber-dim:oklch(62% 0.14 70 / 0.15);
+    --red:oklch(55% 0.18 25);    --red-dim:oklch(55% 0.18 25 / 0.15);
+    --violet:oklch(55% 0.16 295);--violet-dim:oklch(55% 0.16 295 / 0.15);
+    --amber-ink:#fff7ea; --green-ink:#e8faef;
+    border:1px solid #d6d7dc;
+  }
+
+  /* sidebar */
+  .fs{grid-area:side;background:var(--bg-2);border-right:1px solid var(--border);padding:12px 10px;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+  .fs-brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;padding:0 4px 10px;border-bottom:1px solid var(--border)}
+  .fs-mark{width:20px;height:20px;border-radius:5px;background:var(--text);color:var(--bg);display:grid;place-items:center;font:700 11px var(--font-mono)}
+  .fs-brand small{margin-left:auto;font:500 9px var(--font-sans);color:var(--muted);border:1px solid var(--border-hi);border-radius:999px;padding:1px 6px;letter-spacing:.05em;text-transform:uppercase}
+  .ws{margin-top:10px;display:flex;align-items:center;gap:7px;padding:7px 9px;background:var(--surface);border:1px solid var(--border-hi);border-radius:6px}
+  .ws-ico{width:18px;height:18px;border-radius:4px;display:grid;place-items:center;font:600 9px var(--font-mono);background:var(--violet-dim);color:var(--violet)}
+  .ws-name{font-weight:500;font-size:12px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ws-chev{color:var(--muted);font-size:10px}
+  .fs-nav{margin-top:10px;display:flex;flex-direction:column;gap:1px;flex:1;min-height:0}
+  .fs-label{font:600 10px var(--font-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:8px 8px 4px}
+  .fs-item{display:flex;align-items:center;gap:9px;padding:5px 8px;border-radius:5px;color:var(--text-2);font-size:12px;cursor:pointer}
+  .fs-item.on{background:var(--surface-2);color:var(--text)}
+  .fs-item .fs-ico{width:13px;height:13px;color:var(--muted);flex-shrink:0}
+  .fs-item.on .fs-ico{color:var(--teal)}
+  .fs-running{margin-top:6px;padding:8px 10px;border-left:2px solid var(--amber);background:var(--amber-dim);border-radius:0 6px 6px 0}
+  .fs-running .nr-top{display:flex;align-items:center;gap:6px;font:600 10.5px var(--font-sans);color:var(--amber);margin-bottom:3px;letter-spacing:.02em}
+  .fs-running .nr-title{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fs-running .nr-meta{font:500 10px var(--font-mono);color:var(--muted);margin-top:2px}
+
+  /* topbar */
+  .ftb{grid-area:topbar;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;background:var(--bg)}
+  .crumb{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;min-width:0}
+  .crumb .sep{color:var(--dim)}
+  .crumb .now{color:var(--text);font-weight:500}
+  .spacer{flex:1}
+  .key{font:500 10px var(--font-mono);border:1px solid var(--border-hi);background:var(--surface);border-radius:4px;padding:2px 5px;color:var(--muted)}
+
+  .fbd{grid-area:body;min-width:0;min-height:0;overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
+  .pulse-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--amber);animation:pulse 1.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.85)}}
+
+  /* shared atoms */
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;border-radius:999px;border:1px solid var(--border-hi);background:var(--surface);color:var(--text-2);font-size:11px;font-weight:500}
+  .chip.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+  .chip.teal{border-color:transparent;background:var(--teal-dim);color:var(--teal)}
+  .chip.green{border-color:transparent;background:var(--green-dim);color:var(--green)}
+  .chip.amber{border-color:transparent;background:var(--amber-dim);color:var(--amber)}
+  .chip.violet{border-color:transparent;background:var(--violet-dim);color:var(--violet)}
+  .chip .dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+  .chip .dot.pulse{animation:pulse 1.5s ease-in-out infinite}
+
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border:1px solid var(--border-hi);background:var(--surface);color:var(--text);border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0}
+  .btn:hover{border-color:var(--border-bright);background:var(--surface-2)}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--text-2)}
+  .btn.ghost:hover{background:var(--surface)}
+  .btn.amber{background:var(--amber);color:var(--amber-ink);border-color:var(--amber);font-weight:600}
+  .btn.amber:hover{filter:brightness(0.95)}
+  .btn.sm{padding:4px 8px;font-size:11px}
+  .btn.icn{padding:6px 8px}
+  .btn.icn.sub{color:var(--muted);border-color:transparent;background:transparent}
+  .btn.icn.sub:hover{color:var(--text);background:var(--surface)}
+
+  /* ─── topbar: run controls ─── */
+  .topbar-actions{display:flex;align-items:center;gap:8px}
+  .topbar-actions .runctrl{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border-hi);border-radius:6px;padding:2px;gap:1px}
+  .topbar-actions .runctrl .rc{padding:5px 9px;border-radius:4px;color:var(--text-2);display:flex;align-items:center;gap:5px;font-size:11.5px;cursor:pointer;font-weight:500}
+  .topbar-actions .runctrl .rc:hover{background:var(--surface-2);color:var(--text)}
+  .topbar-actions .runctrl .rc.primary{color:var(--text);font-weight:600}
+  .topbar-actions .runctrl .rc.danger{color:var(--muted);padding:5px 8px}
+  .topbar-actions .runctrl .rc.danger:hover{color:var(--red);background:var(--red-dim)}
+  .topbar-actions .runctrl .div{width:1px;height:14px;background:var(--border)}
+
+  /* status strip */
+  .statusbar{display:grid;grid-template-columns:1fr auto;align-items:center;padding:12px 22px;gap:14px;background:linear-gradient(180deg,var(--amber-dim),transparent 90%);border-bottom:1px solid var(--border)}
+  .statusbar .sl{display:flex;align-items:center;gap:14px;min-width:0}
+  .statusbar .sl .icb{width:34px;height:34px;border-radius:8px;background:var(--amber);color:var(--amber-ink);display:grid;place-items:center;flex-shrink:0}
+  .statusbar .sl .t{font:600 14.5px var(--font-sans);letter-spacing:-0.005em;color:var(--text);display:flex;align-items:center;gap:9px}
+  .statusbar .sl .t .ttkt{font-family:var(--font-mono);color:var(--violet);font-size:13px}
+  .statusbar .sl .s{font:500 12px var(--font-sans);color:var(--text-2);margin-top:2px}
+  .statusbar .sl .s b{color:var(--text);font-weight:600}
+  .statusbar .sr{display:flex;align-items:center;gap:6px;flex-shrink:0}
+
+  /* ─── pipeline ribbon with prominent GATE ─── */
+  .ribbon{padding:18px 22px 14px;border-bottom:1px solid var(--border);background:var(--bg)}
+  .ribbon-h{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+  .ribbon-h h3{margin:0;font-size:13px;font-weight:600;letter-spacing:-0.005em;color:var(--text)}
+  .ribbon-h .sub{color:var(--muted);font-size:11.5px;font-family:var(--font-mono)}
+  .ribbon-h .legend{margin-left:auto;display:flex;gap:14px;font-size:10.5px;color:var(--muted)}
+  .ribbon-h .legend .dt{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}
+
+  .flow{display:grid;grid-template-columns:1.2fr 1.4fr 1.2fr 2.4fr 1fr 1.2fr 1fr 1.1fr;column-gap:0;position:relative;padding:0 6px;align-items:start}
+  .flow::before{content:"";position:absolute;left:46px;right:46px;top:16px;height:2px;background:var(--surface-3);border-radius:1px;z-index:0}
+  .flow .pseg{display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;z-index:1;padding:0 4px;min-width:0;text-align:center}
+  .flow .pseg .node{width:30px;height:30px;border-radius:50%;background:var(--surface-2);border:3px solid var(--bg);display:grid;place-items:center;font:700 11.5px var(--font-mono);color:var(--muted);transition:all .2s}
+  .flow .pseg.done .node{background:var(--green);color:var(--green-ink)}
+  .flow .pseg .pname{font-size:11.5px;color:var(--text-2);line-height:1.3;font-weight:500;padding:0 3px}
+  .flow .pseg.done .pname{color:var(--text-2)}
+  .flow .pseg.pending .pname{color:var(--muted)}
+  .flow .pseg .pdur{font:500 10px var(--font-mono);color:var(--muted)}
+  .flow .pseg.done .pdur{color:var(--green)}
+  .flow .pseg .pmeta{font-size:10px;color:var(--dim);margin-top:1px}
+
+  /* the big GATE waypoint between phase 1 and 2 — separate styling */
+  .flow .gate-mk{display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;z-index:2;min-width:0;text-align:center;padding:0 6px}
+  .flow .gate-mk .gnode{
+    width:44px;height:44px;background:var(--amber);
+    transform:rotate(45deg);border-radius:8px;
+    display:grid;place-items:center;
+    box-shadow:0 0 0 4px var(--bg), 0 0 0 8px color-mix(in oklab,var(--amber) 40%,transparent);
+    position:relative;margin-top:-7px;
+    animation:gatepulse 2s ease-in-out infinite
+  }
+  @keyframes gatepulse{
+    0%,100%{box-shadow:0 0 0 4px var(--bg), 0 0 0 8px color-mix(in oklab,var(--amber) 35%,transparent)}
+    50%{box-shadow:0 0 0 4px var(--bg), 0 0 0 12px color-mix(in oklab,var(--amber) 12%,transparent)}
+  }
+  .flow .gate-mk .gnode svg{transform:rotate(-45deg);color:var(--amber-ink)}
+  .flow .gate-mk .glabel{font:700 10px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-top:4px}
+  .flow .gate-mk .gsub{font-size:10.5px;color:var(--text-2);font-weight:500;line-height:1.3}
+
+  /* ─── decision queue (full width) ─── */
+  .deck{padding:16px 22px;border-bottom:1px solid var(--border);background:var(--bg)}
+  .decision{border:1px solid var(--amber);border-radius:12px;background:linear-gradient(180deg,var(--amber-dim),transparent 70%);padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:flex-start}
+  .decision .dq-l{min-width:0}
+  .decision .dh{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .decision .dh .dh-tag{font:700 10px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--amber);padding:3px 9px;border-radius:5px;background:var(--amber-dim);display:inline-flex;align-items:center;gap:6px}
+  .decision .dh .dh-meta{font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+  .decision .dt{font-size:17px;font-weight:600;letter-spacing:-0.012em;color:var(--text);margin-bottom:4px}
+  .decision .ds{font-size:13px;color:var(--text-2);line-height:1.55;max-width:780px}
+  .decision .ds strong{color:var(--text);font-weight:600}
+  .decision .ds-bullets{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  .decision .ds-bullets .b{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;background:var(--surface);border:1px solid var(--border-hi);font-size:11.5px;color:var(--text-2)}
+  .decision .ds-bullets .b svg{color:var(--green)}
+  .decision .dq-r{display:flex;flex-direction:column;gap:7px;align-items:stretch;min-width:200px}
+  .decision .dq-r .btn{justify-content:center}
+
+  /* ─── activity log (collapsible) ─── */
+  .actlog{border-bottom:1px solid var(--border);background:var(--bg)}
+  .actlog.collapsed .actlog-body{display:none}
+  .actlog-head{padding:10px 22px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+  .actlog-head:hover{background:var(--surface-2)}
+  .actlog-head .ico{width:22px;height:22px;border-radius:5px;background:var(--surface-2);color:var(--muted);display:grid;place-items:center}
+  .actlog-head .at{font-size:12.5px;font-weight:600;color:var(--text)}
+  .actlog-head .as{font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+  .actlog-head .ar{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .actlog-head .chev{color:var(--muted);transition:transform .2s}
+  .actlog.collapsed .chev{transform:rotate(-90deg)}
+  .actlog-body{padding:4px 22px 14px;font-family:var(--font-mono);font-size:11.5px;line-height:1.65;color:var(--text-2);max-height:170px;overflow-y:auto}
+  .actlog-body .ev{display:grid;grid-template-columns:60px 84px 1fr;gap:12px;padding:1.5px 0}
+  .actlog-body .ev .t{color:var(--dim)}
+  .actlog-body .ev .ag{color:var(--muted)}
+  .actlog-body .ev .ag.violet{color:var(--violet)}
+  .actlog-body .ev .ag.green{color:var(--green)}
+  .actlog-body .ev .ag.amber{color:var(--amber)}
+  .actlog-body .ev .ag.teal{color:var(--teal)}
+  .actlog-body .ev .msg{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .actlog-body .sep{text-align:center;color:var(--dim);padding:8px 0;font-size:10px;letter-spacing:.1em}
+
+  /* ─── body grid: main + right rail ─── */
+  .body-split{display:grid;grid-template-columns:1fr 320px;flex:1;min-height:0;overflow:hidden}
+  .body-main{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .body-rail{border-left:1px solid var(--border);background:var(--bg-2);overflow:auto;min-height:0;display:flex;flex-direction:column}
+  .rail-sec{padding:14px 18px;border-bottom:1px solid var(--border)}
+  .rail-sec:last-child{border-bottom:0;flex:1;display:flex;flex-direction:column}
+  .rail-h{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .rail-h .badge{margin-left:auto;font:600 9px var(--font-mono);color:var(--muted);background:var(--surface-2);padding:1px 7px;border-radius:999px;letter-spacing:.04em}
+  .rail-h .badge.amber{background:var(--amber-dim);color:var(--amber)}
+  .rail-h .ract{margin-left:auto;font:500 11px var(--font-sans);color:var(--muted);cursor:pointer;text-transform:none;letter-spacing:0}
+  .rail-h .ract:hover{color:var(--text)}
+
+  /* tasks tree */
+  .tasks-note{font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:11px;padding:8px 10px;background:var(--amber-dim);border-radius:6px;border:1px solid color-mix(in oklab,var(--amber) 30%,transparent);color:var(--amber)}
+  .tasks-note b{font-weight:600}
+  .cp-block{margin-bottom:12px}
+  .cp-block:last-child{margin-bottom:0}
+  .cp-header{display:grid;grid-template-columns:22px 1fr auto;gap:9px;align-items:center;padding:4px 0;cursor:pointer}
+  .cp-header .cpn{width:20px;height:20px;border-radius:5px;background:var(--surface-2);color:var(--muted);display:grid;place-items:center;font:700 10px var(--font-mono)}
+  .cp-header .cpt{font-size:12px;font-weight:600;color:var(--text);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cp-header .cpm{font:500 10px var(--font-mono);color:var(--muted)}
+  .cp-block.locked .cp-header .cpn{opacity:.5}
+  .cp-block.locked .cp-header .cpt{color:var(--text-2)}
+  .cp-block.done .cp-header .cpn{background:var(--green-dim);color:var(--green)}
+  .cp-block.now  .cp-header .cpn{background:var(--teal-dim);color:var(--teal)}
+  .cp-tasks{padding:4px 0 0 28px;display:flex;flex-direction:column;gap:5px;border-left:1px dashed var(--border-hi);margin-left:9px;padding-left:14px;margin-top:2px}
+  .ti{display:grid;grid-template-columns:14px 1fr;gap:8px;align-items:center;padding:2px 0;font-size:11.5px;color:var(--text-2);line-height:1.4}
+  .ti .box{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--border-bright);background:transparent;display:grid;place-items:center;flex-shrink:0}
+  .ti.done .box{background:var(--green);border-color:var(--green)}
+  .ti.done .box svg{color:var(--green-ink)}
+  .ti.done .tl{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--dim)}
+  .ti.now{color:var(--text)}
+  .ti.now .box{border-color:var(--teal);position:relative;background:var(--teal-dim)}
+  .ti.now .box::after{content:"";display:block;width:5px;height:5px;border-radius:50%;background:var(--teal);animation:pulse 1.5s infinite}
+  .ti.locked{color:var(--muted)}
+  .ti.locked .box{border-color:var(--dim);border-style:dashed}
+
+  /* artifacts mini-panel (placement α — top-bar pill / dropdown) */
+  .art-pill{position:relative;display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:var(--surface);border:1px solid var(--border-hi);border-radius:6px;font-size:11.5px;color:var(--text-2);cursor:pointer;font-weight:500}
+  .art-pill:hover{border-color:var(--border-bright);color:var(--text)}
+  .art-pill .ct{font:700 9px var(--font-mono);background:var(--surface-3);color:var(--muted);padding:1px 6px;border-radius:999px}
+  .art-pop{position:absolute;right:0;top:calc(100% + 6px);width:320px;background:var(--surface);border:1px solid var(--border-hi);border-radius:8px;box-shadow:0 12px 36px rgba(0,0,0,.32);z-index:30;padding:8px;display:none}
+  .art-pill.open .art-pop{display:block}
+  .art-pop .ah{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:5px 8px}
+  .art-pop .ali{display:grid;grid-template-columns:22px 1fr auto;gap:10px;padding:7px 8px;border-radius:5px;align-items:center;cursor:pointer}
+  .art-pop .ali:hover{background:var(--surface-2)}
+  .art-pop .ali .ico{width:22px;height:22px;border-radius:5px;background:var(--violet-dim);color:var(--violet);display:grid;place-items:center}
+  .art-pop .ali .ali-n{font-family:var(--font-mono);font-size:11.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .art-pop .ali .ali-s{font-size:10.5px;color:var(--muted);font-family:var(--font-sans);margin-top:1px}
+  .art-pop .ali .meta{font:500 10px var(--font-mono);color:var(--muted)}
+
+  /* ─── placement-option mini-frames (tab 3) ─── */
+  .opts-wrap{padding:8px 48px 48px;max-width:1400px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+  .opt-row{display:grid;grid-template-columns:300px 1fr;gap:32px;align-items:flex-start}
+  .opt-desc h3{margin:0 0 6px;font-size:16px;font-weight:600;letter-spacing:-0.005em;color:#ededef}
+  .opt-desc .opt-tag{font:700 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:oklch(72% 0.13 295);margin-bottom:6px}
+  .opt-desc p{margin:0 0 8px;font-size:12.5px;color:#b8b9be;line-height:1.55}
+  .opt-desc .pro,.opt-desc .con{font-size:11.5px;color:#b8b9be;line-height:1.5;padding-left:14px;position:relative;margin-bottom:3px}
+  .opt-desc .pro::before{content:"+";position:absolute;left:0;color:oklch(78% 0.13 150);font-weight:700}
+  .opt-desc .con::before{content:"−";position:absolute;left:0;color:oklch(70% 0.16 25);font-weight:700}
+  .mini-frame{
+    --bg:#08090a; --bg-2:#0e0f11; --surface:#131418; --surface-2:#181a1f; --surface-3:#20232a;
+    --border:#23252b; --border-hi:#2e3138; --border-bright:#3b3f48;
+    --text:#ededef; --text-2:#b8b9be; --muted:#797b83; --dim:#4d4f57;
+    --teal:oklch(78% 0.13 195); --teal-dim:oklch(78% 0.13 195 / 0.18);
+    --green:oklch(78% 0.13 150); --green-dim:oklch(78% 0.13 150 / 0.18);
+    --amber:oklch(80% 0.13 78);  --amber-dim:oklch(80% 0.13 78 / 0.18);
+    --violet:oklch(72% 0.13 295);--violet-dim:oklch(72% 0.13 295 / 0.18);
+    --amber-ink:#1a1300; --green-ink:#04190f;
+    background:var(--bg);color:var(--text);border:1px solid var(--border-hi);border-radius:10px;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.32);position:relative}
+
+  /* placement α — topbar artifacts pill (full mini frame) */
+  .mini-α{display:grid;grid-template-rows:46px 60px auto;height:300px}
+  .mini-α .mtb{border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 16px;background:var(--bg)}
+  .mini-α .mtb .crm{color:var(--muted);font-size:12px}
+  .mini-α .mtb .crm .nm{color:var(--text);font-family:var(--font-mono)}
+  .mini-α .msb{display:flex;align-items:center;gap:14px;padding:12px 22px;background:linear-gradient(180deg,var(--amber-dim),transparent 80%);border-bottom:1px solid var(--border)}
+  .mini-α .msb .icb{width:30px;height:30px;border-radius:7px;background:var(--amber);color:var(--amber-ink);display:grid;place-items:center}
+  .mini-α .msb .t{font:600 13px var(--font-sans)}
+  .mini-α .msb .s{font:500 11px var(--font-sans);color:var(--text-2);margin-top:2px}
+  .mini-α .annot{padding:16px 22px;font-size:12px;color:var(--text-2);line-height:1.5}
+  .arrow-line{position:absolute;border:0;border-top:2px dashed oklch(78% 0.13 195);pointer-events:none}
+  .arrow-circ{position:absolute;border:2px dashed oklch(78% 0.13 195);border-radius:50%;pointer-events:none}
+
+  /* placement β — right rail section (illustration) */
+  .mini-β{display:grid;grid-template-columns:1fr 220px;height:300px}
+  .mini-β .mleft{padding:14px 18px;display:flex;flex-direction:column;gap:10px;background:var(--bg);border-right:1px solid var(--border)}
+  .mini-β .mleft .lab{font:500 11px var(--font-sans);color:var(--muted);line-height:1.5}
+  .mini-β .mleft .lab b{color:var(--text);font-weight:600}
+  .mini-β .mrail{padding:14px 16px;background:var(--bg-2);overflow:hidden}
+  .mini-β .mrail .rh{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .mini-β .mrail .rh.hi{color:var(--violet)}
+  .mini-β .mrail .placeholder{height:60px;background:var(--surface-2);border-radius:5px;margin-bottom:10px;opacity:.5}
+  .mini-β .mrail .art-card{border:1.5px solid var(--violet);border-radius:6px;padding:8px 10px;background:var(--violet-dim);display:flex;flex-direction:column;gap:5px}
+  .mini-β .mrail .art-card .ali{display:grid;grid-template-columns:18px 1fr;gap:8px;font:500 11px var(--font-mono);color:var(--text);align-items:center}
+  .mini-β .mrail .art-card .ali svg{color:var(--violet)}
+
+  /* placement γ — inline artifact strip below pipeline */
+  .mini-γ{display:grid;grid-template-rows:46px auto 80px auto;height:300px}
+  .mini-γ .mtb{border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 16px;background:var(--bg);font-size:12px;color:var(--muted)}
+  .mini-γ .mrib{padding:16px 22px;border-bottom:1px solid var(--border);background:var(--bg);font-size:12px;color:var(--muted)}
+  .mini-γ .mrib .pl{height:36px;background:var(--surface-2);border-radius:6px;opacity:.6}
+  .mini-γ .mast{padding:10px 22px;background:linear-gradient(180deg,var(--violet-dim),transparent 90%);border-top:1px solid var(--violet);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .mini-γ .mast .ah{font:700 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--violet);margin-right:6px}
+  .mini-γ .mast .ach{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;background:var(--surface);border:1px solid var(--border-hi);font-family:var(--font-mono);font-size:11px;color:var(--text);cursor:pointer}
+  .mini-γ .mast .ach:hover{border-color:var(--border-bright)}
+  .mini-γ .mast .ach svg{color:var(--violet)}
+  .mini-γ .mbottom{padding:14px 22px;font-size:12px;color:var(--muted);line-height:1.5}
+
+  .brandword{display:inline-flex;align-items:baseline}
+  .wbd{color:var(--teal,#1ed1d1)}
+</style>
+</head>
+<body>
+
+<header class="pg-head">
+  <div class="brand">
+    <span class="brand-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span>
+    <span class="brandword">claud<span class="wbd">board</span></span> · UX exploration · active run · v2
+  </div>
+  <h1>Active run · v2 — built from variant C feedback</h1>
+  <p>Dropped the KPI tiles and the "What just happened" recap so the <b>Decision Queue</b> can be the full-width focal point. Added a prominent <b>GATE</b> waypoint between phase 1 and phase 2 — it stays visually distinct from the regular phase circles whether the gate is upcoming, active, or passed. Pause / resume / stop landed in the topbar as a compact run-control cluster. The right-rail feed is now <b>Implementation tasks</b>: the architect's 11 sub-tasks across 4 checkpoints, ready to be ticked off as the autonomous run progresses. The activity log lives below as a collapsible drawer so it's one click away when an engineer needs it.</p>
+</header>
+
+<div class="tabs">
+  <button class="tab on" data-tab="dark"><span class="tag">1</span>Dark theme</button>
+  <button class="tab" data-tab="light"><span class="tag">2</span>Light theme</button>
+  <button class="tab" data-tab="art"><span class="tag">3</span>Artifacts placement — 3 options</button>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SHARED MAIN-VIEW MARKUP — rendered twice (.frame.dark and .frame.light)
+     ════════════════════════════════════════════════════════════════════ -->
+
+<!-- DARK panel -->
+<section class="panel on" data-panel="dark">
+  <div class="intro">
+    <div>
+      <div class="intro-tag">Main view · dark</div>
+      <h2>Orchestration first. Decision queue full-width. Log collapsed.</h2>
+      <p>The default state shown here is the same one you've been looking at: paused at the phase-1 human gate. The amber diamond between phase 1 and phase 2 marks the gate as its own milestone — visually heavier than any phase node so it can't be mistaken for "just another step". The decision card is centered and full-width because that's the one action you actually need right now.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">What changed from variant C</div>
+        <div class="meta-item">KPI tiles removed (the same numbers live in the rail)</div>
+        <div class="meta-item">"What just happened" card removed (lived in the pipeline phase + log already)</div>
+        <div class="meta-item">Decision Queue is full-width, single-focus</div>
+        <div class="meta-item">Gate is a separate amber-diamond waypoint, not a phase node</div>
+        <div class="meta-item">Pause / Resume / Stop in topbar</div>
+        <div class="meta-item">Right rail = task list from architect's plan</div>
+      </div>
+      <div>
+        <div class="meta-h">Where the activity log lives</div>
+        <div class="meta-item">Collapsible drawer below the decision queue</div>
+        <div class="meta-item">Collapsed by default · expands inline</div>
+        <div class="meta-item">Full fidelity preserved — engineers lose nothing</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame dark">
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="fs">
+      <div class="fs-brand"><span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span><span class="brandword">claud<span class="wbd">board</span></span><small>v1.4</small></div>
+      <div class="ws"><span class="ws-ico">M</span><span class="ws-name">meas</span><span class="ws-chev">▾</span></div>
+      <nav class="fs-nav">
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11 12 3l9 8M5 9.5V21h14V9.5"/></svg>Overview</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2 4 6v6c0 5 4 9 8 10 4-1 8-5 8-10V6l-8-4z"/></svg>Project · health</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19c0-3 2-6 5-7l9-9-1 9c-1 3-4 5-7 5l-3 3-3-1z"/></svg>Start feature</div>
+        <div class="fs-item on"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>Active run</div>
+        <div class="fs-label">Project</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Run history</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M5 17V9M11 17V5M17 17v-7"/></svg>Analytics</div>
+        <div class="fs-running">
+          <div class="nr-top"><span class="pulse-dot"></span>HUMAN GATE</div>
+          <div class="nr-title">MEAS-7140 · Outbox dispatcher</div>
+          <div class="nr-meta">phase 1 / 7 · 13m</div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- ===== TOPBAR ===== -->
+    <div class="ftb">
+      <div class="crumb">
+        <span>meas.cloud.datahandler</span><span class="sep">/</span><span>runs</span><span class="sep">/</span><span class="now mono">MEAS-7140</span>
+      </div>
+      <div class="spacer"></div>
+      <div class="topbar-actions">
+        <div class="art-pill open" id="artpill-dark">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+          Artifacts
+          <span class="ct">3</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          <div class="art-pop">
+            <div class="ah">From this run</div>
+            <div class="ali">
+              <div class="ico"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg></div>
+              <div>
+                <div class="ali-n">outbox-dispatcher.feature</div>
+                <div class="ali-s">BDD spec · sdd-expert · 3 scenarios</div>
+              </div>
+              <div class="meta">142 LOC</div>
+            </div>
+            <div class="ali">
+              <div class="ico"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg></div>
+              <div>
+                <div class="ali-n">plan.md</div>
+                <div class="ali-s">Execution plan · architect · 4 checkpoints</div>
+              </div>
+              <div class="meta">11 tasks</div>
+            </div>
+            <div class="ali">
+              <div class="ico"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/><path d="M13 5v14"/></svg></div>
+              <div>
+                <div class="ali-n">MEAS-7140 · Jira story</div>
+                <div class="ali-s">Filed by jira-agent · 2 ACs</div>
+              </div>
+              <div class="meta">link ↗</div>
+            </div>
+            <div style="padding:6px 8px;border-top:1px solid var(--border);margin-top:4px;font-size:10.5px;color:var(--muted);font-family:var(--font-mono);text-align:center">stays accessible after gate passes</div>
+          </div>
+        </div>
+
+        <div class="runctrl">
+          <button class="rc primary" title="Resume autonomous run after approval">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8V4z"/></svg>
+            Resume
+          </button>
+          <button class="rc" title="Pause">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+          </button>
+          <span class="div"></span>
+          <button class="rc danger" title="Stop run">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>
+          </button>
+        </div>
+        <span class="key">⌘ K</span>
+      </div>
+    </div>
+
+    <!-- ===== BODY ===== -->
+    <div class="fbd">
+      <!-- status -->
+      <div class="statusbar">
+        <div class="sl">
+          <div class="icb"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></div>
+          <div>
+            <div class="t"><span class="ttkt">MEAS-7140</span><span>Outbox dispatcher for entitlement events</span></div>
+            <div class="s">Paused at human gate · phase 1 of 7 · 13m 28s elapsed · est. <b>3h 24m</b> to merge after approval · <span class="mono">$0.84</span> spent / ~$5.20 projected</div>
+          </div>
+        </div>
+        <div class="sr">
+          <span class="chip mono"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="7" r="2"/><path d="M6 7v10M6 13c0-4 4-6 12-6"/></svg>feature/MEAS-7140/outbox-dispatcher</span>
+        </div>
+      </div>
+
+      <div class="body-split">
+        <div class="body-main">
+          <!-- pipeline ribbon with prominent gate -->
+          <div class="ribbon">
+            <div class="ribbon-h">
+              <h3>Pipeline</h3>
+              <span class="sub">7 phases · 1 gate · 8 agents</span>
+              <div class="legend">
+                <span><span class="dt" style="background:var(--green)"></span>done</span>
+                <span><span class="dt" style="background:var(--amber)"></span>gate</span>
+                <span><span class="dt" style="background:var(--surface-3)"></span>pending</span>
+              </div>
+            </div>
+            <div class="flow">
+              <div class="pseg done">
+                <div class="node"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg></div>
+                <div class="pname">Ticket · Spec · Plan</div>
+                <div class="pdur">12m 04s</div>
+                <div class="pmeta">3 scenarios · 4 checkpoints</div>
+              </div>
+              <div class="gate-mk">
+                <div class="gnode"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 21V3"/><path d="M4 4h12l-2 4 2 4H4"/></svg></div>
+                <div class="glabel">Gate</div>
+                <div class="gsub">Approve to enter<br>autonomous mode</div>
+              </div>
+              <div class="pseg pending">
+                <div class="node">2</div>
+                <div class="pname">Branch</div>
+                <div class="pdur">~ 20s</div>
+              </div>
+              <div class="pseg pending">
+                <div class="node">3</div>
+                <div class="pname">Develop · 4 checkpoints</div>
+                <div class="pdur">~ 2h 40m</div>
+                <div class="pmeta">0 / 11 tasks</div>
+              </div>
+              <div class="pseg pending">
+                <div class="node">4</div>
+                <div class="pname">Commit</div>
+                <div class="pdur">~ 1m</div>
+              </div>
+              <div class="pseg pending">
+                <div class="node">5</div>
+                <div class="pname">Review</div>
+                <div class="pdur">~ 12m</div>
+              </div>
+              <div class="pseg pending">
+                <div class="node">6</div>
+                <div class="pname">PR</div>
+                <div class="pdur">~ 2m</div>
+              </div>
+              <div class="pseg pending">
+                <div class="node">7</div>
+                <div class="pname">Finalize</div>
+                <div class="pdur">~ 30s</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- decision queue (full width) -->
+          <div class="deck">
+            <div class="decision">
+              <div class="dq-l">
+                <div class="dh">
+                  <span class="dh-tag"><span class="pulse-dot" style="background:var(--amber-ink);width:5px;height:5px"></span>Decision queue · 1 item</span>
+                  <span class="dh-meta">phase 1d · waiting 4m 22s</span>
+                </div>
+                <div class="dt">Approve spec + plan to start autonomous execution</div>
+                <div class="ds">3 BDD scenarios cover the happy path, FIFO ordering, and broker-outage retry. The 4-checkpoint plan touches domain, application and adapter layers — consistent with the project's hexagonal convention. <strong>No schema-registry checkpoint</strong> — architect believes Avro isn't in use in this repo; confirm intentional.</div>
+                <div class="ds-bullets">
+                  <span class="b"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>3 BDD scenarios, 14 steps</span>
+                  <span class="b"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>4 checkpoints, 11 tasks</span>
+                  <span class="b"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>Est. 3h 24m unattended</span>
+                  <span class="b"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>Reuses existing Mongo + Kafka wiring</span>
+                </div>
+              </div>
+              <div class="dq-r">
+                <button class="btn amber"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>Approve · start autonomy</button>
+                <button class="btn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17.25V21h3.75L17.8 9.9l-3.7-3.7L3 17.25z"/></svg>Request changes</button>
+                <button class="btn ghost"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg>Reject &amp; abort</button>
+                <button class="btn ghost sm" style="justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M6 9v9a3 3 0 0 0 3 3h6M18 15V6a3 3 0 0 0-3-3H9"/></svg>Diff vs. last run</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- activity log (collapsible) -->
+          <div class="actlog" id="actlog-dark">
+            <div class="actlog-head" onclick="document.getElementById('actlog-dark').classList.toggle('collapsed')">
+              <div class="ico"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></div>
+              <div>
+                <div class="at">Activity log</div>
+                <div class="as">17 events · last @ 09:58:52</div>
+              </div>
+              <div class="ar">
+                <span class="chip mono" style="font-size:10px">paused at gate</span>
+                <button class="btn ghost sm">Filter</button>
+                <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+            </div>
+            <div class="actlog-body">
+              <div class="ev"><span class="t">09:47:02</span><span class="ag teal">main</span><span class="msg">Workflow started · ticket=MEAS-7140</span></div>
+              <div class="ev"><span class="t">09:47:04</span><span class="ag violet">jira-agent</span><span class="msg">→ atlassian.createIssue project=MEAS type=Story</span></div>
+              <div class="ev"><span class="t">09:47:23</span><span class="ag green">jira-agent</span><span class="msg">Created MEAS-7140 · labels=[AI, AI_CLI, backend]</span></div>
+              <div class="ev"><span class="t">09:50:46</span><span class="ag violet">jira-agent</span><span class="msg">→ atlassian.updateIssue MEAS-7140 description=…</span></div>
+              <div class="ev"><span class="t">09:51:04</span><span class="ag green">jira-agent</span><span class="msg">Updated MEAS-7140 · 4 paragraphs · 2 ACs</span></div>
+              <div class="ev"><span class="t">09:51:06</span><span class="ag">sdd-expert</span><span class="msg">Reading .claude/rules/testing-rules.md</span></div>
+              <div class="ev"><span class="t">09:53:11</span><span class="ag">sdd-expert</span><span class="msg">Drafted 3 scenarios · 14 G/W/T steps</span></div>
+              <div class="ev"><span class="t">09:55:16</span><span class="ag green">sdd-expert</span><span class="msg">Wrote outbox-dispatcher.feature · 142 LOC</span></div>
+              <div class="ev"><span class="t">09:55:18</span><span class="ag">architect</span><span class="msg">Reading kafka-producer.md, mongodb-conventions.md</span></div>
+              <div class="ev"><span class="t">09:58:48</span><span class="ag">architect</span><span class="msg">DB: 1 new collection (outbox_events)</span></div>
+              <div class="ev"><span class="t">09:58:49</span><span class="ag">architect</span><span class="msg">Decomposed into 4 checkpoints · est. 3.5h</span></div>
+              <div class="ev"><span class="t">09:58:50</span><span class="ag green">architect</span><span class="msg">Wrote plan.md · 4 checkpoints, 11 tasks, 7 contracts</span></div>
+              <div class="ev"><span class="t">09:58:51</span><span class="ag amber">main</span><span class="msg">Phase 1d · spec + plan approval</span></div>
+              <div class="ev"><span class="t">09:58:52</span><span class="ag amber">main</span><span class="msg">⏸  Waiting for user approval to enter autonomous mode</span></div>
+              <div class="sep">— gate · waiting for human —</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- right rail: tasks + telemetry -->
+        <div class="body-rail">
+          <div class="rail-sec">
+            <div class="rail-h">
+              Implementation tasks
+              <span class="badge amber">locked</span>
+            </div>
+            <div class="tasks-note">Prepared by <b>architect</b> · 4 checkpoints, 11 tasks · unlocks &amp; ticks off automatically once you approve.</div>
+
+            <div class="cp-block locked">
+              <div class="cp-header"><span class="cpn">1</span><span class="cpt">OutboxEvent entity + repo</span><span class="cpm">0/3</span></div>
+              <div class="cp-tasks">
+                <div class="ti locked"><span class="box"></span><span class="tl">Add @Document OutboxEvent</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">Reactive repo · findPendingByTenant()</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">MongoOutboxEventAdapter</span></div>
+              </div>
+            </div>
+
+            <div class="cp-block locked">
+              <div class="cp-header"><span class="cpn">2</span><span class="cpt">Dispatcher worker</span><span class="cpm">0/3</span></div>
+              <div class="cp-tasks">
+                <div class="ti locked"><span class="box"></span><span class="tl">@Scheduled component · lock-and-claim</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">Batch by tenant + handoff to port</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">OutboxDispatcherProperties</span></div>
+              </div>
+            </div>
+
+            <div class="cp-block locked">
+              <div class="cp-header"><span class="cpn">3</span><span class="cpt">Kafka producer wiring</span><span class="cpm">0/3</span></div>
+              <div class="cp-tasks">
+                <div class="ti locked"><span class="box"></span><span class="tl">KafkaOutboxProducerAdapter (KafkaTemplate)</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">Partition key = tenantId</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">Topic from config · entitlement.events.v1</span></div>
+              </div>
+            </div>
+
+            <div class="cp-block locked">
+              <div class="cp-header"><span class="cpn">4</span><span class="cpt">Integration tests</span><span class="cpm">0/2</span></div>
+              <div class="cp-tasks">
+                <div class="ti locked"><span class="box"></span><span class="tl">Spock + EmbeddedKafka + Testcontainers Mongo</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">Cover all 3 BDD scenarios + outage retry</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rail-sec">
+            <div class="rail-h">Telemetry</div>
+            <div style="display:grid;grid-template-columns:90px 1fr;font-size:11.5px;gap:4px 10px">
+              <span style="color:var(--muted)">Phase</span><span style="color:var(--text)">1 of 7</span>
+              <span style="color:var(--muted)">Checkpoint</span><span style="color:var(--text)">0 of 4</span>
+              <span style="color:var(--muted)">Elapsed</span><span class="mono" style="color:var(--text)">13m 28s</span>
+              <span style="color:var(--muted)">ETA · merge</span><span class="mono" style="color:var(--text)">+3h 24m</span>
+              <span style="color:var(--muted)">Cost</span><span class="mono" style="color:var(--text)">$0.84 / ~$5.20</span>
+              <span style="color:var(--muted)">Tokens</span><span class="mono" style="color:var(--text)">143,250</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIGHT panel -->
+<section class="panel" data-panel="light">
+  <div class="intro">
+    <div>
+      <div class="intro-tag">Main view · light</div>
+      <h2>Same layout, light surface.</h2>
+      <p>Identical structure and information density — light theme uses the same token names so accent meanings (amber = gate, green = done, teal = active, violet = artifacts) carry across. Chromas of accents drop and lightness flips to keep contrast against the lighter background.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">Token strategy</div>
+        <div class="meta-item">Tokens scoped to <code class="mono" style="color:#b8b9be">.frame.light</code></div>
+        <div class="meta-item">Greys: <code class="mono" style="color:#b8b9be">#fafafa</code> → <code class="mono" style="color:#b8b9be">#16171a</code> ramp</div>
+        <div class="meta-item">Accents drop saturation: <code class="mono" style="color:#b8b9be">oklch(56% .14 …)</code></div>
+        <div class="meta-item">Amber ink for buttons swaps to creamy on amber</div>
+      </div>
+      <div>
+        <div class="meta-h">Verify when reviewing</div>
+        <div class="meta-item">Gate diamond still feels heavier than phase nodes</div>
+        <div class="meta-item">Decision-queue amber wash still reads as "needs you"</div>
+        <div class="meta-item">Done/pending tasks distinguishable at a glance</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frame light">
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="fs">
+      <div class="fs-brand"><span class="fs-mark" style="background:var(--teal,#1ed1d1);border:1px solid var(--teal,#1ed1d1);overflow:hidden"><svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><rect x="12" y="5" width="7" height="7" rx="2" fill="#08090a" opacity="0.32"/><rect x="5" y="12" width="7" height="7" rx="2" fill="#08090a"/></svg></span><span class="brandword">claud<span class="wbd">board</span></span><small>v1.4</small></div>
+      <div class="ws"><span class="ws-ico">M</span><span class="ws-name">meas</span><span class="ws-chev">▾</span></div>
+      <nav class="fs-nav">
+        <div class="fs-label">Workflow</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11 12 3l9 8M5 9.5V21h14V9.5"/></svg>Overview</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2 4 6v6c0 5 4 9 8 10 4-1 8-5 8-10V6l-8-4z"/></svg>Project · health</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19c0-3 2-6 5-7l9-9-1 9c-1 3-4 5-7 5l-3 3-3-1z"/></svg>Start feature</div>
+        <div class="fs-item on"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>Active run</div>
+        <div class="fs-label">Project</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Run history</div>
+        <div class="fs-item"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M5 17V9M11 17V5M17 17v-7"/></svg>Analytics</div>
+        <div class="fs-running">
+          <div class="nr-top"><span class="pulse-dot"></span>HUMAN GATE</div>
+          <div class="nr-title">MEAS-7140 · Outbox dispatcher</div>
+          <div class="nr-meta">phase 1 / 7 · 13m</div>
+        </div>
+      </nav>
+    </aside>
+
+    <div class="ftb">
+      <div class="crumb">
+        <span>meas.cloud.datahandler</span><span class="sep">/</span><span>runs</span><span class="sep">/</span><span class="now mono">MEAS-7140</span>
+      </div>
+      <div class="spacer"></div>
+      <div class="topbar-actions">
+        <div class="art-pill" id="artpill-light">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+          Artifacts
+          <span class="ct">3</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="runctrl">
+          <button class="rc primary"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8V4z"/></svg>Resume</button>
+          <button class="rc"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+          <span class="div"></span>
+          <button class="rc danger"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg></button>
+        </div>
+        <span class="key">⌘ K</span>
+      </div>
+    </div>
+
+    <div class="fbd">
+      <div class="statusbar">
+        <div class="sl">
+          <div class="icb"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></div>
+          <div>
+            <div class="t"><span class="ttkt">MEAS-7140</span><span>Outbox dispatcher for entitlement events</span></div>
+            <div class="s">Paused at human gate · phase 1 of 7 · 13m 28s elapsed · est. <b>3h 24m</b> to merge after approval · <span class="mono">$0.84</span> spent / ~$5.20 projected</div>
+          </div>
+        </div>
+        <div class="sr">
+          <span class="chip mono"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="7" r="2"/><path d="M6 7v10M6 13c0-4 4-6 12-6"/></svg>feature/MEAS-7140/outbox-dispatcher</span>
+        </div>
+      </div>
+
+      <div class="body-split">
+        <div class="body-main">
+          <div class="ribbon">
+            <div class="ribbon-h">
+              <h3>Pipeline</h3>
+              <span class="sub">7 phases · 1 gate · 8 agents</span>
+              <div class="legend">
+                <span><span class="dt" style="background:var(--green)"></span>done</span>
+                <span><span class="dt" style="background:var(--amber)"></span>gate</span>
+                <span><span class="dt" style="background:var(--surface-3)"></span>pending</span>
+              </div>
+            </div>
+            <div class="flow">
+              <div class="pseg done">
+                <div class="node"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg></div>
+                <div class="pname">Ticket · Spec · Plan</div>
+                <div class="pdur">12m 04s</div>
+                <div class="pmeta">3 scenarios · 4 checkpoints</div>
+              </div>
+              <div class="gate-mk">
+                <div class="gnode"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 21V3"/><path d="M4 4h12l-2 4 2 4H4"/></svg></div>
+                <div class="glabel">Gate</div>
+                <div class="gsub">Approve to enter<br>autonomous mode</div>
+              </div>
+              <div class="pseg pending"><div class="node">2</div><div class="pname">Branch</div><div class="pdur">~ 20s</div></div>
+              <div class="pseg pending"><div class="node">3</div><div class="pname">Develop · 4 checkpoints</div><div class="pdur">~ 2h 40m</div><div class="pmeta">0 / 11 tasks</div></div>
+              <div class="pseg pending"><div class="node">4</div><div class="pname">Commit</div><div class="pdur">~ 1m</div></div>
+              <div class="pseg pending"><div class="node">5</div><div class="pname">Review</div><div class="pdur">~ 12m</div></div>
+              <div class="pseg pending"><div class="node">6</div><div class="pname">PR</div><div class="pdur">~ 2m</div></div>
+              <div class="pseg pending"><div class="node">7</div><div class="pname">Finalize</div><div class="pdur">~ 30s</div></div>
+            </div>
+          </div>
+
+          <div class="deck">
+            <div class="decision">
+              <div class="dq-l">
+                <div class="dh">
+                  <span class="dh-tag"><span class="pulse-dot" style="background:var(--amber-ink);width:5px;height:5px"></span>Decision queue · 1 item</span>
+                  <span class="dh-meta">phase 1d · waiting 4m 22s</span>
+                </div>
+                <div class="dt">Approve spec + plan to start autonomous execution</div>
+                <div class="ds">3 BDD scenarios cover the happy path, FIFO ordering, and broker-outage retry. The 4-checkpoint plan touches domain, application and adapter layers — consistent with the project's hexagonal convention. <strong>No schema-registry checkpoint</strong> — architect believes Avro isn't in use in this repo; confirm intentional.</div>
+                <div class="ds-bullets">
+                  <span class="b"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>3 BDD scenarios, 14 steps</span>
+                  <span class="b"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>4 checkpoints, 11 tasks</span>
+                  <span class="b"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>Est. 3h 24m unattended</span>
+                  <span class="b"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>Reuses existing Mongo + Kafka wiring</span>
+                </div>
+              </div>
+              <div class="dq-r">
+                <button class="btn amber"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>Approve · start autonomy</button>
+                <button class="btn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17.25V21h3.75L17.8 9.9l-3.7-3.7L3 17.25z"/></svg>Request changes</button>
+                <button class="btn ghost"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg>Reject &amp; abort</button>
+                <button class="btn ghost sm" style="justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M6 9v9a3 3 0 0 0 3 3h6M18 15V6a3 3 0 0 0-3-3H9"/></svg>Diff vs. last run</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="actlog collapsed" id="actlog-light">
+            <div class="actlog-head" onclick="document.getElementById('actlog-light').classList.toggle('collapsed')">
+              <div class="ico"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></div>
+              <div>
+                <div class="at">Activity log</div>
+                <div class="as">17 events · last @ 09:58:52 · click to expand</div>
+              </div>
+              <div class="ar">
+                <span class="chip mono" style="font-size:10px">paused at gate</span>
+                <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+            </div>
+            <div class="actlog-body">
+              <div class="ev"><span class="t">09:55:18</span><span class="ag">architect</span><span class="msg">Reading kafka-producer.md</span></div>
+              <div class="ev"><span class="t">09:58:48</span><span class="ag">architect</span><span class="msg">DB: 1 new collection (outbox_events)</span></div>
+              <div class="ev"><span class="t">09:58:50</span><span class="ag green">architect</span><span class="msg">Wrote plan.md · 4 checkpoints</span></div>
+              <div class="ev"><span class="t">09:58:52</span><span class="ag amber">main</span><span class="msg">⏸  Waiting for user approval</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="body-rail">
+          <div class="rail-sec">
+            <div class="rail-h">
+              Implementation tasks
+              <span class="badge amber">locked</span>
+            </div>
+            <div class="tasks-note">Prepared by <b>architect</b> · 4 checkpoints, 11 tasks · unlocks &amp; ticks off automatically once you approve.</div>
+
+            <div class="cp-block locked">
+              <div class="cp-header"><span class="cpn">1</span><span class="cpt">OutboxEvent entity + repo</span><span class="cpm">0/3</span></div>
+              <div class="cp-tasks">
+                <div class="ti locked"><span class="box"></span><span class="tl">Add @Document OutboxEvent</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">Reactive repo · findPendingByTenant()</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">MongoOutboxEventAdapter</span></div>
+              </div>
+            </div>
+
+            <div class="cp-block locked">
+              <div class="cp-header"><span class="cpn">2</span><span class="cpt">Dispatcher worker</span><span class="cpm">0/3</span></div>
+              <div class="cp-tasks">
+                <div class="ti locked"><span class="box"></span><span class="tl">@Scheduled component · lock-and-claim</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">Batch by tenant + handoff to port</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">OutboxDispatcherProperties</span></div>
+              </div>
+            </div>
+
+            <div class="cp-block locked">
+              <div class="cp-header"><span class="cpn">3</span><span class="cpt">Kafka producer wiring</span><span class="cpm">0/3</span></div>
+              <div class="cp-tasks">
+                <div class="ti locked"><span class="box"></span><span class="tl">KafkaOutboxProducerAdapter</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">Partition key = tenantId</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">Topic · entitlement.events.v1</span></div>
+              </div>
+            </div>
+
+            <div class="cp-block locked">
+              <div class="cp-header"><span class="cpn">4</span><span class="cpt">Integration tests</span><span class="cpm">0/2</span></div>
+              <div class="cp-tasks">
+                <div class="ti locked"><span class="box"></span><span class="tl">Spock + EmbeddedKafka + Testcontainers</span></div>
+                <div class="ti locked"><span class="box"></span><span class="tl">Cover 3 scenarios + outage retry</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rail-sec">
+            <div class="rail-h">Telemetry</div>
+            <div style="display:grid;grid-template-columns:90px 1fr;font-size:11.5px;gap:4px 10px">
+              <span style="color:var(--muted)">Phase</span><span style="color:var(--text)">1 of 7</span>
+              <span style="color:var(--muted)">Checkpoint</span><span style="color:var(--text)">0 of 4</span>
+              <span style="color:var(--muted)">Elapsed</span><span class="mono" style="color:var(--text)">13m 28s</span>
+              <span style="color:var(--muted)">ETA · merge</span><span class="mono" style="color:var(--text)">+3h 24m</span>
+              <span style="color:var(--muted)">Cost</span><span class="mono" style="color:var(--text)">$0.84 / ~$5.20</span>
+              <span style="color:var(--muted)">Tokens</span><span class="mono" style="color:var(--text)">143,250</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     ARTIFACTS PLACEMENT — 3 OPTIONS
+     ════════════════════════════════════════════════════════════════════ -->
+<section class="panel" data-panel="art">
+  <div class="intro">
+    <div>
+      <div class="intro-tag">Artifacts placement · 3 options</div>
+      <h2>Where to surface spec, plan, and other run-generated files.</h2>
+      <p>The artifacts (.feature spec, plan.md, possibly analysis reports later) need to stay reachable for the full life of the run — during the gate, during autonomous execution, and after the PR is merged. Below are three placements that keep them one click away from the active-run screen, ranked roughly from "most discoverable" to "most ambient". My recommendation is bolded in option α.</p>
+    </div>
+    <div class="scen-meta">
+      <div>
+        <div class="meta-h">What counts as an artifact</div>
+        <div class="meta-item">BDD spec file <span class="mono" style="color:#b8b9be">outbox-dispatcher.feature</span></div>
+        <div class="meta-item">Execution plan <span class="mono" style="color:#b8b9be">plan.md</span></div>
+        <div class="meta-item">Jira story link (created by jira-agent)</div>
+        <div class="meta-item">Later: review notes, ADO PR link, commit SHA</div>
+      </div>
+      <div>
+        <div class="meta-h">Requirements</div>
+        <div class="meta-item">Reachable during the gate AND after it</div>
+        <div class="meta-item">Glanceable count + last-updated</div>
+        <div class="meta-item">Click → side panel (don't navigate away)</div>
+        <div class="meta-item">Doesn't compete with the decision queue</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="opts-wrap">
+
+    <!-- ─── Option α — top-bar pill (RECOMMENDED) ─── -->
+    <div class="opt-row">
+      <div class="opt-desc">
+        <div class="opt-tag">Option α · recommended</div>
+        <h3>Topbar pill with dropdown</h3>
+        <p>A persistent <code class="mono" style="color:#b8b9be">Artifacts · n</code> pill on the right side of the topbar, beside the run-control cluster. Opens an inline dropdown listing each artifact with a label, who produced it, and a quick metric. Click an item → opens in a side drawer; doesn't navigate away from the active run.</p>
+        <div class="pro">Anchored — present in every state of the run</div>
+        <div class="pro">Counts (3) read as a glanceable status</div>
+        <div class="pro">Topbar already houses run-level metadata, fits the model</div>
+        <div class="con">Dropdown design needs to scale to 6+ artifacts post-merge</div>
+      </div>
+      <div class="mini-frame mini-α" style="height:280px">
+        <div class="mtb">
+          <span class="crm">meas.cloud.datahandler / runs / <span class="nm">MEAS-7140</span></span>
+          <div style="flex:1"></div>
+          <!-- highlighted artifacts pill -->
+          <div class="art-pill open" style="position:relative;box-shadow:0 0 0 3px color-mix(in oklab,var(--violet) 35%,transparent);border-color:var(--violet);color:var(--text)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            Artifacts
+            <span class="ct" style="background:var(--violet);color:var(--amber-ink)">3</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            <div class="art-pop" style="display:block;right:0">
+              <div class="ah">From this run</div>
+              <div class="ali">
+                <div class="ico"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg></div>
+                <div>
+                  <div class="ali-n">outbox-dispatcher.feature</div>
+                  <div class="ali-s">BDD spec · sdd-expert</div>
+                </div>
+                <div class="meta">142 LOC</div>
+              </div>
+              <div class="ali">
+                <div class="ico"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg></div>
+                <div>
+                  <div class="ali-n">plan.md</div>
+                  <div class="ali-s">Execution plan · architect</div>
+                </div>
+                <div class="meta">11 tasks</div>
+              </div>
+              <div class="ali">
+                <div class="ico"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/><path d="M13 5v14"/></svg></div>
+                <div>
+                  <div class="ali-n">MEAS-7140</div>
+                  <div class="ali-s">Jira story · 2 ACs</div>
+                </div>
+                <div class="meta">link ↗</div>
+              </div>
+              <div style="padding:6px 8px;border-top:1px solid var(--border);margin-top:4px;font-size:10.5px;color:var(--muted);font-family:var(--font-mono);text-align:center">stays accessible after gate passes</div>
+            </div>
+          </div>
+        </div>
+        <div class="msb">
+          <div class="icb"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></div>
+          <div>
+            <div class="t">MEAS-7140 · Outbox dispatcher for entitlement events</div>
+            <div class="s">Paused at gate · phase 1 of 7</div>
+          </div>
+        </div>
+        <div class="annot">
+          The pill sits in the topbar action cluster, beside the run-controls. Always present, count badge updates as more artifacts appear (e.g. ADO PR link in phase 6, commit SHA in phase 4).
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Option β — right rail section ─── -->
+    <div class="opt-row">
+      <div class="opt-desc">
+        <div class="opt-tag">Option β</div>
+        <h3>Section in the right rail</h3>
+        <p>An <code class="mono" style="color:#b8b9be">Artifacts</code> section sitting at the top of the right rail, above <b>Implementation tasks</b>. Files render as a compact list. Stays visible whenever the rail is open — no click needed to discover them.</p>
+        <div class="pro">Zero clicks to see what exists</div>
+        <div class="pro">Lives next to tasks they relate to (spec → tasks)</div>
+        <div class="con">Eats rail real estate that tasks need post-approval</div>
+        <div class="con">Rail can be collapsed/hidden on smaller widths</div>
+      </div>
+      <div class="mini-frame mini-β">
+        <div class="mleft">
+          <div class="lab"><b style="color:var(--text)">Main area</b> — pipeline, decision queue and activity log render here as in the main view.</div>
+          <div style="height:36px;background:var(--surface);border:1px solid var(--border);border-radius:6px;opacity:.6"></div>
+          <div style="height:80px;background:var(--surface);border:1px solid var(--border-hi);border-radius:6px;border-color:var(--amber);opacity:.7"></div>
+          <div style="height:36px;background:var(--surface-2);border-radius:6px;opacity:.5"></div>
+        </div>
+        <div class="mrail">
+          <div class="rh hi">Artifacts <span style="margin-left:auto;color:var(--muted);font-weight:normal">3</span></div>
+          <div class="art-card">
+            <div class="ali"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span>outbox-dispatcher.feature</span></div>
+            <div class="ali"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span>plan.md</span></div>
+            <div class="ali"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/><path d="M13 5v14"/></svg><span>MEAS-7140</span></div>
+          </div>
+          <div class="rh" style="margin-top:14px">Implementation tasks</div>
+          <div class="placeholder" style="height:48px"></div>
+          <div class="placeholder" style="height:36px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Option γ — inline strip ─── -->
+    <div class="opt-row">
+      <div class="opt-desc">
+        <div class="opt-tag">Option γ</div>
+        <h3>Inline strip between pipeline and decision</h3>
+        <p>A horizontal band of artifact chips immediately below the pipeline ribbon, visually owned by the violet "artifacts" accent. Reads as "here's what the agents produced so far". Always full-width.</p>
+        <div class="pro">Highest visibility — impossible to miss</div>
+        <div class="pro">Lives near the pipeline that produced them, contextually coherent</div>
+        <div class="con">Adds a band of height to the body, pushes log down</div>
+        <div class="con">Can get long once 6+ artifacts exist (needs horizontal scroll or "+n more")</div>
+      </div>
+      <div class="mini-frame mini-γ">
+        <div class="mtb">
+          <span>meas.cloud.datahandler / runs / <span class="mono" style="color:var(--text)">MEAS-7140</span></span>
+        </div>
+        <div class="mrib">
+          <div class="pl"></div>
+        </div>
+        <div class="mast">
+          <span class="ah">Artifacts</span>
+          <span class="ach"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>outbox-dispatcher.feature</span>
+          <span class="ach"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>plan.md</span>
+          <span class="ach"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/><path d="M13 5v14"/></svg>MEAS-7140</span>
+        </div>
+        <div class="mbottom">
+          Decision queue and activity log continue below, with all the same content as the main view.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      const id = t.dataset.tab;
+      document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
+      document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.dataset.panel === id));
+      window.scrollTo({top: 0, behavior: 'instant'});
+    });
+  });
+
+  // artifacts pill toggles
+  document.querySelectorAll('.art-pill').forEach(p => {
+    p.addEventListener('click', (e) => {
+      // ignore clicks inside the popover
+      if (e.target.closest('.art-pop')) return;
+      p.classList.toggle('open');
+    });
+  });
+  // click outside to close
+  document.addEventListener('click', (e) => {
+    document.querySelectorAll('.art-pill.open').forEach(p => {
+      if (!p.contains(e.target)) p.classList.remove('open');
+    });
+  });
+</script>
+
+</body>
+</html>

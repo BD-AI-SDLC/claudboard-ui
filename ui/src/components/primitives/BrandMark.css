@@ -1,0 +1,6 @@
+.brand-mark { display: inline-grid; place-items: center; overflow: hidden; flex-shrink: 0; background: var(--teal); }
+.brand-mark svg { display: block; width: 100%; height: 100%; }
+.brand-mark__cell { fill: var(--brand-cutout); }
+.brand-mark__cell--ghost { opacity: 0.32; }
+.brand-mark--inverted { background: var(--surface-2); }
+.brand-mark--inverted .brand-mark__cell { fill: var(--teal); }

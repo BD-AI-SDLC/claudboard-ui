@@ -1,0 +1,112 @@
+/* ============================================================
+   Bosch SDLC — design tokens
+   Ported from bosch-workflow/project/src/styles.css
+
+   Ink tokens (theme-invariant — designed for specific surface colours):
+     --ink-on-amber  dark warm text for amber chip/button backgrounds
+     --ink-on-accent white text for teal/accent button backgrounds
+     --ink-on-light  black text for bright chip surfaces
+     --scrim         modal backdrop colour (theme-aware opacity)
+   ============================================================ */
+
+:root {
+  /* dark (default) */
+  --bg:           #08090a;
+  --bg-2:         #0e0f11;
+  --surface:      #131418;
+  --surface-2:    #181a1f;
+  --surface-3:    #20232a;
+  --border:       #23252b;
+  --border-hi:    #2e3138;
+  --border-bright:#3b3f48;
+
+  --text:         #ededef;
+  --text-2:       #b8b9be;
+  --muted:        #797b83;
+  --dim:          #4d4f57;
+
+  /* accents — same chroma family */
+  --teal:         oklch(78% 0.13 195);   /* live / AI / running */
+  --teal-dim:     oklch(78% 0.13 195 / 0.18);
+  --brand-cutout: var(--bg);
+  --green:        oklch(78% 0.13 150);   /* success */
+  --green-dim:    oklch(78% 0.13 150 / 0.18);
+  --amber:        oklch(80% 0.13 78);    /* human gate / warning */
+  --amber-dim:    oklch(80% 0.13 78 / 0.18);
+  --red:          oklch(70% 0.16 25);    /* error */
+  --red-dim:      oklch(70% 0.16 25 / 0.18);
+  --violet:       oklch(72% 0.13 295);   /* prep / vertical ops */
+  --violet-dim:   oklch(72% 0.13 295 / 0.18);
+  --blue:         oklch(70% 0.14 245);   /* imported / info */
+  --blue-dim:     oklch(70% 0.14 245 / 0.18);
+
+  --radius-sm: 4px;
+  --radius:    6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+
+  /* density (set via tweaks: comfortable | compact | tight) */
+  --u:         4px;
+  --row-h:     28px;
+  --pad-x:     14px;
+  --pad-y:     10px;
+  --fs-xs:     11px;
+  --fs-sm:     12px;
+  --fs-md:     13px;
+  --fs-lg:     15px;
+  --fs-xl:     18px;
+  --fs-2xl:    24px;
+
+  --font-sans: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.35);
+  --shadow:    0 4px 14px rgba(0,0,0,0.32);
+
+  /* ink tokens — theme-invariant surface-specific colours */
+  --scrim:         rgba(0, 0, 0, 0.5);
+  --ink-on-amber:  #1a1300;
+  --ink-on-accent: #ffffff;
+  --ink-on-light:  #000000;
+}
+
+[data-theme="light"] {
+  --bg:           #fafafa;
+  --bg-2:         #f3f3f4;
+  --surface:      #ffffff;
+  --surface-2:    #f7f7f8;
+  --surface-3:    #ecedf0;
+  --border:       #e4e5e8;
+  --border-hi:    #d6d7dc;
+  --border-bright:#bcbec5;
+
+  --text:         #16171a;
+  --text-2:       #393b41;
+  --muted:        #6b6d75;
+  --dim:          #9a9ca3;
+
+  --teal:         oklch(58% 0.12 195);
+  --teal-dim:     oklch(58% 0.12 195 / 0.15);
+  --green:        oklch(56% 0.13 150);
+  --green-dim:    oklch(56% 0.13 150 / 0.15);
+  --amber:        oklch(62% 0.14 70);
+  --amber-dim:    oklch(62% 0.14 70 / 0.15);
+  --red:          oklch(55% 0.18 25);
+  --red-dim:      oklch(55% 0.18 25 / 0.15);
+  --violet:       oklch(55% 0.16 295);
+  --violet-dim:   oklch(55% 0.16 295 / 0.15);
+  --blue:         oklch(52% 0.14 245);
+  --blue-dim:     oklch(52% 0.14 245 / 0.15);
+
+  --scrim: rgba(20, 20, 22, 0.32);
+}
+
+[data-density="compact"] {
+  --u: 3px;  --row-h: 24px;  --pad-x: 10px; --pad-y: 7px;
+  --fs-sm: 11px; --fs-md: 12px; --fs-lg: 14px;
+}
+
+[data-density="tight"] {
+  --u: 2px;  --row-h: 22px;  --pad-x: 8px;  --pad-y: 5px;
+  --fs-sm: 10px; --fs-md: 11px; --fs-lg: 13px;
+}

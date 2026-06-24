@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>claudboard — logo · dark &amp; light</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --teal:oklch(78% 0.13 195);
+    --teal-ink:#001016;
+    --font-sans:'Geist',-apple-system,system-ui,sans-serif;
+    --font-mono:'Geist Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#101113;color:#ededef;font-family:var(--font-sans);
+    -webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01","ss03"}
+  .page{max-width:1200px;margin:0 auto;padding:52px 44px 80px}
+  .kick{font:700 11px var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:13px}
+  h1{font-size:32px;font-weight:600;letter-spacing:-0.022em;margin:0 0 9px}
+  .lead{font-size:14px;color:#a9aab0;line-height:1.55;max-width:620px;margin:0 0 36px}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  @media(max-width:900px){.cols{grid-template-columns:1fr}}
+
+  /* theme card */
+  .theme{border-radius:20px;padding:34px;border:1px solid;overflow:hidden}
+  .theme.dark{background:#08090a;border-color:#23252b;color:#ededef;--cut:#08090a;
+    --t2:#b8b9be;--mut:#797b83;--bd:#23252b;--bd2:#2e3138;--surf:#0e0f11;--surf2:#181a1f;--ink:#ededef}
+  .theme.light{background:#f4f4f5;border-color:#e3e4e7;color:#0c0d0f;--cut:#f4f4f5;
+    --t2:#46474d;--mut:#86888f;--bd:#e3e4e7;--bd2:#d6d7db;--surf:#ffffff;--surf2:#ededef;--ink:#0c0d0f}
+
+  .th-tag{display:flex;align-items:center;gap:9px;font:600 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:26px}
+  .th-tag .d{width:9px;height:9px;border-radius:50%}
+  .theme.dark .th-tag .d{background:#0e0f11;border:1px solid #2e3138}
+  .theme.light .th-tag .d{background:#fff;border:1px solid #d6d7db}
+
+  .blk{margin-top:30px}
+  .blk-h{font:600 10px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);
+    margin:0 0 15px;padding-bottom:9px;border-bottom:1px solid var(--bd)}
+
+  /* hero lockup */
+  .hero{display:flex;align-items:center;gap:18px;padding:10px 0 4px}
+  .pill{font:600 9px var(--font-sans);color:var(--mut);border:1px solid var(--bd2);
+    border-radius:999px;padding:2px 8px;letter-spacing:.06em;text-transform:uppercase;align-self:center}
+
+  /* ── the mark ── */
+  .mk{position:relative;overflow:hidden;display:inline-block;flex-shrink:0;background:var(--teal);
+    width:var(--m);height:var(--m);border-radius:calc(var(--m) * 0.24)}
+  .mk i{position:absolute;background:var(--cut);border-radius:calc(var(--m) * 0.085)}
+  .mk i.a{width:calc(var(--m)*0.29);height:calc(var(--m)*0.29);left:calc(var(--m)*0.2);bottom:calc(var(--m)*0.2)}
+  .mk i.b{width:calc(var(--m)*0.29);height:calc(var(--m)*0.29);right:calc(var(--m)*0.2);top:calc(var(--m)*0.2);opacity:.34}
+
+  /* ── wordmark ── */
+  .wm{display:inline-flex;align-items:baseline;font-weight:600;letter-spacing:-0.03em;line-height:1;color:var(--ink)}
+  .wm .bx{background:var(--teal);color:var(--teal-ink);border-radius:.22em;padding:.05em .26em .12em;margin-left:.05em;font-weight:600}
+  .wm2{display:inline-flex;align-items:baseline;font-weight:600;letter-spacing:-0.03em;line-height:1;color:var(--ink)}
+  .wm2 b{color:var(--teal);font-weight:600}
+
+  /* sizes */
+  .sizes{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap}
+  .szi{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .szi span{font:500 9px var(--font-mono);color:var(--mut)}
+
+  /* wordmark stack */
+  .wmrow{display:flex;flex-direction:column;gap:18px}
+  .wmrow .tagline{font:500 9px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:7px}
+
+  /* in-context */
+  .ctx{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+  .side{width:200px;background:var(--surf);border:1px solid var(--bd);border-radius:10px;padding:11px}
+  .side .r{display:flex;align-items:center;gap:9px;font-weight:600;font-size:13px;color:var(--ink);padding-bottom:10px;border-bottom:1px solid var(--bd)}
+  .side .r small{margin-left:auto;font:500 8px var(--font-sans);color:var(--mut);border:1px solid var(--bd2);border-radius:999px;padding:1px 6px;letter-spacing:.05em;text-transform:uppercase}
+  .side .stub{height:7px;border-radius:4px;background:var(--surf2);margin-top:10px}
+  .tab{display:inline-flex;align-items:center;gap:8px;background:var(--surf);border:1px solid var(--bd);
+    border-bottom:0;border-radius:9px 9px 0 0;padding:8px 13px;font-size:11px;color:var(--t2);height:fit-content}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="kick">claudboard · identity</div>
+  <h1>Dark &amp; light</h1>
+  <p class="lead">The 08 knockout mark and the boxed turquoise wordmark, set for both surfaces. The mark stays turquoise on both — only the punched-out cells change to match the surface beneath, so the holes read as true negative space in either theme.</p>
+
+  <div class="cols">
+
+    <!-- ════ DARK ════ -->
+    <div class="theme dark">
+      <div class="th-tag"><span class="d"></span>Dark theme · on #08090A</div>
+
+      <div class="hero">
+        <span class="mk" style="--m:60px"><i class="b"></i><i class="a"></i></span>
+        <span class="wm" style="font-size:34px">claud<span class="bx">board</span></span>
+        <span class="pill">v1.4</span>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h">Mark</div>
+        <div class="sizes">
+          <div class="szi"><span class="mk" style="--m:16px"><i class="b"></i><i class="a"></i></span><span>16</span></div>
+          <div class="szi"><span class="mk" style="--m:24px"><i class="b"></i><i class="a"></i></span><span>24</span></div>
+          <div class="szi"><span class="mk" style="--m:32px"><i class="b"></i><i class="a"></i></span><span>32</span></div>
+          <div class="szi"><span class="mk" style="--m:48px"><i class="b"></i><i class="a"></i></span><span>48</span></div>
+          <div class="szi"><span class="mk" style="--m:72px"><i class="b"></i><i class="a"></i></span><span>72</span></div>
+        </div>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h">Wordmark</div>
+        <div class="wmrow">
+          <div><div class="tagline">boxed</div><span class="wm" style="font-size:28px">claud<span class="bx">board</span></span></div>
+          <div><div class="tagline">two-tone</div><span class="wm2" style="font-size:28px">claud<b>board</b></span></div>
+        </div>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h">In context</div>
+        <div class="ctx">
+          <div class="side">
+            <div class="r"><span class="mk" style="--m:20px"><i class="b"></i><i class="a"></i></span>claudboard<small>v1.4</small></div>
+            <div class="stub" style="width:84%"></div><div class="stub" style="width:62%"></div><div class="stub" style="width:72%"></div>
+          </div>
+          <div class="tab"><span class="mk" style="--m:15px"><i class="b"></i><i class="a"></i></span>claudboard — active run</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ LIGHT ════ -->
+    <div class="theme light">
+      <div class="th-tag"><span class="d"></span>Light theme · on #F4F4F5</div>
+
+      <div class="hero">
+        <span class="mk" style="--m:60px"><i class="b"></i><i class="a"></i></span>
+        <span class="wm" style="font-size:34px">claud<span class="bx">board</span></span>
+        <span class="pill">v1.4</span>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h">Mark</div>
+        <div class="sizes">
+          <div class="szi"><span class="mk" style="--m:16px"><i class="b"></i><i class="a"></i></span><span>16</span></div>
+          <div class="szi"><span class="mk" style="--m:24px"><i class="b"></i><i class="a"></i></span><span>24</span></div>
+          <div class="szi"><span class="mk" style="--m:32px"><i class="b"></i><i class="a"></i></span><span>32</span></div>
+          <div class="szi"><span class="mk" style="--m:48px"><i class="b"></i><i class="a"></i></span><span>48</span></div>
+          <div class="szi"><span class="mk" style="--m:72px"><i class="b"></i><i class="a"></i></span><span>72</span></div>
+        </div>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h">Wordmark</div>
+        <div class="wmrow">
+          <div><div class="tagline">boxed</div><span class="wm" style="font-size:28px">claud<span class="bx">board</span></span></div>
+          <div><div class="tagline">two-tone</div><span class="wm2" style="font-size:28px">claud<b>board</b></span></div>
+        </div>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h">In context</div>
+        <div class="ctx">
+          <div class="side">
+            <div class="r"><span class="mk" style="--m:20px"><i class="b"></i><i class="a"></i></span>claudboard<small>v1.4</small></div>
+            <div class="stub" style="width:84%"></div><div class="stub" style="width:62%"></div><div class="stub" style="width:72%"></div>
+          </div>
+          <div class="tab"><span class="mk" style="--m:15px"><i class="b"></i><i class="a"></i></span>claudboard — active run</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

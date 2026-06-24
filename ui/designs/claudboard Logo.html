@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>claudboard — logo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#08090a; --bg-2:#0e0f11; --surface:#131418; --surface-2:#181a1f; --surface-3:#20232a;
+    --border:#23252b; --border-hi:#2e3138; --border-bright:#3b3f48;
+    --text:#ededef; --text-2:#b8b9be; --muted:#797b83; --dim:#4d4f57;
+    --teal:oklch(78% 0.13 195); --teal-dim:oklch(78% 0.13 195 / 0.18);
+    --font-sans:'Geist',-apple-system,system-ui,sans-serif;
+    --font-mono:'Geist Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-sans);
+    -webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01","ss03"}
+  .wrap{max-width:1080px;margin:0 auto;padding:56px 48px 80px}
+
+  /* header */
+  .kick{font:700 11px var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+  h1{font-size:34px;font-weight:600;letter-spacing:-0.022em;margin:0 0 10px}
+  .sub{font-size:15px;color:var(--text-2);line-height:1.55;max-width:640px;margin:0}
+
+  /* section scaffolding */
+  .sec{margin-top:48px}
+  .sec-h{font:700 10px var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .grid{display:grid;gap:18px}
+
+  .card{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:26px}
+  .card .lab{font:600 10px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+  .card .cap{font-size:12px;color:var(--text-2);line-height:1.5}
+
+  /* ── the mark ── */
+  .mark{display:inline-grid;place-items:center;overflow:hidden;flex-shrink:0;
+    background:var(--teal);border:1px solid var(--teal);
+    width:var(--m);height:var(--m);border-radius:calc(var(--m) * 0.24)}
+  .mark svg{display:block;width:100%;height:100%}
+  .mark.lg{box-shadow:0 16px 50px rgba(0,0,0,.5)}
+  /* mono / knockout variants recolor via currentColor swap */
+  .mark.mono{background:var(--surface-2)}
+  .mark.solid{background:var(--surface-2);border-color:var(--border-hi)}
+
+  /* hero */
+  .hero{display:flex;align-items:center;gap:40px;background:
+    radial-gradient(420px 200px at 18% 50%, rgba(30,209,209,0.06), transparent 70%),var(--bg-2);
+    border:1px solid var(--border);border-radius:18px;padding:44px}
+  .hero .lock{display:flex;align-items:center;gap:18px}
+  .hero .wm{font-size:40px;font-weight:600;letter-spacing:-0.026em}
+  .hero .wm b{color:var(--teal);font-weight:600}
+  .hero .pill{font:600 10px var(--font-sans);color:var(--muted);border:1px solid var(--border-hi);
+    border-radius:999px;padding:3px 9px;letter-spacing:.06em;text-transform:uppercase;align-self:center}
+
+  /* sizes strip */
+  .sizes{display:flex;align-items:flex-end;gap:34px;flex-wrap:wrap}
+  .szi{display:flex;flex-direction:column;align-items:center;gap:12px}
+  .szi span{font:500 10px var(--font-mono);color:var(--muted)}
+
+  /* on-surfaces */
+  .surf-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+  .surf{border-radius:12px;display:grid;place-items:center;padding:34px 0;position:relative}
+  .surf .tag{position:absolute;left:12px;top:10px;font:600 9px var(--font-mono);letter-spacing:.06em;text-transform:uppercase}
+  .surf.dark{background:var(--bg);border:1px solid var(--border)}
+  .surf.dark .tag{color:var(--dim)}
+  .surf.light{background:#ededef}
+  .surf.light .tag{color:#8a8c92}
+  .surf.teal{background:var(--teal)}
+  .surf.teal .tag{color:rgba(0,20,22,.55)}
+
+  /* favicon / tab */
+  .tabs{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+  .btab{display:inline-flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border-hi);
+    border-bottom:0;border-radius:9px 9px 0 0;padding:9px 14px;font-size:12px;color:var(--text-2)}
+  .dockicon{background:var(--teal);border:1px solid var(--teal)}
+
+  /* sidebar context */
+  .ctx-side{width:230px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;padding:13px}
+  .ctx-side .row{display:flex;align-items:center;gap:9px;font-weight:600;font-size:14px;padding-bottom:11px;border-bottom:1px solid var(--border)}
+  .ctx-side .row small{margin-left:auto;font:500 8px var(--font-sans);color:var(--muted);border:1px solid var(--border-hi);border-radius:999px;padding:2px 7px;letter-spacing:.05em;text-transform:uppercase}
+  .ctx-side .stub{height:8px;border-radius:4px;background:var(--surface-2);margin-top:11px}
+
+  /* construction */
+  .build{display:flex;gap:32px;align-items:center;flex-wrap:wrap}
+  .gridmark{position:relative;width:168px;height:168px;border-radius:24px;background:var(--teal);border:1px solid var(--teal);overflow:hidden}
+  .gridmark svg{display:block;width:100%;height:100%}
+  .build ul{margin:0;padding-left:18px;color:var(--text-2);font-size:13px;line-height:1.85}
+  .build ul b{color:var(--text);font-weight:600}
+  .build code{font-family:var(--font-mono);font-size:12px;color:var(--teal);background:var(--teal-dim);padding:1px 6px;border-radius:4px}
+
+  /* code */
+  pre{margin:0;background:#0b0c0e;border:1px solid var(--border);border-radius:12px;padding:20px 22px;overflow:auto}
+  code.block{font-family:var(--font-mono);font-size:12px;line-height:1.7;color:var(--text-2);white-space:pre}
+  code.block .t{color:var(--teal)}
+  code.block .m{color:var(--muted)}
+
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .do .lab{color:oklch(78% 0.13 150)}
+  .dont .lab{color:oklch(70% 0.16 25)}
+  @media(max-width:760px){.surf-row,.twocol{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="kick">claudboard · brand mark</div>
+  <h1>The knockout</h1>
+  <p class="sub">A solid tile with one cell punched out to the surface beneath — figure and ground swap, so the accent reads as negative space. The quietest, most premium take on the board, and unmistakable at a glance.</p>
+
+  <!-- HERO -->
+  <div class="hero" style="margin-top:34px">
+    <span class="mark lg" style="--m:104px"></span>
+    <div class="lock">
+      <div class="wm">claud<b>board</b></div>
+      <span class="pill">v1.4</span>
+    </div>
+  </div>
+
+  <!-- SIZES -->
+  <div class="sec">
+    <div class="sec-h">Size set · holds from favicon to app icon</div>
+    <div class="card">
+      <div class="sizes">
+        <div class="szi"><span class="mark" style="--m:16px"></span><span>16</span></div>
+        <div class="szi"><span class="mark" style="--m:20px"></span><span>20</span></div>
+        <div class="szi"><span class="mark" style="--m:24px"></span><span>24</span></div>
+        <div class="szi"><span class="mark" style="--m:32px"></span><span>32</span></div>
+        <div class="szi"><span class="mark" style="--m:48px"></span><span>48</span></div>
+        <div class="szi"><span class="mark" style="--m:64px"></span><span>64</span></div>
+        <div class="szi"><span class="mark" style="--m:96px"></span><span>96</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SURFACES -->
+  <div class="sec">
+    <div class="sec-h">On surfaces · the tile carries its own contrast</div>
+    <div class="surf-row">
+      <div class="surf dark"><span class="tag">on bg</span><span class="mark" style="--m:64px"></span></div>
+      <div class="surf light"><span class="tag">on light</span><span class="mark" style="--m:64px"></span></div>
+      <div class="surf teal"><span class="tag">on accent</span><span class="mark solid" style="--m:64px"></span></div>
+    </div>
+  </div>
+
+  <!-- IN CONTEXT -->
+  <div class="sec">
+    <div class="sec-h">In context</div>
+    <div class="grid" style="grid-template-columns:auto 1fr;align-items:center;gap:28px">
+      <div class="ctx-side">
+        <div class="row"><span class="mark" style="--m:20px"></span>claudboard<small>v1.4</small></div>
+        <div class="stub" style="width:86%"></div>
+        <div class="stub" style="width:64%"></div>
+        <div class="stub" style="width:74%"></div>
+      </div>
+      <div class="tabs">
+        <div class="btab"><span class="mark" style="--m:15px"></span>claudboard — active run</div>
+        <div class="szi"><span class="mark dockicon" style="--m:44px"></span><span style="font:500 10px var(--font-mono);color:var(--muted)">favicon / dock</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSTRUCTION -->
+  <div class="sec">
+    <div class="sec-h">Construction</div>
+    <div class="card build">
+      <div class="gridmark" id="bigmark"></div>
+      <ul>
+        <li><b>24×24 grid</b>, cells punched at <code>7×7</code> with <code>rx 2</code></li>
+        <li>Tile radius scales at <code>24%</code> of the mark — soft, not pill</li>
+        <li><b>One cell knocked out</b> bottom-left to the surface below; a faint second sits top-right at <code>32%</code></li>
+        <li>Tile is a single solid <code>--teal</code> — the cutouts carry the contrast, no extra fill</li>
+        <li>On an accent surface, flip it: a <code>--surface-2</code> tile with <code>--teal</code> cells</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CODE -->
+  <div class="sec">
+    <div class="sec-h">Drop-in markup</div>
+    <pre><code class="block"><span class="m">&lt;!-- sidebar / header brand mark · solid --teal tile --&gt;</span>
+&lt;span class="brand-mark"&gt;
+  &lt;svg viewBox="0 0 24 24" width="100%" height="100%"&gt;
+    &lt;rect x="12" y="5"  width="7" height="7" rx="2" fill="<span class="m">#08090a</span>" opacity=".32"/&gt;
+    &lt;rect x="5"  y="12" width="7" height="7" rx="2" fill="<span class="m">#08090a</span>"/&gt;
+  &lt;/svg&gt;
+&lt;/span&gt;</code></pre>
+  </div>
+
+  <!-- DO / DONT -->
+  <div class="sec">
+    <div class="sec-h">Guidance</div>
+    <div class="twocol">
+      <div class="card do">
+        <div class="lab">Do</div>
+        <div class="cap">Keep one strong cutout plus a faint second. Let the tile stay a single solid colour. On accent surfaces, invert to a surface tile with teal cells.</div>
+      </div>
+      <div class="card dont">
+        <div class="lab">Don't</div>
+        <div class="cap">Don't punch more than two cutouts, gradient-fill the tile, outline the cells, or drop the teal tile onto a busy or photographic background.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // single source of truth for the mark svg, injected everywhere
+  function markSVG({solid=false} = {}){
+    // solid = sits on an accent/teal surface → cells become positive teal on a surface tile
+    const cut   = solid ? 'var(--teal)' : '#08090a';
+    const faint = solid ? 'var(--teal)' : '#08090a';
+    const fo    = solid ? '0.4' : '0.32';
+    return `<svg viewBox="0 0 24 24" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">`+
+      `<rect x="12" y="5" width="7" height="7" rx="2" fill="${faint}" opacity="${fo}"/>`+
+      `<rect x="5" y="12" width="7" height="7" rx="2" fill="${cut}"/>`+
+      `</svg>`;
+  }
+  document.querySelectorAll('.mark').forEach(el=>{
+    el.innerHTML = markSVG({mono:el.classList.contains('mono'), solid:el.classList.contains('solid')});
+  });
+  document.getElementById('bigmark').innerHTML = markSVG();
+</script>
+</body>
+</html>
