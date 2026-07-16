@@ -17,7 +17,7 @@ jest.unstable_mockModule('@anthropic-ai/claude-agent-sdk', () => ({
   tool: (name: string, _d: unknown, _s: unknown, handler: unknown) => ({ name, handler }),
 }))
 
-jest.unstable_mockModule('../../ws-server.js', () => ({ broadcast: jest.fn() }))
+jest.unstable_mockModule('../../ws-server.js', () => ({ broadcast: jest.fn(), subscribe: jest.fn(() => () => {}) }))
 jest.unstable_mockModule('../../db.js', () => ({ getDb: () => testDb }))
 jest.unstable_mockModule('../../run/event-log.js', () => ({
   appendEvent: jest.fn(),

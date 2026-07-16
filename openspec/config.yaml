@@ -1,20 +1,43 @@
-schema: spec-driven
+schema: ai-factory
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  Tech stack: TBD — not yet chosen. Finalize once the application stack is
+  decided (language, framework, datastore, test framework); the pattern seed and
+  some compatibility surfaces depend on it.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+  Design patterns: catalogued in openspec/specs/architecture-patterns/spec.md.
+  Reference existing patterns before inventing new ones; introducing a new
+  pattern is an explicit ADDED requirement in that catalog.
+
+  Backward compatibility: public surfaces under compatibility guarantees are
+  declared in openspec/specs/compatibility-contract/spec.md (for example REST
+  endpoints, database schema, CLI flags, configuration keys, emitted events).
+
+  Versioning: semver. The compatibility class is derived from the delta headers —
+  ADDED maps to minor; safe MODIFIED maps to minor/patch; REMOVED, RENAMED, or
+  breaking MODIFIED maps to major. Major changes are fail-closed until an
+  adequate migration plan exists; declaring explicit MAJOR intent legitimizes a
+  break but never waives the migration requirement.
+
+  Process: contribution flows through two pull requests — PR #1 is the OpenSpec
+  change (team change review); PR #2 is the implementation (code review, defined
+  separately). Approval of PR #1 hands off to the factory. Contributors author
+  changes through an AI agent (their interface to OpenSpec); they are not required
+  to invoke OpenSpec commands directly.
+
+rules:
+  proposal:
+    - State the compatibility class and the resulting semver bump, derived from the delta headers.
+    - Reference existing design patterns; explicitly flag any new pattern the change introduces.
+  specs:
+    - Use Given/When/Then (WHEN/THEN) scenario format.
+    - Reference existing patterns before inventing new ones.
+    - For each requirement, state how it will be verified when implementation completes.
+  design:
+    - Show conformance to existing architecture patterns; justify every deviation.
+  tasks:
+    - Include one explicit verification task per declared constraint (compatibility check, pattern conformance, migration dry-run).
+  migration:
+    - Steps must be AI-executable and idempotent.
+    - Breaking changes require forward steps, a dry-run/validation step, rollback steps, and a deprecation window.
+    - Non-breaking, additive changes may state "N/A — additive only".
