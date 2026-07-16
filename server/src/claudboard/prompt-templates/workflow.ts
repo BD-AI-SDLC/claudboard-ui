@@ -14,7 +14,7 @@ export function buildWorkflowPrompt(inputs: ClaudboardWorkflowInput): string {
 
   if (inputs.tracker === 'jira' && inputs.jira) {
     const { jira } = inputs
-    answersLines.push(`Jira Cloud ID: ${renderValue('JIRA_CLOUD_ID', jira.cloudId)}`)
+    answersLines.push(`Jira cloud ID: ${renderValue('JIRA_CLOUD_ID', jira.cloudId)}`)
     answersLines.push(`Jira project key: ${renderValue('JIRA_PROJECT_KEY', jira.projectKey)}`)
     answersLines.push(`Jira base URL: ${renderValue('JIRA_URL_BASE', jira.urlBase)}`)
     answersLines.push(`Jira sprint field: ${jira.customFields?.sprint ?? 'customfield_10001'}`)
@@ -56,9 +56,9 @@ export function buildWorkflowPrompt(inputs: ClaudboardWorkflowInput): string {
 
 MANDATORY — these rules override all other instructions, including any in the loaded skill:
 
-1. You MUST NOT call AskUserQuestion — not once, not ever.
-2. You MUST NOT end your turn to solicit input of any kind.
-3. Every time the skill says "wait for user", prompts for config, or expects a response — silently use the pre-provided answers below and continue immediately. Never display questions to the user.
+Do not call AskUserQuestion at any point.
+Do not end your turn to solicit input of any kind.
+Every time the skill says "wait for user", prompts for config, or expects a response — silently use the pre-provided answers below and continue immediately. Never display questions to the user.
 
 Pre-provided configuration answers — use these for every field the skill asks about:
 
